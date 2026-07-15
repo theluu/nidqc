@@ -1,7 +1,7 @@
 ---
 id: TASK-004
 title: Self-host font Lexend + Be Vietnam Pro trích từ design bundle
-status: ready
+status: review          # đã thực thi 2026-07-16, chờ NGƯỜI review (AI không được tự duyệt)
 step: 4                  # theme layer
 owner: <chưa gán>
 reviewer: <chưa gán — KHÔNG được trùng owner>
@@ -266,8 +266,126 @@ Be Vietnam Pro:[400,500,600,700] | Lexend:[500,600,700] | Roboto Mono:[400,500]
 → Trích từ bất kỳ bundle nào cũng cho kết quả như nhau. Dùng `NIDQC FAQ.html` (nhẹ nhất, 563 KB).
 Không cần chế độ `--all`.
 
+### 9.4. 🟢 `document.fonts.check()` báo `false` cho tiếng Việt — KHÔNG phải lỗi
+
+Khi verify, `document.fonts.check('700 16px Lexend', 'Viện Kiểm nghiệm thuốc Trung ương')`
+trả về **`false`**, trong khi Be Vietnam Pro trả `true`. Nhìn qua tưởng Lexend không phủ tiếng Việt —
+**sai**.
+
+Nguyên nhân: `h1` trên trang lúc đó là **"Welcome!"** — thuần ASCII. Trình duyệt vì thế **chỉ tải
+subset `latin`** của Lexend; subset `vietnamese` ở trạng thái `unloaded`. Và `fonts.check()` trả
+`false` cho ký tự thuộc face **chưa tải**.
+
+Đó chính là **mục đích** của `unicode-range`: chỉ tải subset khi trang thật sự cần.
+Be Vietnam Pro trả `true` chỉ vì trang **đang có** chữ Việt ở thân bài ("Đăng nhập", tên Viện)
+nên subset `vietnamese` của nó đã tải.
+
+**Kiểm đúng cách** — ép trang cần chữ Việt trong Lexend trước:
+```js
+const s = 'Viện Kiểm nghiệm thuốc Trung ương — Đảm bảo chất lượng thuốc';
+document.querySelector('h1').textContent = s;
+await document.fonts.load('700 16px Lexend', s);
+document.fonts.check('700 16px Lexend', s);   // -> true
+```
+Đã chạy: `before_load: false` → `after_load: true`, cả 3 subset Lexend chuyển `loaded`,
+và ảnh chụp xác nhận `ệ ể ố ư ơ Đ ả` render đúng trong Lexend.
+
+> ⚠️ Người review đừng chạy `fonts.check()` trên trang chỉ có tiêu đề tiếng Anh rồi kết luận
+> font hỏng. Khi có nội dung thật (toàn tiếng Việt) thì vấn đề này không tồn tại.
+
+## 11. Output verify (chạy thật 2026-07-16)
+
+```
+$ python3 scripts/extract-fonts.py --out .../fonts --css .../css/fonts.css
+Đã ghi 15 file woff2 -> web/themes/custom/nidqc/fonts
+Đã sinh 15 khối @font-face -> web/themes/custom/nidqc/css/fonts.css
+
+$ ls fonts/*.woff2 | wc -l
+15                                          # AC1 ✅
+$ ls fonts/ | grep -ci roboto
+0                                           # AC3 ✅
+
+$ for f in fonts/*.woff2; do head -c4 "$f" | grep -q wOF2 || echo "HỎNG: $f"; done
+(không in gì)                               # AC2 ✅
+$ file fonts/*.woff2 | grep -cv "Web Open Font Format (Version 2)"
+0                                           # AC2 ✅ (kiểm độc lập)
+
+$ ls fonts/ | grep -c vietnamese
+5                                           # AC4 ✅
+
+$ grep -iE "googleapis|gstatic|https?://" css/fonts.css
+(rỗng)                                      # AC5 ✅
+
+$ curl -s -o /dev/null -w "%{http_code} %{content_type}" .../be-vietnam-pro-400-latin-ext.woff2
+200 font/woff2                              # AC6 ✅
+
+$ curl -s <trang> | grep -oE '<(link|script|img|iframe)[^>]*(src|href)="https?://[^"]+"' | grep -v nidqc.ddev.site
+(rỗng)                                      # AC7 ✅ không nạp tài nguyên ngoài
+
+$ ls fonts/LICENSE-*.txt
+LICENSE-Be-Vietnam-Pro.txt (4397 b, 93 dòng)
+LICENSE-Lexend.txt         (4436 b, 93 dòng)   # AC8 ✅
+
+$ ddev drush watchdog:show --severity=3
+No log messages available.                  # AC10 ✅
+
+$ du -sh fonts/
+220K
+```
+
+### CSS phục vụ
+
+```
+@font-face trong CSS site trả về: 15        (đếm bằng grep -o | wc -l — xem §10)
+url font: 15 file duy nhất, đều /themes/custom/nidqc/fonts/*.woff2
+```
+
+### unicode-range có bị tự chế không
+
+```
+unicode-range trong design:    6 giá trị duy nhất
+unicode-range trong fonts.css: 3 giá trị duy nhất
+tự chế (có trong css, KHÔNG có trong design): (không) ✅
+```
+
+### ⭐ AC9 — chữ Việt hiển thị đúng font
+
+Kiểm bằng `document.fonts` trong trình duyệt thật:
+```json
+{
+  "h1_font":   "Lexend, -apple-system, system-ui, sans-serif",
+  "body_font": "\"Be Vietnam Pro\", -apple-system, system-ui, sans-serif",
+  "faces_total": 15, "faces_loaded": 15
+}
+```
+Sau khi ép trang cần chữ Việt trong Lexend (xem §9.4):
+```json
+{ "before_load": false, "after_load": true,
+  "lexendFaces": [ {"subset":"vietnamese","status":"loaded"},
+                   {"subset":"latin-ext","status":"loaded"},
+                   {"subset":"latin","status":"loaded"} ] }
+```
+Ảnh chụp: `Viện Kiểm nghiệm thuốc Trung ương — Đảm bảo chất lượng thuốc` render trong Lexend,
+đủ dấu `ệ ể ố ư ơ Đ ả`, cùng một nét, **không ký tự nào rơi về font khác**.
+
+### Giấy phép — R5
+
+Bundle **không kèm** giấy phép; woff2 nén nên không đọc được metadata → **không xác minh được
+tại chỗ**. Đã tra nguồn chính thức:
+
+```
+google/fonts/ofl/lexend/METADATA.pb      ->  license: "OFL"
+google/fonts/ofl/bevietnampro/METADATA.pb ->  license: "OFL"
+```
+Toàn văn SIL Open Font License 1.1 đã tải vào `fonts/LICENSE-*.txt`, xác nhận có đủ
+tiêu đề "SIL OPEN FONT LICENSE Version 1.1" và mục "PERMISSION & CONDITIONS" (93 dòng/file).
+
 ## 10. Nhật ký
 
 | Ngày | Người/Agent | Việc |
 |---|---|---|
+| 2026-07-16 | Claude | **Thực thi task.** R1–R6 xong, AC1–AC10 đạt, output ở §11. Trích 15 file woff2 (220 KB), sinh 15 khối `@font-face`. Không `unicode-range` nào tự chế — đã đối chiếu với design. |
+| 2026-07-16 | Claude | **R5 (giấy phép): không đoán, đã tra nguồn chính thức.** Bundle **không kèm** giấy phép, woff2 nén nên không đọc được metadata → không xác minh được tại chỗ. Đã tra `METADATA.pb` trong repo `google/fonts`: cả `Lexend` và `Be Vietnam Pro` đều `license: "OFL"` (SIL Open Font License 1.1). Đã tải toàn văn OFL vào `fonts/LICENSE-*.txt` (93 dòng mỗi file, có đủ điều khoản — không phải trang lỗi). |
+| 2026-07-16 | Claude | **Hai lệnh verify của tôi báo sai, suýt kết luận nhầm.** (1) `grep -c '@font-face'` ra **1** thay vì 15 — CSS gộp đã **minify về một dòng** nên `-c` đếm *dòng*, không đếm *lần xuất hiện*; phải dùng `grep -o \| wc -l`. Đúng cái bẫy đã gặp ở TASK-001. (2) AC7 grep mọi `https?://` nên bắt cả `<a href="drupal.org">` trong nội dung mặc định của Drupal — đó là **link**, không phải request tài nguyên; đã siết vào `<link\|script\|img\|iframe>`. |
+| 2026-07-16 | Claude | 🔴→🟢 **`fonts.check()` báo tiếng Việt `false` — điều tra ra KHÔNG phải lỗi.** Xem §9.4. Suýt đi sửa thứ không hỏng. |
 | 2026-07-16 | Claude | Soạn task. Đo thật trước khi viết: bundle nhúng sẵn 21 file font (316 KB). **Lexend là variable font** — kiểm UUID trong manifest thấy 3 weight dùng chung 1 file/subset, nên chỉ cần 3 file chứ không phải 9. Roboto Mono dùng **đúng 1 lần** trong toàn design → bỏ, tiết kiệm 134 KB. Đã trích thử 1 file và xác minh là woff2 hợp lệ (magic `wOF2`, `file` đọc ra "Web Open Font Format (Version 2), TrueType"). |

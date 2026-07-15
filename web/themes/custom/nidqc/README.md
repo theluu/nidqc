@@ -35,15 +35,63 @@ Nguồn tài liệu: `docs/design/DESIGN_SYSTEM.md` §7.
 
 ```
 nidqc/
-├── nidqc.info.yml         # khai báo theme + region
-├── nidqc.libraries.yml    # library `global`: tokens.css -> base.css
+├── nidqc.info.yml         # khai báo theme + 8 region
+├── nidqc.libraries.yml    # library `global`
 ├── css/
+│   ├── fonts.css          # @font-face — SINH TỰ ĐỘNG, đừng sửa tay
 │   ├── tokens.css         # ⭐ NGUỒN DUY NHẤT của màu/layout/font
-│   └── base.css           # chỉ áp token lên body, không style component
+│   ├── base.css           # chỉ áp token lên body
+│   └── layout.css         # 5 vùng dùng chung
+├── fonts/                 # 15 file woff2 + giấy phép
+├── templates/
+│   └── layout/page.html.twig
 └── README.md
 ```
 
-`tokens.css` **phải** nạp trước `base.css` — `base.css` dùng biến của nó.
+**Thứ tự nạp bắt buộc:** `fonts.css` → `tokens.css` → `base.css` → `layout.css`.
+`@font-face` phải khai báo trước khi có gì dùng tới; `base.css`/`layout.css` dùng biến của `tokens.css`.
+
+## Font
+
+**Self-host. KHÔNG gọi Google Fonts CDN** — site cơ quan nhà nước không phụ thuộc hạ tầng nước ngoài,
+và giữ được CSP chặt (`default-src 'self'`). Xem `docs/security/SECURITY_POLICY.md` §10.
+
+| Font | File | Vai trò |
+|---|---|---|
+| **Lexend** | 3 (variable, weight 500–700) | Tiêu đề `h1`–`h4` — dùng 140 lần trong design |
+| **Be Vietnam Pro** | 12 (weight 400/500/600/700) | Thân bài — mặc định của `body` |
+
+Mỗi font có 3 subset: `vietnamese`, `latin-ext`, `latin`. **Subset `vietnamese` không được thiếu** —
+thiếu là chữ có dấu vỡ hoặc rơi về font khác.
+
+`Roboto Mono` **cố ý không self-host**: dùng đúng 1 lần trong toàn design, không đáng 134 KB.
+`--nidqc-font-mono` fallback về `ui-monospace`.
+
+### Trích lại font
+
+Font lấy từ chính design bundle (`design/*.html` nhúng sẵn woff2 base64), **không tải từ CDN**:
+
+```bash
+python3 scripts/extract-fonts.py --list     # xem trước, không ghi
+python3 scripts/extract-fonts.py \
+  --out web/themes/custom/nidqc/fonts \
+  --css web/themes/custom/nidqc/css/fonts.css
+```
+
+> ⚠️ `css/fonts.css` **sinh tự động** — sửa tay sẽ bị ghi đè. Cần đổi thì sửa
+> `scripts/extract-fonts.py`. Lý do sinh bằng script: mỗi `@font-face` có một
+> `unicode-range` dài ~200 ký tự; gõ sai một ký tự là chữ Việt rơi về font khác,
+> lỗi rất khó nhìn ra.
+
+### Giấy phép
+
+Cả hai font là **SIL Open Font License 1.1**, đã xác minh từ nguồn chính thức
+(`license: "OFL"` trong `METADATA.pb` của repo `google/fonts`). Toàn văn giấy phép kèm tại:
+
+- `fonts/LICENSE-Lexend.txt`
+- `fonts/LICENSE-Be-Vietnam-Pro.txt`
+
+OFL cho phép self-host và nhúng. **Không xoá hai file này** — giữ giấy phép là điều kiện của OFL.
 
 ## Region
 

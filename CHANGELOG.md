@@ -9,6 +9,10 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 ## [Unreleased]
 
 ### Added
+- **Font đúng design, self-host** (TASK-004) — `Lexend` cho tiêu đề, `Be Vietnam Pro` cho thân bài,
+  tiếng Việt đủ dấu. 15 file woff2 (220 KB) trích thẳng từ design bundle, **không gọi Google Fonts
+  CDN** — site nhà nước không phụ thuộc hạ tầng nước ngoài và giữ được CSP chặt. Kèm giấy phép
+  SIL OFL 1.1 đã xác minh từ repo `google/fonts`.
 - **Khung trang theo design** (TASK-003) — `page.html.twig` dựng 5 vùng dùng chung đúng thứ tự:
   top bar → banner → nav (sticky) → breadcrumb → nội dung → footer. Thêm region `breadcrumb`
   còn thiếu, và dọn 10 block bị Drupal dồn nhầm vào `header_top` (giờ chỉ còn `account_menu`).
@@ -26,6 +30,9 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 - `tasks/TASK-002.md` — sửa `config_sync_directory`, đưa `settings.php` vào git (chặn TASK-001)
 - `tasks/TASK-003.md` — dựng `page.html.twig` (5 vùng dùng chung) + sửa 2 lỗi tài liệu design
 - `tasks/TASK-004.md` — self-host font Lexend + Be Vietnam Pro trích từ design bundle
+- `tasks/TASK-005.md` — dựng `frontend/` (Vite + bootstrap island)
+- `docs/ROADMAP.md` — lộ trình, đường găng và blocker
+- `scripts/extract-fonts.py` — trích woff2 + sinh `@font-face` từ design bundle
 
 ### Fixed
 - **Tài liệu design sai về font** (TASK-003) — `DESIGN_SYSTEM` §2 khẳng định "Font duy nhất:

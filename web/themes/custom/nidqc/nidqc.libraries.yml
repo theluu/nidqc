@@ -7,6 +7,9 @@ global:
   version: 1.x
   css:
     base:
+      # fonts.css TRƯỚC tokens.css: @font-face phải được khai báo trước khi có gì
+      # dùng tới. Drupal giữ nguyên thứ tự khai báo trong cùng nhóm.
+      css/fonts.css: {}
       css/tokens.css: {}
     theme:
       css/base.css: {}
