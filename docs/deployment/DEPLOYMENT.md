@@ -100,7 +100,7 @@ drush state:set system.maintenance_mode 0
 - [ ] `curl -s https://nidqc.gov.vn/tin-tuc | grep "<tiêu đề>"` → **nội dung có trong HTML thô**
 - [ ] `/sitemap.xml` được
 - [ ] **URL cũ vẫn redirect đúng**
-- [ ] `drush watchdog:show` không có lỗi mới
+- [ ] `drush watchdog:show --severity=3` không có lỗi mới (`3` = Error; dùng số, xem `DEFINITION_OF_DONE.md`)
 - [ ] HTTPS + header bảo mật đúng (`SECURITY_POLICY.md` §10)
 
 ## 7. Cấu hình production bắt buộc

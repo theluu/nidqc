@@ -15,6 +15,11 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 - `docs/design/PAGE_MAPPING.md` — ánh xạ design → route Drupal
 - `docs/decisions/ADR-001` — chốt kiến trúc Drupal theme + Vue islands
 - `scripts/extract-design.py` — trích markup/token từ design bundled
+- `tasks/TASK-001.md` — dựng khung theme custom `nidqc` + `tokens.css`
+
+### Fixed
+- Sửa lệnh kiểm tra sai trong tài liệu: `drush watchdog:show --severity=Error` lỗi exit 1 vì
+  site chạy langcode `vi` (Drush khớp nhãn severity đã dịch) — phải dùng `--severity=3`
 
 ---
 

@@ -21,7 +21,9 @@
 
 ### Verify — **đã chạy thật, đã nhìn thấy output**
 - [ ] Lệnh ở §6 của task đã chạy, output đã dán vào task
-- [ ] Không có lỗi mới trong log (`ddev drush watchdog:show`)
+- [ ] Không có lỗi mới trong log (`ddev drush watchdog:show --severity=3`)
+      — `3` = Error. Dùng **số**, không dùng `--severity=Error`: site chạy langcode `vi`,
+      Drush khớp nhãn đã dịch nên dạng chữ sẽ lỗi exit 1 kể cả khi không có lỗi nào.
 - [ ] Không còn `dpm()`, `var_dump()`, `console.log()`, `TODO` tạm
 
 > ⚠️ Đây là mục hay bị nói dối nhất. Không chạy thì không được tick.
