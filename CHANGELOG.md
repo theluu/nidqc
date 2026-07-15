@@ -16,6 +16,7 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 - `docs/decisions/ADR-001` — chốt kiến trúc Drupal theme + Vue islands
 - `scripts/extract-design.py` — trích markup/token từ design bundled
 - `tasks/TASK-001.md` — dựng khung theme custom `nidqc` + `tokens.css`
+- `tasks/TASK-002.md` — sửa `config_sync_directory`, đưa `settings.php` vào git (chặn TASK-001)
 
 ### Fixed
 - Sửa lệnh kiểm tra sai trong tài liệu: `drush watchdog:show --severity=Error` lỗi exit 1 vì

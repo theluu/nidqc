@@ -204,10 +204,12 @@ họ `git pull` xong vẫn thấy `olivero`.
 Mâu thuẫn với `docs/architecture/BACKEND_ARCHITECTURE.md` §6 (nói config export vào `config/sync/`)
 và `.env.example` (`CONFIG_SYNC_DIRECTORY=../config/sync`). **Tài liệu mô tả ý định, thực tế chưa khớp.**
 
-**Xử lý:** ⛔ **KHÔNG tự sửa trong task này** (ngoài `allowed_files`). Đây là việc của **TASK-002**.
+**Xử lý:** ⛔ **KHÔNG tự sửa trong task này** (ngoài `allowed_files`).
+→ Đã có **`tasks/TASK-002.md`** xử lý riêng, kèm nguyên nhân gốc đã truy được.
 
-Trong lúc chờ, TASK-001 chấp nhận: bật theme là **thao tác thủ công**, ghi lại trong `§6.1`.
-Người review phải biết điều này để không tưởng đã tái lập được.
+**Thứ tự khuyến nghị: làm TASK-002 TRƯỚC, rồi mới merge TASK-001.** Nếu làm TASK-001 trước,
+việc bật theme chỉ là thao tác thủ công trên máy người làm — người khác `git pull` vẫn thấy
+`olivero`. Người review phải biết điều này để không tưởng đã tái lập được.
 
 ### 9.2. 🟡 Site không có content type nào
 
