@@ -22,6 +22,7 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 - `tasks/TASK-001.md` — dựng khung theme custom `nidqc` + `tokens.css`
 - `tasks/TASK-002.md` — sửa `config_sync_directory`, đưa `settings.php` vào git (chặn TASK-001)
 - `tasks/TASK-003.md` — dựng `page.html.twig` (5 vùng dùng chung) + sửa 2 lỗi tài liệu design
+- `tasks/TASK-004.md` — self-host font Lexend + Be Vietnam Pro trích từ design bundle
 
 ### Fixed
 - **Config giờ tái lập được giữa các máy** (TASK-002). Trước đây `drush cex` ghi ra

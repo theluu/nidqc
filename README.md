@@ -64,6 +64,32 @@ Design → Phân tích component → API contract → Drupal Backend
 Mỗi task = một file `tasks/TASK-xxx.md` với `allowed_files` cụ thể.
 AI chỉ được sửa trong phạm vi đó.
 
+## Lộ trình
+
+Kế hoạch đầy đủ: [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
+| Task | Việc | Trạng thái |
+|---|---|---|
+| [001](tasks/TASK-001.md) | Khung theme + `tokens.css` | ✅ chờ review |
+| [002](tasks/TASK-002.md) | Config tái lập được | ✅ chờ review |
+| [003](tasks/TASK-003.md) | `page.html.twig` — 5 vùng chung | 📝 ready |
+| [004](tasks/TASK-004.md) | Self-host font | 📝 ready |
+| [005](tasks/TASK-005.md) | Dựng `frontend/` (Vite) | 📝 ready |
+| 007+ | Content type → 11 trang Twig → island | 🔴 **bị chặn** |
+
+> 🔴 **Blocker:** site có **0 content type**, và không thể chốt content type cho tới khi NIDQC
+> trả lời 3 câu ở [`PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md) §5 (tra cứu chất chuẩn ·
+> anchor menu · tiếng Anh). Đây là việc của **người**, không phải AI.
+
+### ⚠️ Không chuyển các trang design sang Vue
+
+Đã đo: **97,9% design là nội dung tĩnh** (32/1.510 phần tử cần JS). Toàn bộ tương tác của 11 trang
+chỉ gồm 7 khối. Chuyển sang Vue SPA = đẩy 1.478 phần tử nội dung ra sau JavaScript để phục vụ 32
+phần tử — giết SEO, và làm `metatag`/`pathauto`/`simple_sitemap` thành vô dụng.
+
+**97,9% → Twig. 7 khối tương tác → Vue island.** Xem [`ADR-001`](docs/decisions/ADR-001-frontend-architecture.md)
+và [`ROADMAP.md`](docs/ROADMAP.md) §5.
+
 ## Tài liệu
 
 | Bắt đầu từ đây | |
@@ -94,17 +120,21 @@ AI chỉ được sửa trong phạm vi đó.
 
 ## ⚠️ Trạng thái hiện tại
 
-Dự án **mới ở giai đoạn dựng khung**. Chưa có:
-
-- [ ] `git init` — **việc đầu tiên cần làm** (xem [`GIT_WORKFLOW.md`](docs/standards/GIT_WORKFLOW.md))
-- [ ] Theme custom `web/themes/custom/nidqc/`
-- [ ] `frontend/` (Vue + Vite)
-- [ ] Content type (cần chốt [`ENTITY_MAPPING.md`](docs/database/ENTITY_MAPPING.md) trước)
+- [x] `git init` + baseline
+- [x] Theme custom `web/themes/custom/nidqc/` — khung + 21 design token
+- [x] Config tái lập được (`config/sync/`, 232 file)
+- [ ] `frontend/` (Vue + Vite) — [TASK-005](tasks/TASK-005.md)
+- [ ] Font self-host — [TASK-004](tasks/TASK-004.md)
+- [ ] `page.html.twig` — [TASK-003](tasks/TASK-003.md)
+- [ ] Content type — 🔴 **bị chặn**, cần NIDQC trả lời
+- [ ] 11 trang Twig + 6 Vue island — chặn bởi content type
 - [ ] Hạ tầng test
 - [ ] Staging / production
 
 **Câu hỏi phạm vi chưa được trả lời** — xem [`PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md) §5:
 tra cứu chất chuẩn · anchor `#chat-chuan`/`#dich-vu` · tiếng Anh · đăng nhập hệ thống · migrate dữ liệu
+
+Nợ kỹ thuật đã ghi nhận: [`ROADMAP.md`](docs/ROADMAP.md) §7.
 
 ## Đóng góp
 
