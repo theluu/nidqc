@@ -13,7 +13,7 @@
 |---|---|---|
 | [TASK-001](../tasks/TASK-001.md) | Khung theme `nidqc` + `tokens.css` (21 token) | ✅ xong, chờ review |
 | [TASK-002](../tasks/TASK-002.md) | `config_sync_directory` — config tái lập được | ✅ xong, chờ review |
-| [TASK-003](../tasks/TASK-003.md) | `page.html.twig` — 5 vùng chung + sửa 2 lỗi tài liệu | 📝 ready |
+| [TASK-003](../tasks/TASK-003.md) | `page.html.twig` — 5 vùng chung + sửa 2 lỗi tài liệu | ✅ xong, chờ review |
 | [TASK-004](../tasks/TASK-004.md) | Self-host font Lexend + Be Vietnam Pro | 📝 ready (sau 003) |
 | [TASK-005](../tasks/TASK-005.md) | Dựng `frontend/` — Vite + island bootstrap | 📝 ready ⚠️ cần duyệt npm |
 | TASK-006 | Island `mega-menu` | ⏳ chưa soạn (sau 005) |
@@ -115,13 +115,15 @@ Mọi island **phải** hoạt động khi tắt JS (`FRONTEND_ARCHITECTURE.md` 
 
 | # | Việc | Nguồn |
 |---|---|---|
-| 1 | 10 block bị dồn vào `header_top` | `TASK-001` §9.4 → sửa ở TASK-003 R6 |
+| 1 | ~~10 block bị dồn vào `header_top`~~ | ✅ đã dọn ở TASK-003 |
 | 2 | `settings.php` là bản DDEV sinh từ **Drupal 10**, thiếu `media_oembed_discovery_trusted_host_patterns` | `TASK-002` §9.2 |
 | 3 | `dev@nidqc.local` trong `update.settings.yml` | `TASK-002` §11 |
 | 4 | Lexend không có weight 400 | `TASK-004` §9.1 |
 | 5 | `rgba()` trên nền xanh chưa có token | `TASK-003` §9.2 |
-| 6 | Chưa có hạ tầng test | `testing/TEST_STRATEGY.md` §1 |
-| 7 | Chưa có staging / production | `deployment/DEPLOYMENT.md` §1 |
+| 6 | Dải breadcrumb rỗng hiện ở trang chủ | `TASK-003` §9.4 → TASK-008 |
+| 7 | `site_branding` tràn mép ở banner (placeholder) | `TASK-003` §9.5 |
+| 8 | Chưa có hạ tầng test | `testing/TEST_STRATEGY.md` §1 |
+| 9 | Chưa có staging / production | `deployment/DEPLOYMENT.md` §1 |
 
 ## 8. Chưa có kế hoạch
 

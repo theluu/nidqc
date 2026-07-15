@@ -86,7 +86,10 @@ Trạng thái hiện tại (đã kiểm tra ngày 2026-07-16):
       **18 biến màu + 2 biến layout (`--nidqc-container`, `--nidqc-gutter`) + 1 biến font**.
       Copy **nguyên văn**, không tự đổi giá trị, không tự thêm màu mới, không bịa thêm biến cho "đủ bộ".
       > Số đếm này đã kiểm bằng lệnh, không phải ước lượng:
-      > `sed -n '/^:root {/,/^}/p' docs/design/DESIGN_SYSTEM.md | grep -cE '^\s*--nidqc-'` → `21`
+      > `sed -n '/^:root {/,/^}/p' docs/design/DESIGN_SYSTEM.md | grep -cE '^\s*--nidqc-[a-z0-9-]+:'` → `21`
+      >
+      > ⚠️ Regex **phải có `:`**. Thiếu nó thì dòng comment nhắc tới tên biến cũng bị đếm.
+      > (TASK-003 nâng lên 24 khi thêm `--nidqc-font-heading`, `--nidqc-font-mono`, `--nidqc-text-body`.)
 - [ ] **R4** — `nidqc.libraries.yml` khai báo library `global` gồm `tokens.css` rồi `base.css`
       (đúng thứ tự — `base.css` dùng biến của `tokens.css`). `nidqc.info.yml` nạp qua
       `libraries: - nidqc/global`.

@@ -10,7 +10,7 @@ _core:
   default_config_hash: VfPFqqxfkomud5CO8DUijw85QIl9GIxh_nIxLOYESxg
 id: nidqc_help
 theme: nidqc
-region: header_top
+region: content
 weight: 0
 provider: null
 plugin: help_block

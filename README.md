@@ -72,7 +72,7 @@ Kế hoạch đầy đủ: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 |---|---|---|
 | [001](tasks/TASK-001.md) | Khung theme + `tokens.css` | ✅ chờ review |
 | [002](tasks/TASK-002.md) | Config tái lập được | ✅ chờ review |
-| [003](tasks/TASK-003.md) | `page.html.twig` — 5 vùng chung | 📝 ready |
+| [003](tasks/TASK-003.md) | `page.html.twig` — 5 vùng chung | ✅ chờ review |
 | [004](tasks/TASK-004.md) | Self-host font | 📝 ready |
 | [005](tasks/TASK-005.md) | Dựng `frontend/` (Vite) | 📝 ready |
 | 007+ | Content type → 11 trang Twig → island | 🔴 **bị chặn** |
@@ -125,7 +125,7 @@ và [`ROADMAP.md`](docs/ROADMAP.md) §5.
 - [x] Config tái lập được (`config/sync/`, 232 file)
 - [ ] `frontend/` (Vue + Vite) — [TASK-005](tasks/TASK-005.md)
 - [ ] Font self-host — [TASK-004](tasks/TASK-004.md)
-- [ ] `page.html.twig` — [TASK-003](tasks/TASK-003.md)
+- [x] `page.html.twig` — 5 vùng chung theo design ([TASK-003](tasks/TASK-003.md))
 - [ ] Content type — 🔴 **bị chặn**, cần NIDQC trả lời
 - [ ] 11 trang Twig + 6 Vue island — chặn bởi content type
 - [ ] Hạ tầng test

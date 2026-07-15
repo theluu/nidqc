@@ -1,0 +1,193 @@
+/**
+ * @file
+ * Khung trang NIDQC — 5 vùng dùng chung.
+ *
+ * Giá trị lấy từ docs/design/DESIGN_SYSTEM.md và đo trực tiếp trên design gốc.
+ *
+ * ⛔ KHÔNG hard-code mã hex trong file này. Chỉ var(--nidqc-*).
+ *    Ngoại lệ DUY NHẤT: rgba() trên nền xanh đậm — design dùng
+ *    rgba(255,255,255,.14/.6/.72/.85) mà DESIGN_SYSTEM §7 chưa có token tương ứng.
+ *    Xem tasks/TASK-003.md §9.2. Nếu chúng lặp lại ở task sau -> nên thêm token.
+ */
+
+/* ---------- Container dùng chung ---------- */
+
+.nidqc-container {
+  max-width: var(--nidqc-container);
+  margin: 0 auto;
+  padding: 0 var(--nidqc-gutter);
+}
+
+/* ---------- Tiêu đề: Lexend, không phải font body ---------- */
+
+.nidqc-page h1,
+.nidqc-page h2,
+.nidqc-page h3,
+.nidqc-page h4 {
+  font-family: var(--nidqc-font-heading);
+}
+
+/* ---------- Top bar (34px) ---------- */
+
+.nidqc-header-top {
+  background: var(--nidqc-primary-dark);
+  color: var(--nidqc-white);
+  font-size: 12.5px;
+}
+
+.nidqc-header-top__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+/* Link KHÔNG kế thừa `color` của cha — không đặt riêng thì trình duyệt dùng xanh
+   mặc định trên nền xanh đậm, gần như không đọc được. Design dùng chữ trắng. */
+.nidqc-header-top a {
+  color: var(--nidqc-white);
+  text-decoration: none;
+}
+
+.nidqc-header-top a:hover {
+  text-decoration: underline;
+}
+
+/* Menu trong top bar là danh sách ngang, không phải bullet list. */
+.nidqc-header-top ul {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---------- Banner (full-width) ---------- */
+
+.nidqc-header-banner {
+  background: var(--nidqc-white);
+  border-bottom: 1px solid var(--nidqc-border);
+}
+
+.nidqc-header-banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ---------- Nav chính (sticky, 50px) ---------- */
+
+.nidqc-nav-main {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--nidqc-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nidqc-nav-main__inner {
+  display: flex;
+  align-items: stretch;
+  height: 50px;
+}
+
+.nidqc-nav-main a {
+  color: var(--nidqc-white);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+/* Menu phải dùng được khi tắt JS — Vue island chỉ nâng cấp hành vi hover
+   (FRONTEND_ARCHITECTURE.md §5). Không ẩn submenu bằng CSS ở đây. */
+.nidqc-nav-main ul {
+  display: flex;
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---------- Breadcrumb ---------- */
+
+.nidqc-breadcrumb {
+  background: var(--nidqc-bg-subtle);
+  border-bottom: 1px solid var(--nidqc-border);
+  font-size: 13px;
+  color: var(--nidqc-text-light);
+}
+
+.nidqc-breadcrumb .nidqc-container {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.nidqc-breadcrumb a {
+  color: var(--nidqc-primary);
+  font-weight: 500;
+}
+
+.nidqc-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Nội dung ---------- */
+
+.nidqc-main {
+  background: var(--nidqc-white);
+}
+
+/* ---------- Footer ---------- */
+
+.nidqc-footer {
+  background: var(--nidqc-primary-dark);
+  color: var(--nidqc-white);
+}
+
+.nidqc-footer__inner {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.3fr;
+  gap: 40px;
+  padding-top: 46px;
+  padding-bottom: 20px;
+}
+
+.nidqc-footer h3,
+.nidqc-footer h4 {
+  font-family: var(--nidqc-font-heading);
+  font-weight: 700;
+}
+
+/* Chữ mờ trên nền xanh — design dùng rgba, chưa có token. Xem đầu file. */
+.nidqc-footer p,
+.nidqc-footer li {
+  font-size: 13.5px;
+  line-height: 21px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.nidqc-footer a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+}
+
+.nidqc-footer a:hover {
+  color: var(--nidqc-white);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 768px) {
+  .nidqc-footer__inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .nidqc-nav-main__inner {
+    height: auto;
+    overflow-x: auto;
+  }
+}

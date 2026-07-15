@@ -10,7 +10,7 @@ _core:
   default_config_hash: VhBzWb7lMRtIOg9G7VSw_0uopi-7zXeHq4vXqqV1HFE
 id: nidqc_breadcrumbs
 theme: nidqc
-region: header_top
+region: breadcrumb
 weight: 0
 provider: null
 plugin: system_breadcrumb_block

@@ -8,12 +8,16 @@ base theme: stable9
 libraries:
   - nidqc/global
 
-# Region theo docs/design/PAGE_MAPPING.md §4 — bốn vùng dùng chung xuất hiện
-# giống hệt nhau ở cả 11 trang design, nên dựng một lần ở page.html.twig.
+# Region theo docs/design/PAGE_MAPPING.md §4 — năm vùng dùng chung, dựng một lần
+# ở page.html.twig. THỨ TỰ khai báo ở đây khớp thứ tự trong design.
+#
+# ⚠️ Region đầu tiên là nơi Drupal dồn block khi cài theme mà không map được
+# region (xem TASK-001 §9.4). Đừng đảo header_top xuống dưới.
 regions:
   header_top: 'Top bar'
   header_banner: 'Banner'
   primary_menu: 'Menu chính'
+  breadcrumb: 'Breadcrumb'
   content: 'Nội dung'
   footer: 'Footer'
   # Drupal cần hai region này cho toolbar và script cuối trang.

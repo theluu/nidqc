@@ -1,0 +1,71 @@
+{#
+/**
+ * @file
+ * Khung trang NIDQC — 5 vùng dùng chung theo docs/design/PAGE_MAPPING.md §4.
+ *
+ * Thứ tự KHÔNG được đảo, khớp design trên cả 10 trang con:
+ *   top bar -> banner -> nav (sticky) -> breadcrumb -> nội dung -> footer
+ *
+ * Trang chủ KHÔNG có breadcrumb và có cấu trúc khác — cần page--front.html.twig
+ * riêng (ROADMAP.md §4, TASK-008).
+ *
+ * Không hard-code nội dung ở đây. Mọi thứ đi qua region/block để biên tập viên
+ * sửa được và để nội dung nằm trong HTML thô (SEO — ADR-001).
+ *
+ * Available variables:
+ * - page: các region đã render.
+ * - node, user, ...: xem Drupal core page.html.twig.
+ */
+#}
+<div class="nidqc-page">
+
+  {# Top bar: ngày, chuyển ngữ VI/EN, đăng nhập hệ thống #}
+  {% if page.header_top %}
+    <div class="nidqc-header-top">
+      <div class="nidqc-container nidqc-header-top__inner">
+        {{ page.header_top }}
+      </div>
+    </div>
+  {% endif %}
+
+  {# Banner: ảnh full-width, KHÔNG bọc container (design: width:100%) #}
+  {% if page.header_banner %}
+    <div class="nidqc-header-banner">
+      {{ page.header_banner }}
+    </div>
+  {% endif %}
+
+  {# Nav chính: sticky. Mega menu sẽ được Vue island nâng cấp (bước 5) —
+     ở đây phải render ra <ul><li><a> dùng được khi tắt JS. #}
+  <header class="nidqc-nav-main" role="banner">
+    <div class="nidqc-container nidqc-nav-main__inner">
+      {{ page.primary_menu }}
+    </div>
+  </header>
+
+  {# Breadcrumb: có ở 10/11 trang, KHÔNG có ở trang chủ #}
+  {% if page.breadcrumb %}
+    <nav class="nidqc-breadcrumb" aria-label="{{ 'Breadcrumb'|t }}">
+      <div class="nidqc-container">
+        {{ page.breadcrumb }}
+      </div>
+    </nav>
+  {% endif %}
+
+  <main class="nidqc-main" role="main">
+    {# Đích của skip link trong html.html.twig — đừng xoá, đây là accessibility. #}
+    <a id="main-content" tabindex="-1"></a>
+    <div class="nidqc-container">
+      {{ page.content }}
+    </div>
+  </main>
+
+  {% if page.footer %}
+    <footer class="nidqc-footer" role="contentinfo">
+      <div class="nidqc-container nidqc-footer__inner">
+        {{ page.footer }}
+      </div>
+    </footer>
+  {% endif %}
+
+</div>

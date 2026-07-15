@@ -22,6 +22,9 @@
   --nidqc-text:           #212529;
   --nidqc-text-muted:     #495057;
   --nidqc-text-light:     #777777;
+  /* Mặc định của body trong design. Hầu như luôn bị --nidqc-text (84 lần) hoặc
+     --nidqc-text-muted (76 lần) ghi đè, nên gần như không hiện ra thật. */
+  --nidqc-text-body:      #333333;
 
   /* Nền & viền */
   --nidqc-white:          #FFFFFF;
@@ -44,7 +47,14 @@
   --nidqc-gutter:         24px;
 
   /* Font — self-host, KHÔNG gọi Google Fonts CDN (site nhà nước).
-     @font-face + file woff2 là task riêng, chưa làm. Tới khi đó trình duyệt
-     fallback về -apple-system — đây là kỳ vọng đúng, không phải lỗi. */
+     File woff2 + @font-face là TASK-004. Tới khi đó trình duyệt fallback về
+     -apple-system — đây là kỳ vọng đúng, không phải lỗi.
+
+     Lexend dùng 140 lần (tiêu đề, cả 12 trang), Be Vietnam Pro 22 lần (thân bài).
+     Xem docs/design/DESIGN_SYSTEM.md §2. */
   --nidqc-font:           'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+  --nidqc-font-heading:   'Lexend', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Roboto Mono CỐ Ý không self-host — dùng đúng 1 lần trong toàn design,
+     134 KB là không đáng (TASK-004 §3). Thực tế fallback về ui-monospace. */
+  --nidqc-font-mono:      'Roboto Mono', ui-monospace, monospace;
 }

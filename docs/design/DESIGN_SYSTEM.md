@@ -49,29 +49,54 @@
 
 ## 2. Typography
 
-> 🔴 **MỤC NÀY SAI — đang chờ sửa ở `tasks/TASK-003.md` (R1).**
-> Đếm thật trên cả 12 file design: **`Lexend` dùng 140 lần** (font tiêu đề, `h1`–`h4`, có ở
-> **mọi trang**), `Be Vietnam Pro` 22 lần (font thân bài), `Roboto Mono` 1 lần. Cả 3 đều self-host.
-> Style toàn cục thật: `body { font-family: 'Be Vietnam Pro'; color: #333333; }`.
-> **Đừng dựa vào mục này cho tới khi TASK-003 xong.** Kiểm lại bất cứ lúc nào bằng:
-> `cat /tmp/tpl/*.tpl.html | grep -oE "font-family:\s*'[^']+'" | sort | uniq -c | sort -rn`
+**Ba font**, tất cả **self-host**, KHÔNG gọi Google Fonts CDN (site nhà nước, tránh phụ thuộc ngoài).
 
-**Font duy nhất: `Be Vietnam Pro`** — self-host, KHÔNG gọi Google Fonts CDN (site nhà nước, tránh phụ thuộc ngoài).
+| Font | Dùng | Vai trò | Weight trong design |
+|---|---|---|---|
+| **`Lexend`** | **140 lần** | **Tiêu đề** — `h1`–`h4`. Có ở **cả 12 trang**. | `500`, `600`, `700` — **variable font** |
+| **`Be Vietnam Pro`** | 22 lần | **Thân bài** — mặc định của `body` | `400`, `500`, `600`, `700` |
+| `Roboto Mono` | 1 lần | Monospace. Chỉ ở trang Đào tạo NCKH. | `400`, `500` — variable |
 
-Weight có trong design: `400`, `500`, `600`, `700`.
+> Số liệu đếm thật trên cả 12 file design, không phải ước lượng. Kiểm lại:
+> ```bash
+> python3 scripts/extract-design.py --all -o /tmp/tpl
+> cat /tmp/tpl/*.tpl.html | grep -oE "font-family:\s*'[^']+'" | sort | uniq -c | sort -rn
+> ```
+
 Subset bắt buộc: `vietnamese`, `latin-ext`, `latin`. Định dạng `woff2`, `font-display: swap`.
+**Subset `vietnamese` không được thiếu** — thiếu là chữ có dấu vỡ hoặc rơi về font khác.
+
+### Style toàn cục thật của design
 
 ```css
-font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #FFFFFF;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  color: #333333;                        /* ⚠️ mặc định của body — KHÔNG phải #212529 */
+  -webkit-font-smoothing: antialiased;
+}
 ```
 
-| Vai trò | Size | Weight |
-|---|---|---|
-| Top bar / meta | 12.5px | 400 |
-| Nav chính | 14px | 600 |
-| Body | 15–16px | 400 |
-| Tiêu đề mục | 18–22px | 700 |
-| Tiêu đề trang | 28–32px | 700 |
+> ⚠️ `body` mặc định là `#333333` (`--nidqc-text-body`), nhưng hầu như mọi thành phần **ghi đè**
+> bằng `#212529` (`--nidqc-text`, 84 lần) hoặc `#495057` (`--nidqc-text-muted`, 76 lần).
+> Nên `#333333` gần như không bao giờ hiện ra thật.
+
+### Ghi chú
+
+- **`Lexend` không có weight 400** trong design — nó chỉ dùng cho tiêu đề (luôn đậm).
+  Cần `h*` weight 400 thì sẽ bị trình duyệt giả lập (synthetic), nhìn xấu.
+- **`Roboto Mono` không được self-host** (`TASK-004` §3): 134 KB cho **1 chỗ dùng** là không đáng.
+  `--nidqc-font-mono` sẽ fallback về `ui-monospace` của hệ thống.
+
+| Vai trò | Font | Size | Weight |
+|---|---|---|---|
+| Top bar / meta | Be Vietnam Pro | 12.5px | 400 |
+| Nav chính | Be Vietnam Pro | 14px | 600 |
+| Body | Be Vietnam Pro | 15–16px | 400 |
+| Tiêu đề mục | **Lexend** | 18–22px | 700 |
+| Tiêu đề trang | **Lexend** | 28–32px | 700 |
 
 ---
 
@@ -157,6 +182,7 @@ Trích từ `sc-for` trong template — mỗi cái là một tập dữ liệu l
   --nidqc-text:           #212529;
   --nidqc-text-muted:     #495057;
   --nidqc-text-light:     #777777;
+  --nidqc-text-body:      #333333;   /* mặc định của body; hầu như luôn bị ghi đè — xem §2 */
 
   --nidqc-white:          #FFFFFF;
   --nidqc-border:         #ECECEC;
@@ -171,11 +197,20 @@ Trích từ `sc-for` trong template — mỗi cái là một tập dữ liệu l
 
   --nidqc-container:      1280px;
   --nidqc-gutter:         24px;
+
+  /* Font — xem §2. Lexend cho tiêu đề, Be Vietnam Pro cho thân bài. */
   --nidqc-font:           'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+  --nidqc-font-heading:   'Lexend', -apple-system, BlinkMacSystemFont, sans-serif;
+  --nidqc-font-mono:      'Roboto Mono', ui-monospace, monospace;
 }
 ```
 
+**24 biến**: 19 màu · 2 layout · 3 font.
+
 File này là nguồn duy nhất. Twig và Vue **cùng** dùng biến này — không hard-code hex ở bất kỳ đâu khác.
+
+> ⚠️ `--nidqc-font-mono` trỏ tới `Roboto Mono` nhưng font đó **không được self-host**
+> (`TASK-004` §3) → thực tế fallback về `ui-monospace`. Có chủ đích: dùng đúng 1 lần trong design.
 
 ---
 

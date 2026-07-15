@@ -8,7 +8,7 @@ _core:
   default_config_hash: 6aOgWsNTXjqrDm98TXSAjP6qd2nCijD1xw45MrnbK-Y
 id: nidqc_page_title
 theme: nidqc
-region: header_top
+region: content
 weight: -5
 provider: null
 plugin: page_title_block

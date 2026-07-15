@@ -1,7 +1,8 @@
 # Library của theme NIDQC.
 #
-# THỨ TỰ QUAN TRỌNG: tokens.css phải đứng trước base.css vì base.css dùng
-# biến do tokens.css định nghĩa. Drupal giữ nguyên thứ tự khai báo trong nhóm.
+# THỨ TỰ QUAN TRỌNG: tokens.css phải đứng trước base.css và layout.css vì cả hai
+# dùng biến do tokens.css định nghĩa. Drupal xếp theo nhóm (base -> theme) rồi
+# theo thứ tự khai báo trong nhóm, nên tokens.css nằm nhóm `base` là đủ đảm bảo.
 global:
   version: 1.x
   css:
@@ -9,3 +10,4 @@ global:
       css/tokens.css: {}
     theme:
       css/base.css: {}
+      css/layout.css: {}

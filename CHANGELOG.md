@@ -9,6 +9,9 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 ## [Unreleased]
 
 ### Added
+- **Khung trang theo design** (TASK-003) — `page.html.twig` dựng 5 vùng dùng chung đúng thứ tự:
+  top bar → banner → nav (sticky) → breadcrumb → nội dung → footer. Thêm region `breadcrumb`
+  còn thiếu, và dọn 10 block bị Drupal dồn nhầm vào `header_top` (giờ chỉ còn `account_menu`).
 - **Theme custom `nidqc`** (TASK-001) — site giờ chạy theme của dự án thay vì `olivero`.
   `css/tokens.css` là **nguồn duy nhất** của màu/layout/font: 21 biến CSS trích thẳng từ design
   gốc, đã kiểm chứng 18/18 màu tồn tại thật trong `design/`. Từ nay không ai phải mở file design
@@ -25,6 +28,16 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 - `tasks/TASK-004.md` — self-host font Lexend + Be Vietnam Pro trích từ design bundle
 
 ### Fixed
+- **Tài liệu design sai về font** (TASK-003) — `DESIGN_SYSTEM` §2 khẳng định "Font duy nhất:
+  Be Vietnam Pro". Đếm thật: `Lexend` dùng **140 lần** (font tiêu đề, cả 12 trang), Be Vietnam Pro
+  22 lần (thân bài), Roboto Mono 1 lần. Hệ quả: `tokens.css` thiếu biến font tiêu đề nên mọi
+  `h1`-`h4` sai font. Đã thêm `--nidqc-font-heading`, `--nidqc-font-mono`, `--nidqc-text-body`
+  (21 → 24 token).
+- **Tài liệu design thiếu một vùng** (TASK-003) — `PAGE_MAPPING` §4 ghi 4 vùng dùng chung, thực tế
+  có **5**: thiếu dải breadcrumb, có ở cả 10 trang con. Đây là nguyên nhân gốc khiến Drupal ném
+  10 block vào `header_top`.
+- **Link top bar không đọc được** (TASK-003) — "Đăng nhập" render xanh dương trên nền xanh đậm
+  do link không kế thừa `color` của cha. Lỗi accessibility, chỉ phát hiện được khi chụp màn hình.
 - **Config giờ tái lập được giữa các máy** (TASK-002). Trước đây `drush cex` ghi ra
   `sites/default/files/sync` — thư mục bị gitignore — nên cấu hình không bao giờ được commit;
   người mới `git clone` không nhận được theme, ngôn ngữ hay module đã bật. Nay export vào

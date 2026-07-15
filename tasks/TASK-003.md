@@ -1,7 +1,7 @@
 ---
 id: TASK-003
 title: Dựng page.html.twig — 5 vùng dùng chung theo design
-status: ready
+status: review          # đã thực thi 2026-07-16, chờ NGƯỜI review (AI không được tự duyệt)
 step: 4                  # Drupal Backend / theme layer
 owner: <chưa gán>
 reviewer: <chưa gán — KHÔNG được trùng owner>
@@ -13,6 +13,7 @@ config_change: true      # ⚠️ đặt lại block placement + thêm region br
 
 allowed_files:
   - web/themes/custom/nidqc/nidqc.info.yml
+  - web/themes/custom/nidqc/nidqc.libraries.yml   # R5 cần — thiếu ở bản đầu, xem §10
   - web/themes/custom/nidqc/nidqc.theme
   - web/themes/custom/nidqc/templates/layout/page.html.twig
   - web/themes/custom/nidqc/css/tokens.css
@@ -190,7 +191,16 @@ ném block `breadcrumbs` vào `header_top` cùng 9 block khác.
 
 ### 6.1. Đếm token — AC1
 ```bash
-grep -cE '^\s*--nidqc-' web/themes/custom/nidqc/css/tokens.css     # phải: 24
+# ⚠️ BẮT BUỘC có ':' trong regex. Thiếu nó thì dòng COMMENT nhắc tới tên biến
+# (vd "--nidqc-text-muted (76 lần) ghi đè...") cũng bị đếm -> ra 25 thay vì 24.
+grep -cE '^\s*--nidqc-[a-z0-9-]+:' web/themes/custom/nidqc/css/tokens.css   # phải: 24
+```
+Tách theo nhóm:
+```bash
+f=web/themes/custom/nidqc/css/tokens.css
+echo "màu:    $(grep -cE '^\s*--nidqc-[a-z0-9-]+:\s*#' $f)"        # 19
+echo "layout: $(grep -cE '^\s*--nidqc-[a-z0-9-]+:\s*[0-9]+px' $f)" # 2
+echo "font:   $(grep -cE '^\s*--nidqc-font[a-z-]*:' $f)"           # 3
 ```
 
 ### 6.2. Token vẫn khớp design — AC2
@@ -317,9 +327,107 @@ R2 thêm `--nidqc-text-body` (`#333333`) cho **đúng design**. Nhưng đổi `b
 gần như không ảnh hưởng gì (bị ghi đè hết) và nằm ngoài `allowed_files`... **`base.css` KHÔNG có
 trong `allowed_files`** — cố ý. Task này chỉ **khai báo biến**; ai đổi `base.css` là task khác quyết.
 
+### 9.4. 🟡 Dải breadcrumb rỗng vẫn hiện ở trang chủ — phát hiện khi NHÌN
+
+`page.html.twig` có `{% if page.breadcrumb %}`, nhưng region **vẫn "truthy"** kể cả khi block
+breadcrumb bên trong render ra rỗng (bẫy kinh điển của Drupal: region array có key của block,
+dù nội dung block rỗng). Kết quả: trang chủ hiện một **dải xám rỗng cao ~40px** — mà design nói
+trang chủ **không có** breadcrumb.
+
+Không sửa ở đây: trang chủ sẽ có `page--front.html.twig` riêng (**TASK-008**, `ROADMAP.md` §4),
+và ở đó bỏ hẳn khối breadcrumb là đúng hơn là thêm logic vá vào template dùng chung.
+
+→ TASK-008 phải xử lý. Chỉ lộ ra khi **chụp màn hình**; mọi lệnh `curl`/`grep` đều báo đạt.
+
+### 9.5. 🟡 `header_banner` không có container — `site_branding` tràn sát mép
+
+`header_banner` **cố ý không bọc** `.nidqc-container` vì design đặt ảnh banner full-width
+(`<img style="width:100%">`). Nhưng hiện region đó đang chứa block `site_branding` (logo + tên
+Viện dạng text) → text tràn sát mép trái (x=8) thay vì thẳng container (x=186).
+
+Đây là **placeholder**, không phải bug của layout: theo design, banner là **một tấm ảnh**
+(`banner-header.jpg`), không phải logo+text. Khi task nội dung thay `site_branding` bằng block ảnh
+thật thì full-width là đúng.
+
+→ Task nội dung phải thay. Nếu quyết định giữ `site_branding` ở banner thì **phải** bọc container.
+
+## 11. Output verify (chạy thật 2026-07-16)
+
+```
+$ grep -cE '^\s*--nidqc-[a-z0-9-]+:' css/tokens.css
+24                          # AC1 ✅  (màu 19 | layout 2 | font 3)
+
+$ comm -23 /tmp/tc.txt /tmp/dc.txt
+(rỗng)                      # AC2 ✅  mọi hex vẫn tồn tại thật trong design
+
+$ # region
+header_top -> header_banner -> primary_menu -> breadcrumb -> content -> footer -> page_top -> page_bottom
+                            # AC3 ✅  8 region, breadcrumb đúng chỗ
+
+$ # AC4 — thứ tự vùng trong HTML (cả trang chủ và /khong-ton-tai)
+nidqc-header-top
+nidqc-header-banner
+nidqc-nav-main
+nidqc-breadcrumb
+nidqc-main
+nidqc-footer                # AC4 ✅  đúng thứ tự design
+
+$ grep -l "^region: header_top" config/sync/block.block.nidqc_*.yml
+account_menu                # AC5 ✅  header_top CHỈ còn account_menu
+
+$ grep -E '#[0-9a-fA-F]{6}' css/layout.css
+(rỗng)                      # AC6 ✅
+
+$ ddev drush cim -y
+There are no changes to import.   # AC7 ✅
+
+$ curl -s https://nidqc.ddev.site/ | grep -c "Viện Kiểm nghiệm thuốc Trung ương"
+2                           # AC8 ✅  nội dung trong HTML thô, không cần JS
+
+$ ddev drush watchdog:show --severity=3
+No log messages available.  # AC9 ✅
+
+$ # AC10 tiếng Việt:
+"Nhảy đến nội dung  Đăng nhập  Viện Kiểm nghiệm thuốc Trung ương  Main navigation  Nhà..."
+                            # AC10 ✅  đủ dấu
+```
+
+### Dọn block — TASK-001 §9.4
+
+| Block | Trước | Sau |
+|---|---|---|
+| `site_branding` | header_top | **header_banner** |
+| `breadcrumbs` | header_top | **breadcrumb** |
+| `page_title`, `messages`, `help`, `*_local_tasks`, `primary_admin_actions` | header_top | **content** |
+| `powered` | header_top | **footer** |
+| `account_menu` | header_top | header_top *(đúng — design có "Đăng nhập hệ thống" ở top bar)* |
+
+`header_top`: **10 block → 1**.
+
+### CSS phục vụ
+
+```
+biến --nidqc-* trong CSS site trả về: 24
+.nidqc-header-top{background:var(--nidqc-primary-dark);color:var(--nidqc-white);...}
+.nidqc-nav-main{position:sticky;top:0;z-index:40;background:var(--nidqc-prim...
+.nidqc-page h1,h2,h3,h4{font-family:var(--nidqc-font-heading);}
+```
+
+### Kiểm bằng mắt (chụp màn hình)
+
+Cả 5 dải render đúng màu và đúng thứ tự. **Bắt được 1 lỗi thật** mà mọi lệnh đều bỏ sót —
+xem §10 (link "Đăng nhập" xanh trên nền xanh). Đã sửa và chụp lại: chữ trắng, đọc được.
+
+Hai vấn đề còn lại **không sửa** (ngoài phạm vi): §9.4 dải breadcrumb rỗng ở trang chủ,
+§9.5 `site_branding` tràn mép ở banner.
+
 ## 10. Nhật ký
 
 | Ngày | Người/Agent | Việc |
 |---|---|---|
 | 2026-07-16 | Claude | Soạn task. Phân tích cấu trúc cấp 1 của cả 12 file design → tìm ra 2 lỗi trong tài liệu đã commit: (1) `DESIGN_SYSTEM` §2 thiếu font `Lexend` — dùng **140 lần**, nhiều gấp 6 lần `Be Vietnam Pro`, có ở cả 12 trang; (2) `PAGE_MAPPING` §4 thiếu vùng breadcrumb — có ở cả 10 trang con, và đây chính là nguyên nhân gốc của TASK-001 §9.4. Đã xác minh style toàn cục thật: `body{font-family:'Be Vietnam Pro';color:#333333}`. |
 | 2026-07-16 | Claude | **Đã chạy thử toàn bộ lệnh §6 trước khi giao task.** Xác minh `#333333` tồn tại thật trong design → R2 sẽ qua AC2. Sửa 2 lỗi trong chính lệnh verify: (1) §6.4 ban đầu grep tên class mà task **không hề quy định** → AC4 không verify được; đã thêm bảng tên class bắt buộc vào R4. (2) Regex `nidqc-main` khớp nhầm chuỗi con trong `block-nidqc-main-menu` (class Drupal tự sinh) → lệnh báo "có" ngay cả khi `page.html.twig` chưa tồn tại; đã thêm `[" ]` hai đầu để bắt trọn class token, kiểm chứng cả hai chiều. |
+| 2026-07-16 | Claude | **Sửa lỗi spec trước khi thực thi:** `allowed_files` **thiếu `nidqc.libraries.yml`** trong khi R5 bắt buộc phải sửa file đó (thêm `layout.css` vào library) → task **tự mâu thuẫn**, không thể hoàn thành R5 mà không vi phạm chính nó. Đã bổ sung vào `allowed_files`. |
+| 2026-07-16 | Claude | **Thực thi task.** R1–R6 xong, AC1–AC10 đạt, output ở §11. Dọn xong 10 block ở `header_top` (TASK-001 §9.4) — giờ chỉ còn `account_menu`, đúng design. |
+| 2026-07-16 | Claude | **Sửa lệnh đếm token AC1 — nó đếm cả comment.** `grep -cE '^\s*--nidqc-'` ra **25** thay vì 24, vì một dòng **comment** tôi viết trong `tokens.css` (`--nidqc-text-muted (76 lần) ghi đè...`) bắt đầu bằng `--nidqc-` nên bị đếm như khai báo. Đã thêm `:` vào regex. Lỗi tương tự có trong TASK-001 §R3 → đã sửa luôn. |
+| 2026-07-16 | Claude | 🔴 **Chụp màn hình bắt được lỗi mà MỌI lệnh đều bỏ sót.** Link "Đăng nhập" render **xanh dương trên nền xanh đậm** — gần như không đọc được, là lỗi accessibility trên site nhà nước. Nguyên nhân: tôi đặt `color` cho `.nidqc-header-top` nhưng **link không kế thừa `color` của cha**. Đã thêm `.nidqc-header-top a { color: var(--nidqc-white) }` + bỏ bullet list. `curl`/`grep`/`watchdog` đều báo đạt — chỉ có nhìn mới thấy. Ghi thêm 2 phát hiện khác ở §9.4, §9.5. |

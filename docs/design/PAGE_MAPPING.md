@@ -74,22 +74,39 @@ thường nằm trong văn bản giấy, không được chết.
 
 ---
 
-## 4. Vùng dùng chung (mọi trang)
+## 4. Vùng dùng chung
 
-> 🔴 **MỤC NÀY THIẾU — đang chờ sửa ở `tasks/TASK-003.md` (R1).**
-> Design có **5** vùng dùng chung, không phải 4: thiếu dải **breadcrumb** (`#F5F5F5`,
-> `border-bottom: 1px solid #ECECEC`, `padding: 14px 24px`) nằm **ngay dưới nav**, có ở
-> **cả 10 trang con** (trang chủ không có). Đây chính là nguyên nhân gốc của `TASK-001.md` §9.4:
-> theme không có region `breadcrumb` nên Drupal ném block `breadcrumbs` vào `header_top`.
+Design có **5** dải dùng chung. Thứ tự **bắt buộc**, đã kiểm trên cả 12 file:
 
-| Vùng | Region Drupal | Nguồn nội dung |
-|---|---|---|
-| Top bar | `header_top` | Block: ngày (JS), chuyển ngữ, link đăng nhập |
-| Banner ảnh | `header_banner` | Block ảnh tĩnh |
-| Nav chính | `primary_menu` | Menu `main` (mega menu — Vue island) |
-| Footer | `footer` | Menu `footer` + block thông tin Viện |
+```
+div    #0D2870   top bar,   min-height 34px          -> header_top
+div    #FFFFFF   banner ảnh, border-bottom #ECECEC   -> header_banner
+header #0F3093   nav, sticky, 50px                   -> primary_menu
+div    #F5F5F5   breadcrumb, padding 14px 24px       -> breadcrumb
+       —         nội dung                            -> content
+footer #0D2870   footer, grid 2fr 1fr 1.3fr          -> footer
+```
 
-Bốn vùng này giống hệt nhau ở cả 11 trang thật → dựng một lần trong `page.html.twig`.
+| Vùng | Region Drupal | Có ở | Nguồn nội dung |
+|---|---|---|---|
+| Top bar | `header_top` | 11/11 | Block: ngày (JS), chuyển ngữ, link đăng nhập |
+| Banner ảnh | `header_banner` | 11/11 | Block ảnh tĩnh |
+| Nav chính | `primary_menu` | 11/11 | Menu `main` (mega menu — Vue island) |
+| **Breadcrumb** | `breadcrumb` | **10/11** — ❌ trang chủ | Block breadcrumb của Drupal |
+| Footer | `footer` | 11/11 | Menu `footer` + block thông tin Viện |
+
+> ⚠️ **Breadcrumb không có ở trang chủ.** Trang chủ cần `page--front.html.twig` riêng —
+> nó cũng khác ở chỗ top bar nằm trong `sc-if value="{{ showUtilityBar }}"` (có điều kiện)
+> và thân trang là nhiều `<section>` thay vì một khối nội dung. Xem `ROADMAP.md` §4 (TASK-008).
+
+Năm vùng này dựng một lần trong `page.html.twig` (`TASK-003`).
+
+### Không phải vùng chung
+
+| Dải | Vì sao không |
+|---|---|
+| Dải tiêu đề trang (`#F3F7FC` hoặc `#0D2870`) | Chỉ 8/10 trang, **và màu đổi theo trang** → thuộc `node--*.html.twig` |
+| Dải tabs (`#FFF`) | Chỉ 5 trang (Chính sách, Cơ cấu, Đào tạo, FAQ, Năng lực) |
 
 ---
 
