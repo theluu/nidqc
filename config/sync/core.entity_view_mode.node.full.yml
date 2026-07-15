@@ -1,0 +1,13 @@
+uuid: 887fc3f9-534c-4aa3-873c-8655e73f94b9
+langcode: vi
+status: false
+dependencies:
+  module:
+    - node
+_core:
+  default_config_hash: QJ2aZ1xfVf59aq6Pz5X7fyUOa2HxuCoTwQ_RQjoulAU
+id: node.full
+label: 'Nội dung đầy đủ'
+description: ''
+targetEntityType: node
+cache: true

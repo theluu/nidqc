@@ -1,0 +1,10 @@
+uuid: 890a65f1-52bf-4e12-9f7a-e3461683994d
+langcode: vi
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: 7yrlW5z9zdg2eBucB2GPqXKSMQfH9lSRSO4DbWF7AFc
+id: footer
+label: 'Phần chân'
+description: 'Site information links'
+locked: true

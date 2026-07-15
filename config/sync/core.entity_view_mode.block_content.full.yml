@@ -1,0 +1,13 @@
+uuid: 8e0f55ae-c3b2-4808-90d2-0882fb1c3f4e
+langcode: vi
+status: false
+dependencies:
+  module:
+    - block_content
+_core:
+  default_config_hash: Q7yUUYeRLByl-MCGveKKF_KhAtNICLCMJuKWfugCvso
+id: block_content.full
+label: 'Đầy đủ'
+description: ''
+targetEntityType: block_content
+cache: true

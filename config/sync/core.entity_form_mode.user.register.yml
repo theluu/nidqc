@@ -1,0 +1,13 @@
+uuid: d835f55a-e72f-4c0d-b0e8-60ad61e9bb94
+langcode: vi
+status: true
+dependencies:
+  module:
+    - user
+_core:
+  default_config_hash: 1TFiplNN7Wmj_DtVLLLP-NLPYpZJdAswKY-vTrYgFyo
+id: user.register
+label: 'Đăng ký'
+description: null
+targetEntityType: user
+cache: true

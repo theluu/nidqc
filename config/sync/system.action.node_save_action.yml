@@ -1,0 +1,13 @@
+uuid: ad272b99-cbab-4869-a987-5475f220fe79
+langcode: vi
+status: true
+dependencies:
+  module:
+    - node
+_core:
+  default_config_hash: LhdsoZPL_pFas2fjaAWue4zvrQ_tEVofLYtcNec-JGM
+id: node_save_action
+label: 'Lưu nội dung'
+type: node
+plugin: 'entity:save_action:node'
+configuration: {  }

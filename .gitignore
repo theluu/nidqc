@@ -14,7 +14,10 @@
 # --- Secrets — TUYỆT ĐỐI KHÔNG commit ---
 # (.ddev/.gitignore và web/sites/default/.gitignore cũng chặn một số mục này.
 #  Lặp lại ở đây có chủ đích: không phụ thuộc gitignore lồng nhau, chúng có thể bị sửa.)
-/web/sites/*/settings.php
+#
+# LƯU Ý: settings.php CÓ ĐƯỢC COMMIT — xem TASK-002 và BACKEND_ARCHITECTURE.md §6.
+# Đó là chỗ duy nhất đặt được config_sync_directory, và DDEV cũng mong đợi như vậy.
+# settings.php không chứa secret (hash_salt = ''); secret nằm ở 2 file dưới đây.
 /web/sites/*/settings.local.php
 /web/sites/*/settings.ddev.php
 /web/sites/*/services.yml

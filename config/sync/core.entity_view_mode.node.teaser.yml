@@ -1,0 +1,13 @@
+uuid: 8f5f0920-c1b9-47e5-b48c-ccc0f04f3ff1
+langcode: vi
+status: true
+dependencies:
+  module:
+    - node
+_core:
+  default_config_hash: KgGJDZFpMaz_8bTv6fN1bXS3Qi5LWmRJI9R53kEGsNQ
+id: node.teaser
+label: 'Bản tóm lược'
+description: ''
+targetEntityType: node
+cache: true

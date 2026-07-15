@@ -1,0 +1,20 @@
+uuid: 69da9518-9a82-417f-bbac-fd19bb3edef2
+langcode: vi
+status: true
+dependencies:
+  config:
+    - filter.format.restricted_html
+  module:
+    - filter
+    - media
+    - system
+_core:
+  default_config_hash: Tus1ZTNXKIOnrennR1hnTbc7wUPBXHTUm5UdCpEhJSk
+id: anonymous
+label: 'Người dùng nặc danh'
+weight: 0
+is_admin: false
+permissions:
+  - 'access content'
+  - 'use text format restricted_html'
+  - 'view media'

@@ -1,0 +1,11 @@
+uuid: 145cab7c-a3ba-4d7d-b9c0-3e7e87deae2b
+langcode: vi
+status: true
+dependencies:
+  module:
+    - taxonomy
+id: taxonomy_term.token
+label: Token
+description: null
+targetEntityType: taxonomy_term
+cache: true

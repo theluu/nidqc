@@ -1,0 +1,13 @@
+uuid: 204ff082-a564-43db-b300-3e829acc1fcc
+langcode: vi
+status: false
+dependencies:
+  module:
+    - user
+_core:
+  default_config_hash: ZbXunWS_xAvMZXFfinyvClDAb_RCVLt7gAzE3v16E-Q
+id: user.full
+label: 'Tài khoản người dùng'
+description: ''
+targetEntityType: user
+cache: true

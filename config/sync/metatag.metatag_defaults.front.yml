@@ -1,0 +1,11 @@
+uuid: 8a54f88e-dce2-4392-9b2b-660614c74cb7
+langcode: vi
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: 1noCXlegCr5HFehQRF1ViXy1jhU1jZ_sNN99a8Sj5jo
+id: front
+label: 'Trang nhất'
+tags:
+  canonical_url: '[site:url]'
+  shortlink: '[site:url]'

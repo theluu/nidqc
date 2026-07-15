@@ -62,9 +62,33 @@ Dự kiến: `page` · `news` · `document` · `faq` · `department` · `equipme
 
 ## 6. Config
 
-- Config export vào `config/sync/`.
+- Config export vào `config/sync/` (gốc dự án, **ngoài webroot**).
 - Đổi config trên UI → **phải** `drush cex` và commit. Không để lệch giữa DB và code.
 - Không commit config chứa secret hoặc thông tin môi trường.
+
+### 6.1. Ba file settings — file nào commit, file nào không
+
+> 🔴 **Đọc kỹ. Repo là public.** Đặt secret nhầm file là lộ ngay khi push.
+
+| File | Git | Chứa gì |
+|---|---|---|
+| `settings.php` | ✅ **ĐƯỢC COMMIT** | `config_sync_directory`, cấu hình chung. **Không secret.** `hash_salt` để rỗng. |
+| `settings.local.php` | ⛔ không commit | **Mọi secret**: `hash_salt` thật, DB creds, API key, `trusted_host_patterns` của production |
+| `settings.ddev.php` | ⛔ không commit | DDEV tự sinh (marker `#ddev-generated`), ghi đè mỗi `ddev start`. Sửa là mất. |
+
+Thứ tự nạp trong `settings.php`: cấu hình chung → `settings.ddev.php` (local) →
+`settings.local.php` (cuối cùng, ghi đè được tất cả).
+
+**Vì sao commit `settings.php`** (ngược `web/example.gitignore` của Drupal):
+`config_sync_directory` **chỉ đặt được ở đây**, và `settings.ddev.php` chỉ đặt fallback
+`sites/default/files/sync` — thư mục đó bị `.gitignore` chặn. Không commit `settings.php` thì
+config không tái lập được trên máy khác. DDEV cũng mong đợi như vậy (`.ddev/.gitignore` chỉ
+chặn `settings.ddev.php`). Xem `tasks/TASK-002.md`.
+
+> ⚠️ `$settings['config_sync_directory'] = '../config/sync';` phải nằm **trước** include
+> `settings.ddev.php`, nếu không DDEV thấy rỗng và gán đè đường dẫn cũ.
+
+### 6.2. Lệnh
 
 ```bash
 ddev drush cex     # export sau khi đổi trên UI

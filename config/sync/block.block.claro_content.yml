@@ -1,0 +1,22 @@
+uuid: e1aa504d-5241-428c-9ee4-531e9ed8183b
+langcode: vi
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - claro
+_core:
+  default_config_hash: a0Yyx1GeyKarZ4T_yXQBR_ZFKnXiFLtxAb6gWLd8nr0
+id: claro_content
+theme: claro
+region: content
+weight: 0
+provider: null
+plugin: system_main_block
+settings:
+  id: system_main_block
+  label: 'Nội dung chính của trang'
+  label_display: '0'
+  provider: system
+visibility: {  }

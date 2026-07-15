@@ -1,0 +1,13 @@
+uuid: 4497007c-272c-4e90-9972-11e9ed580c95
+langcode: vi
+status: true
+dependencies:
+  module:
+    - node
+_core:
+  default_config_hash: JBptjnfuOMtsdKygklXxoOgeOCTMtQxlkymjnnj-cC0
+id: node_unpromote_action
+label: 'Gỡ bỏ nội dung khỏi trang chính'
+type: node
+plugin: node_unpromote_action
+configuration: {  }

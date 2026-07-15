@@ -1,0 +1,12 @@
+uuid: 112ec07a-7a02-454a-812a-ee098bb4ca1c
+langcode: vi
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: 92bXZdyYJ5xqukdfmGRr_CYcwm1vfuS8b8aJ7X_G7E0
+id: taxonomy_term
+label: 'Từ liệu phân loại'
+tags:
+  canonical_url: '[term:url]'
+  description: '[term:description]'
+  title: '[term:name] | [site:name]'

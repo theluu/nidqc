@@ -19,8 +19,17 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 - `tasks/TASK-002.md` — sửa `config_sync_directory`, đưa `settings.php` vào git (chặn TASK-001)
 
 ### Fixed
+- **Config giờ tái lập được giữa các máy** (TASK-002). Trước đây `drush cex` ghi ra
+  `sites/default/files/sync` — thư mục bị gitignore — nên cấu hình không bao giờ được commit;
+  người mới `git clone` không nhận được theme, ngôn ngữ hay module đã bật. Nay export vào
+  `config/sync/` ở gốc dự án và được commit (232 file).
 - Sửa lệnh kiểm tra sai trong tài liệu: `drush watchdog:show --severity=Error` lỗi exit 1 vì
   site chạy langcode `vi` (Drush khớp nhãn severity đã dịch) — phải dùng `--severity=3`
+
+### Security
+- `settings.php` được đưa vào git để đặt `config_sync_directory`. Đã xác minh không chứa secret
+  (`hash_salt = ''`, không có `$databases`). Secret vẫn nằm ngoài git: `settings.ddev.php`
+  (DDEV tự sinh) và `settings.local.php` (mới bật include — chỗ đặt secret cho staging/production).
 
 ---
 

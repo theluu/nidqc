@@ -1,0 +1,14 @@
+uuid: b1297b3b-b7b4-4c0e-baad-385038833be0
+langcode: vi
+status: true
+dependencies:
+  config:
+    - user.role.administrator
+  module:
+    - user
+id: user_remove_role_action.administrator
+label: 'Remove the Administrator role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: administrator

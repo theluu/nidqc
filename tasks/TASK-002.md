@@ -1,7 +1,7 @@
 ---
 id: TASK-002
 title: Sửa config_sync_directory và đưa settings.php vào quản lý git
-status: ready
+status: review          # đã thực thi 2026-07-16, chờ NGƯỜI review (AI không được tự duyệt)
 step: 4                  # Drupal Backend — hạ tầng config
 owner: <chưa gán>
 reviewer: <chưa gán — KHÔNG được trùng owner>
@@ -261,9 +261,86 @@ Cho phép mọi host — chỉ an toàn vì file này là local-only và bị gi
 **Production phải đặt `trusted_host_patterns` thật** trong `settings.local.php`.
 Đã có trong `docs/deployment/DEPLOYMENT.md` §7? → kiểm tra, nếu chưa thì bổ sung ở task deploy.
 
+## 11. Output verify (chạy thật 2026-07-16)
+
+```
+$ ddev drush php:eval "print \Drupal\Core\Site\Settings::get('config_sync_directory');"
+../config/sync                                          # AC1 ✅
+
+$ ddev drush cex -y
+[success] Configuration successfully exported to ../config/sync.
+$ ls config/sync/*.yml | wc -l
+232                                                     # AC2 ✅
+
+$ git check-ignore -q config/sync/system.theme.yml       ; echo $?
+1  -> không bị ignore                                    # AC3 ✅
+$ git check-ignore -q web/sites/default/settings.php     ; echo $?
+1  -> không bị ignore                                    # AC4 ✅
+$ git check-ignore -q web/sites/default/settings.ddev.php; echo $?
+0  -> VẪN bị ignore                                      # AC5 ✅
+
+$ scan web/sites/default/settings.php
+(rỗng)                                                   # AC6 ✅
+
+$ ddev drush cim -y
+[notice] There are no changes to import.                 # AC7 ✅
+
+$ curl -s -o /dev/null -w "%{http_code}" https://nidqc.ddev.site/
+200                                                      # AC8 ✅
+
+$ ddev drush watchdog:show --severity=3 --count=10
+[notice] No log messages available.                      # AC9 ✅
+```
+
+### §6.7 — bài kiểm quyết định: config/sync có thật sự là nguồn sự thật?
+
+```
+$ grep "^default:" config/sync/system.theme.yml
+default: olivero
+
+$ ddev drush config:set system.theme default claro -y     # cố tình làm lệch
+$ ddev drush config:get system.theme default --format=string
+claro
+
+$ ddev drush cim -y
+[success] The configuration was imported successfully.
+$ ddev drush config:get system.theme default --format=string
+olivero                                                  # ✅ khôi phục đúng
+```
+
+### Soát bảo mật — mọi dòng thực thi trong settings.php
+
+19 dòng code (bỏ comment). Không có secret:
+```
+93:$databases = [];                                      # RỖNG — không có creds
+267:$settings['config_sync_directory'] = '../config/sync';  # trước include DDEV (885) ✅
+297:$settings['hash_salt'] = '';                         # RỖNG
+320:$settings['update_free_access'] = FALSE;
+724:$settings['container_yamls'][] = ... 'services.yml';
+794-797:$settings['file_scan_ignore_directories'] = ['node_modules','bower_components'];
+807:$settings['entity_update_batch_size'] = 50;
+816:$settings['entity_update_backup'] = TRUE;
+826:$settings['state_cache'] = TRUE;
+839:$settings['migrate_node_migrate_type_classic'] = FALSE;
+885-887: include settings.ddev.php
+906-908: include settings.local.php                      # sau DDEV -> ghi đè được ✅
+```
+
+### Soát 232 file config
+
+- `user.mail.yml`: `password: Your password` → **không phải secret**, là chữ trong mẫu email.
+- Mật khẩu admin **không có trong config** — password hash nằm ở bảng `users` trong DB, không export.
+- Email: site mail ban đầu là một hộp thư **thật của Viện** → **đã đổi** thành
+  `noreply@nidqc.gov.vn` (xem §10). Địa chỉ cũ cố ý **không ghi ra đây** — viết nó vào tài liệu
+  thì nó vẫn vào repo public, đúng thứ vừa gỡ đi.
+- Còn `dev@nidqc.local` ở `update.settings.yml` — giữ nguyên: `.local` không phải TLD thật,
+  không routable, bot harvest vô dụng. Production cần đổi khi cấu hình mail thật.
+
 ## 10. Nhật ký
 
 | Ngày | Người/Agent | Việc |
 |---|---|---|
 | 2026-07-16 | Claude | Soạn task. Truy được nguyên nhân gốc: `settings.ddev.php` dòng 32–35 chỉ đặt fallback và mong `settings.php` đặt giá trị; nhưng `.gitignore` dòng 20 chặn `settings.php` → vòng luẩn quẩn. Đã xác minh `settings.php` không chứa secret (`hash_salt=''`), secret thật nằm ở `settings.ddev.php` (vẫn bị chặn). |
 | 2026-07-16 | Claude | **Đã chạy thử lệnh quét secret §6.4 trước khi giao task.** Bản đầu có 2 false positive (`file_scan_ignore_directories`, `entity_update_batch_size`) rồi 2 dòng comment proxy — AC "output rỗng" sẽ fail dù file sạch. Đã thiết kế lại: chỉ bắt gán chuỗi không rỗng vào key nhạy cảm, loại dòng comment. Kiểm chứng 3 chiều: sạch trên `settings.php`, bắt đúng 4 secret trong `settings.ddev.php`, bắt được secret giả cố tình chèn. |
+| 2026-07-16 | Claude | **Thực thi task.** R1–R6 xong. AC1–AC9 đạt, output dán ở §11. `drush cex` ra 232 file vào `config/sync/`. §6.7 (bài kiểm quyết định) đạt: đổi theme sang `claro` → `cim` → về `olivero`, chứng minh `config/sync/` là nguồn sự thật. |
+| 2026-07-16 | Claude | ⚠️ **VƯỢT `allowed_files` — có người cho phép rõ ràng.** Khi soát bảo mật trước commit, phát hiện `config/sync/system.site.yml` chứa site mail là một **hộp thư thật của Viện**, sắp vào git history của **repo public** (bot harvest email). Sửa nằm ngoài `allowed_files` nên đã **dừng và hỏi** theo `AGENTS.md` §2. Người dùng chọn "đổi sang email trung tính rồi push" → đã chạy `drush config:set system.site mail noreply@nidqc.gov.vn` + export lại. Ghi nhận để người review biết diff có thay đổi ngoài phạm vi ban đầu. (Địa chỉ cũ không ghi ra đây — xem §11.) |

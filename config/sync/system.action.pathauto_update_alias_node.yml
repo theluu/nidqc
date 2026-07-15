@@ -1,0 +1,16 @@
+uuid: 7ae084ee-b5d0-435a-aaaf-4c9a53578f86
+langcode: vi
+status: true
+dependencies:
+  module:
+    - pathauto
+  enforced:
+    module:
+      - node
+_core:
+  default_config_hash: Cr0CsPUSuio4ClP7bOTqHBefJOLtN5KPyKyYj9E4qvQ
+id: pathauto_update_alias_node
+label: 'Cập nhật đường dẫn URL ảo'
+type: node
+plugin: pathauto_update_alias
+configuration: {  }

@@ -1,0 +1,13 @@
+uuid: 2e9c5767-9c25-4acd-a5dd-17f5cd654f63
+langcode: vi
+status: true
+dependencies:
+  enforced:
+    module:
+      - navigation
+_core:
+  default_config_hash: nqVwm91Uyib_rvFaNPF1MdYqHlmZ38w5rsOVVy4uWDw
+id: content
+label: 'Nội dung'
+description: 'Content task links'
+locked: true

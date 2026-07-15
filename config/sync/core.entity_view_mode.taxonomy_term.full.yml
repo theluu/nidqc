@@ -1,0 +1,13 @@
+uuid: 3183389e-7300-427e-b8bf-0c9ea0bc8bc5
+langcode: vi
+status: true
+dependencies:
+  module:
+    - taxonomy
+_core:
+  default_config_hash: iukUENpf8CFvjZbGGacKX_Ges0-lU9z6zvsd32P6kbo
+id: taxonomy_term.full
+label: 'Trang từ liệu'
+description: ''
+targetEntityType: taxonomy_term
+cache: true

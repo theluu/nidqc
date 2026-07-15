@@ -1,0 +1,16 @@
+uuid: 5d0b8137-6282-4db5-91d2-4f0a00ef581d
+langcode: vi
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: QgF3JDg2h0tf2gaqzc4mNvlHttNkUpmxk1LZefP82hE
+id: document
+label: 'Tài liệu'
+description: 'A locally hosted document, such as a PDF file.'
+source: file
+queue_thumbnail_downloads: false
+new_revision: true
+source_configuration:
+  source_field: field_media_document
+field_map:
+  name: name

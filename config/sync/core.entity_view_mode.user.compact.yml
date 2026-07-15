@@ -1,0 +1,13 @@
+uuid: 3bd227ca-f387-463d-9433-2ad48b6278cf
+langcode: vi
+status: true
+dependencies:
+  module:
+    - user
+_core:
+  default_config_hash: TtD7OuGskOsQfoGyxXkrdtllBpR37J19d5BMQDZWJgA
+id: user.compact
+label: Compact
+description: ''
+targetEntityType: user
+cache: true

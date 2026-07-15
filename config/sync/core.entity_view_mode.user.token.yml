@@ -1,0 +1,11 @@
+uuid: 7fa7b6d5-2c52-4041-933e-4637ab323e04
+langcode: vi
+status: true
+dependencies:
+  module:
+    - user
+id: user.token
+label: Token
+description: null
+targetEntityType: user
+cache: true

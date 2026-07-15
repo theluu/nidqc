@@ -1,0 +1,11 @@
+uuid: aa648cb1-82cf-48f0-b326-9b5e838d22e1
+langcode: vi
+status: true
+dependencies:
+  module:
+    - media
+id: media.token
+label: Token
+description: null
+targetEntityType: media
+cache: true

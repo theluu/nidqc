@@ -1,0 +1,11 @@
+uuid: 6592f027-94a0-4aef-8e90-e4909d99b0aa
+langcode: vi
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: PWTsHiwkIfp5TW-iTBc9AhBtvbYY6wrp3MopazQ-95o
+name: Thẻ
+vid: tags
+description: 'Use tags to group content on similar topics into categories.'
+weight: 0
+new_revision: false

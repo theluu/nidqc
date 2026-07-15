@@ -1,0 +1,13 @@
+uuid: c6c45f64-7381-469c-acd9-10fe0170ae5d
+langcode: vi
+status: false
+dependencies:
+  module:
+    - media
+_core:
+  default_config_hash: dTfAUHooYV0uOVPO3saGpgv-c5PppJXDwxvwRTJOycM
+id: media.full
+label: 'Nội dung đầy đủ'
+description: ''
+targetEntityType: media
+cache: true

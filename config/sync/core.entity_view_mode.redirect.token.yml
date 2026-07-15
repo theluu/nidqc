@@ -1,0 +1,11 @@
+uuid: 1a211469-53cf-4b1a-a12a-70313a052f37
+langcode: vi
+status: true
+dependencies:
+  module:
+    - redirect
+id: redirect.token
+label: Token
+description: null
+targetEntityType: redirect
+cache: true
