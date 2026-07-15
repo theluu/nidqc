@@ -49,6 +49,13 @@
 
 ## 2. Typography
 
+> 🔴 **MỤC NÀY SAI — đang chờ sửa ở `tasks/TASK-003.md` (R1).**
+> Đếm thật trên cả 12 file design: **`Lexend` dùng 140 lần** (font tiêu đề, `h1`–`h4`, có ở
+> **mọi trang**), `Be Vietnam Pro` 22 lần (font thân bài), `Roboto Mono` 1 lần. Cả 3 đều self-host.
+> Style toàn cục thật: `body { font-family: 'Be Vietnam Pro'; color: #333333; }`.
+> **Đừng dựa vào mục này cho tới khi TASK-003 xong.** Kiểm lại bất cứ lúc nào bằng:
+> `cat /tmp/tpl/*.tpl.html | grep -oE "font-family:\s*'[^']+'" | sort | uniq -c | sort -rn`
+
 **Font duy nhất: `Be Vietnam Pro`** — self-host, KHÔNG gọi Google Fonts CDN (site nhà nước, tránh phụ thuộc ngoài).
 
 Weight có trong design: `400`, `500`, `600`, `700`.

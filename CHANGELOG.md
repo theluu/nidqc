@@ -21,6 +21,7 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 - `scripts/extract-design.py` — trích markup/token từ design bundled
 - `tasks/TASK-001.md` — dựng khung theme custom `nidqc` + `tokens.css`
 - `tasks/TASK-002.md` — sửa `config_sync_directory`, đưa `settings.php` vào git (chặn TASK-001)
+- `tasks/TASK-003.md` — dựng `page.html.twig` (5 vùng dùng chung) + sửa 2 lỗi tài liệu design
 
 ### Fixed
 - **Config giờ tái lập được giữa các máy** (TASK-002). Trước đây `drush cex` ghi ra

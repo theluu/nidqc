@@ -76,6 +76,12 @@ thường nằm trong văn bản giấy, không được chết.
 
 ## 4. Vùng dùng chung (mọi trang)
 
+> 🔴 **MỤC NÀY THIẾU — đang chờ sửa ở `tasks/TASK-003.md` (R1).**
+> Design có **5** vùng dùng chung, không phải 4: thiếu dải **breadcrumb** (`#F5F5F5`,
+> `border-bottom: 1px solid #ECECEC`, `padding: 14px 24px`) nằm **ngay dưới nav**, có ở
+> **cả 10 trang con** (trang chủ không có). Đây chính là nguyên nhân gốc của `TASK-001.md` §9.4:
+> theme không có region `breadcrumb` nên Drupal ném block `breadcrumbs` vào `header_top`.
+
 | Vùng | Region Drupal | Nguồn nội dung |
 |---|---|---|
 | Top bar | `header_top` | Block: ngày (JS), chuyển ngữ, link đăng nhập |
