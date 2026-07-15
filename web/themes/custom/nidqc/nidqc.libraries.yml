@@ -14,3 +14,15 @@ global:
     theme:
       css/base.css: {}
       css/layout.css: {}
+
+# Vue island — TÁCH khỏi `global` có chủ đích.
+#
+# Island CHỈ nạp ở trang cần, qua #attached trong preprocess. Nhét vào `global`
+# là bắt mọi trang tải JS mà 97,9% nội dung không cần (xem docs/ROADMAP.md §5).
+#
+# Hiện chưa nạp ở đâu — registry trong main.js còn rỗng. Island đầu tiên là TASK-006.
+# File dist/islands.js do Vite build ra, KHÔNG commit (xem .gitignore).
+islands:
+  version: 1.x
+  js:
+    dist/islands.js: { attributes: { type: module, defer: true } }

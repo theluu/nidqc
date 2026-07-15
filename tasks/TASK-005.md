@@ -1,7 +1,7 @@
 ---
 id: TASK-005
 title: Dựng frontend/ — Vite + bootstrap island (chưa có island nào)
-status: ready
+status: review          # đã thực thi 2026-07-16, chờ NGƯỜI review (AI không được tự duyệt)
 step: 5                  # Vue Frontend — hạ tầng
 owner: <chưa gán>
 reviewer: <chưa gán — KHÔNG được trùng owner>
@@ -60,11 +60,15 @@ Nếu thấy mình định render nội dung bằng Vue → **sai kiến trúc, 
 
 - [ ] **R1** — 🔴 **Xin duyệt package trước khi cài.** Task này là ngoại lệ duy nhất của
       `AGENTS.md` §2.3. Danh sách **tối thiểu**, không thêm gì khác:
-      | Package | Vì sao |
-      |---|---|
-      | `vue` ^3 | Bắt buộc |
-      | `vite` ^7 | Build |
-      | `@vitejs/plugin-vue` | Biên dịch `.vue` |
+      | Package | Bản | Vì sao |
+      |---|---|---|
+      | `vue` | ^3 | Bắt buộc |
+      | `vite` | **^8** | Build |
+      | `@vitejs/plugin-vue` | ^6 | Biên dịch `.vue` |
+
+      > ✅ **Đã được người duyệt 2026-07-16** — dùng Vite 8.
+      > Ba package này kéo theo **66 package** trong lock (dependency gián tiếp). Đó mới là
+      > bề mặt supply chain thật, không phải 3. Xem §8.
 
       ⛔ **KHÔNG** cài: router (điều hướng là việc của Drupal) · Pinia/Vuex (island độc lập) ·
       Tailwind/CSS framework (design là inline style thuần) · UI library · axios (dùng `fetch`).
@@ -212,13 +216,85 @@ tức là cần Node ở tầng build (CI hoặc máy deploy).
 Nếu deploy tay không có Node → phải commit `dist/`. **Quyết định này chưa chốt** và ảnh hưởng
 deploy. Cần trả lời trước lần deploy đầu, không phải bây giờ.
 
-### 9.2. 🟡 Vite 7 cần Node ≥ 20.19
+### 9.2. 🟡 Vite 8 cần Node hiện đại
 
-DDEV có Node 24.13.1 → OK. Nhưng **máy CI/production phải cùng phiên bản**. Nên ghim
-`engines` trong `package.json` và `.nvmrc`. Chưa có hạ tầng CI để ghim vào — ghi nhận.
+DDEV có Node 24.13.1 → OK. Nhưng **máy CI/production phải cùng phiên bản**. Đã ghim `engines`
+trong `package.json` và thêm `.nvmrc`. Chưa có hạ tầng CI để áp — ghi nhận.
+
+> Task bản đầu ghi `vite ^7`; khi thực thi thì bản hiện tại đã là **8.1.4**. Người duyệt chọn
+> Vite 8 (2026-07-16). Đã sửa R1.
+
+## 11. Output verify (chạy thật 2026-07-16)
+
+```
+$ ddev exec "cd frontend && npm ci"
+found 0 vulnerabilities                          # AC1 ✅
+
+$ ddev exec "cd frontend && npm run build"
+../web/themes/custom/nidqc/dist/islands.js  58.45 kB │ gzip: 23.12 kB
+✓ built in 295ms                                 # AC2 ✅
+
+$ ls web/themes/custom/nidqc/dist/
+islands.js                                       # AC3 ✅ không hash
+
+$ # AC4 — package trực tiếp
+@vitejs/plugin-vue: ^6.0.8
+vite: ^8.1.4
+vue: ^3.5.39
+⛔ CẤM mà vẫn có: (không) ✅
+Số package trực tiếp: 3                          # AC4 ✅
+tổng package trong lock: 66                      # bề mặt supply chain thật
+
+$ npm audit --audit-level=moderate
+found 0 vulnerabilities                          # §8 ✅
+
+$ git check-ignore -v web/themes/custom/nidqc/dist/islands.js
+.gitignore:44 -> bị chặn                         # AC5 ✅
+$ git check-ignore -v frontend/node_modules/.package-lock.json
+.gitignore:42 -> bị chặn                         # AC5 ✅
+$ git check-ignore -q frontend/package-lock.json
+-> KHÔNG bị chặn, sẽ được commit                 # AC5 ✅
+$ git status --porcelain | grep -E "node_modules|dist/"
+(rỗng)                                           # AC5 ✅
+
+$ curl -s -o /dev/null -w "%{http_code}" https://nidqc.ddev.site/
+200                                              # AC6 ✅
+$ curl -s <trang> | grep -oE '<(link|script|img|iframe)[^>]*(src|href)="https?://[^"]+"' | grep -v nidqc.ddev.site
+(rỗng)                                           # AC7 ✅
+$ ddev drush watchdog:show --severity=3
+No log messages available.                       # AC8 ✅
+
+$ # Drupal nhận diện library
+getLibraryByName('nidqc','islands') -> themes/custom/nidqc/dist/islands.js  ✅
+
+$ # islands.js CHƯA nạp ở trang nào (đúng — registry rỗng, xem §7)
+số lần islands.js trong HTML: 0                  ✅
+```
+
+### §6.5 — bootstrap có im lặng bỏ qua island lạ không?
+
+Chạy trong trình duyệt thật: dựng 2 island **không có trong registry**, một cái kèm
+`data-props` **JSON hỏng**, rồi nạp bundle đã build:
+
+```json
+{
+  "script_load": "loaded",
+  "console_errors": [],
+  "noi_dung_con_nguyen": true
+}
+```
+
+**0 lỗi console**, và **nội dung do Twig render còn nguyên**. Đó là điểm mấu chốt của
+progressive enhancement: island không mount được thì HTML vẫn phải dùng được.
+
+> Ghi chú: `data-props` hỏng không sinh lỗi vì island đó không có trong registry nên
+> `mountIsland()` return sớm, `readProps()` chưa từng chạy. Đúng thiết kế.
 
 ## 10. Nhật ký
 
 | Ngày | Người/Agent | Việc |
 |---|---|---|
+| 2026-07-16 | Claude | **Người duyệt npm 2026-07-16** — chọn Vite 8. Task bản đầu ghi `vite ^7` nhưng bản hiện tại đã là **8.1.4**; đã sửa R1 và §9.2. |
+| 2026-07-16 | Claude | **Thực thi task.** R1–R7 xong, AC1–AC8 đạt, output ở §11. `npm audit`: 0 lỗ hổng. Đúng 3 package trực tiếp, 66 package trong lock. |
+| 2026-07-16 | Claude | **Hai lần suýt kết luận sai.** (1) Sau `npm run build`, `ls` trên host báo thư mục `dist` **không tồn tại** dù build báo thành công — hoá ra **DDEV dùng mutagen sync bất đồng bộ**, file có trong container trước, host trễ vài giây. Không phải lỗi build. Đã ghi cảnh báo vào `frontend/README.md`. (2) Cùng lúc đó dòng "✅ không hash" là **false pass**: `ls` lỗi → `grep` rỗng → `\|\|` bắn. Đúng bẫy `&&/\|\|` đã dính nhiều lần; đã đổi sang `if/then`. |
 | 2026-07-16 | Claude | Soạn task. Kiểm thật: `frontend/` rỗng hoàn toàn; DDEV có sẵn Node v24.13.1 + npm 11.8.0 nên không cần cài Node. Giới hạn 3 package có chủ đích — `node_modules` là bề mặt supply chain lớn nhất, và `ADR-001` không cần router/store/CSS framework. |

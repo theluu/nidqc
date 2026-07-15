@@ -15,8 +15,8 @@
 | [TASK-002](../tasks/TASK-002.md) | `config_sync_directory` — config tái lập được | ✅ xong, chờ review |
 | [TASK-003](../tasks/TASK-003.md) | `page.html.twig` — 5 vùng chung + sửa 2 lỗi tài liệu | ✅ xong, chờ review |
 | [TASK-004](../tasks/TASK-004.md) | Self-host font Lexend + Be Vietnam Pro | ✅ xong, chờ review |
-| [TASK-005](../tasks/TASK-005.md) | Dựng `frontend/` — Vite + island bootstrap | 📝 ready ⚠️ cần duyệt npm |
-| TASK-006 | Island `mega-menu` | ⏳ chưa soạn (sau 005) |
+| [TASK-005](../tasks/TASK-005.md) | Dựng `frontend/` — Vite + island bootstrap | ✅ xong, chờ review |
+| TASK-006 | Island `mega-menu` | ⏳ **chưa soạn — task tiếp theo, KHÔNG bị chặn** |
 | **TASK-007** | **Content type + field** | 🔴 **BỊ CHẶN** — xem §3 |
 | TASK-008+ | 11 trang Twig + 5 island còn lại | 🔴 chặn bởi TASK-007 |
 
@@ -25,15 +25,15 @@
 ```
 TASK-003 ✅ (Twig khung) ─┐
 TASK-004 ✅ (font)       ─┤
-TASK-005 (Vite)  ── TASK-006 (mega menu island)
+TASK-005 ✅ (Vite)  ── TASK-006 (mega menu island)  <- tiếp theo
                          │
       🔴 TASK-007 (content type) ──── 11 trang Twig + 5 island
               ↑
       BỊ CHẶN bởi 3 câu hỏi chưa hỏi NIDQC
 ```
 
-**Làm được ngay (không chặn):** ~~TASK-003~~ ✅ → ~~TASK-004~~ ✅ → **TASK-005** → TASK-006.
-Còn lại: hạ tầng Vue (cần duyệt npm) và mega menu island.
+**Làm được ngay (không chặn):** ~~003~~ ✅ → ~~004~~ ✅ → ~~005~~ ✅ → **TASK-006 (mega menu island)**.
+Sau TASK-006 thì **hết việc không bị chặn** — mọi thứ còn lại cần content type.
 
 **Mọi thứ còn lại chặn bởi TASK-007.**
 

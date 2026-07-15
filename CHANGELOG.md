@@ -9,6 +9,10 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 ## [Unreleased]
 
 ### Added
+- **Hạ tầng Vue island** (TASK-005) — `frontend/` với Vite 8, bootstrap tự quét `[data-island]`
+  và mount. Chưa có island nào (registry rỗng — đúng); island đầu tiên là TASK-006. Đúng 3
+  package trực tiếp (`vue`, `vite`, `@vitejs/plugin-vue`), 0 lỗ hổng. Production **không chạy
+  Node** — Vite chỉ build ra JS tĩnh cho Drupal library nạp.
 - **Font đúng design, self-host** (TASK-004) — `Lexend` cho tiêu đề, `Be Vietnam Pro` cho thân bài,
   tiếng Việt đủ dấu. 15 file woff2 (220 KB) trích thẳng từ design bundle, **không gọi Google Fonts
   CDN** — site nhà nước không phụ thuộc hạ tầng nước ngoài và giữ được CSP chặt. Kèm giấy phép

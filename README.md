@@ -74,7 +74,7 @@ Kế hoạch đầy đủ: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 | [002](tasks/TASK-002.md) | Config tái lập được | ✅ chờ review |
 | [003](tasks/TASK-003.md) | `page.html.twig` — 5 vùng chung | ✅ chờ review |
 | [004](tasks/TASK-004.md) | Self-host font | ✅ chờ review |
-| [005](tasks/TASK-005.md) | Dựng `frontend/` (Vite) | 📝 ready |
+| [005](tasks/TASK-005.md) | Dựng `frontend/` (Vite) | ✅ chờ review |
 | 007+ | Content type → 11 trang Twig → island | 🔴 **bị chặn** |
 
 > 🔴 **Blocker:** site có **0 content type**, và không thể chốt content type cho tới khi NIDQC
@@ -123,7 +123,7 @@ và [`ROADMAP.md`](docs/ROADMAP.md) §5.
 - [x] `git init` + baseline
 - [x] Theme custom `web/themes/custom/nidqc/` — khung + 21 design token
 - [x] Config tái lập được (`config/sync/`, 232 file)
-- [ ] `frontend/` (Vue + Vite) — [TASK-005](tasks/TASK-005.md)
+- [x] `frontend/` — Vite 8 + bootstrap island ([TASK-005](tasks/TASK-005.md))
 - [x] Font self-host: Lexend + Be Vietnam Pro, tiếng Việt đủ dấu ([TASK-004](tasks/TASK-004.md))
 - [x] `page.html.twig` — 5 vùng chung theo design ([TASK-003](tasks/TASK-003.md))
 - [ ] Content type — 🔴 **bị chặn**, cần NIDQC trả lời

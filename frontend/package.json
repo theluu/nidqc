@@ -1,0 +1,22 @@
+{
+  "name": "nidqc-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Vue island cho website Viện Kiểm nghiệm thuốc Trung ương. KHÔNG phải SPA — xem docs/decisions/ADR-001.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "echo 'Chưa dựng lint — xem tasks/TASK-005.md §9' && exit 0"
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
+  "dependencies": {
+    "vue": "^3.5.39"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.8",
+    "vite": "^8.1.4"
+  }
+}
