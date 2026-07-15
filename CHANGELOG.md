@@ -9,6 +9,9 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 ## [Unreleased]
 
 ### Added
+- **Mega menu dùng được bằng bàn phím và cảm ứng** (TASK-006) — design chỉ có hover, làm y hệt
+  là loại người dùng bàn phím và điện thoại khỏi menu chính của site nhà nước. Island thêm
+  Enter/Esc/mũi tên, chạm-lần-1-mở, `aria-expanded`. Tắt JS thì `:hover`/`:focus-within` lo.
 - **Hạ tầng Vue island** (TASK-005) — `frontend/` với Vite 8, bootstrap tự quét `[data-island]`
   và mount. Chưa có island nào (registry rỗng — đúng); island đầu tiên là TASK-006. Đúng 3
   package trực tiếp (`vue`, `vite`, `@vitejs/plugin-vue`), 0 lỗ hổng. Production **không chạy
@@ -40,6 +43,12 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 - `scripts/extract-fonts.py` — trích woff2 + sinh `@font-face` từ design bundle
 
 ### Fixed
+- 🔴 **Bootstrap island sẽ xoá mất nội dung Twig** (TASK-006, sửa lỗi của TASK-005) —
+  `createApp().mount(el)` xoá sạch nội dung container rồi mới render, nên mount vào
+  `<div data-island>` sẽ phá đúng HTML mà Twig render cho SEO. Nguyên tắc *"Vue nâng cấp HTML có
+  sẵn"* trong `FRONTEND_ARCHITECTURE` §1 sai về kỹ thuật. Nay tách hai loại island ([ADR-002]):
+  nâng cấp → JS thuần, render → Vue. `main.js` chặn thẳng việc mount Vue vào container có nội dung.
+  Phụ thêm: trang chỉ có mega-menu giờ tải **0,6 kB** thay vì **58 kB**.
 - **Tài liệu design sai về font** (TASK-003) — `DESIGN_SYSTEM` §2 khẳng định "Font duy nhất:
   Be Vietnam Pro". Đếm thật: `Lexend` dùng **140 lần** (font tiêu đề, cả 12 trang), Be Vietnam Pro
   22 lần (thân bài), Roboto Mono 1 lần. Hệ quả: `tokens.css` thiếu biến font tiêu đề nên mọi

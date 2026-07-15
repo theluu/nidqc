@@ -14,6 +14,7 @@ ADR không phải thủ tục hành chính. Nó là cách làm cho quyết đị
 | # | Quyết định | Trạng thái | Ngày |
 |---|---|---|---|
 | [001](ADR-001-frontend-architecture.md) | Drupal theme + Vue islands | ✅ Accepted | 2026-07-15 |
+| [002](ADR-002-island-types.md) | Hai loại island: JS thuần nâng cấp, Vue render | ✅ Accepted | 2026-07-16 |
 
 ## Khi nào viết ADR
 

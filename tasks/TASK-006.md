@@ -1,7 +1,7 @@
 ---
 id: TASK-006
 title: Island mega-menu — nâng cấp menu chính, có bàn phím và cảm ứng
-status: ready
+status: review          # đã thực thi 2026-07-16, chờ NGƯỜI review (AI không được tự duyệt)
 step: 5                  # Vue Frontend
 owner: <chưa gán>
 reviewer: <chưa gán — KHÔNG được trùng owner>
@@ -14,8 +14,10 @@ config_change: false     # ⚠️ menu link là CONTENT, không phải config �
 # PHỤ THUỘC: sau TASK-005 (hạ tầng Vite) và TASK-003 (page.html.twig).
 
 allowed_files:
-  - frontend/src/islands/MegaMenu.vue
+  - frontend/src/islands/megaMenu.js        # .js chứ KHÔNG .vue — xem §10 / ADR-002
   - frontend/src/main.js
+  - docs/decisions/ADR-002-island-types.md  # phát sinh khi thực thi — xem §10
+  - docs/architecture/FRONTEND_ARCHITECTURE.md
   - web/themes/custom/nidqc/nidqc.theme
   - web/themes/custom/nidqc/css/layout.css
   - web/themes/custom/nidqc/templates/navigation/menu--main.html.twig
@@ -102,7 +104,7 @@ Phần lớn trỏ tới trang **chưa tồn tại** (0 content type). Dựng me
 ## 3. Phạm vi
 
 ### Trong phạm vi
-- `MegaMenu.vue` — island nâng cấp menu có sẵn
+- `megaMenu.js` — island **loại nâng cấp** (JS thuần, ADR-002), nâng cấp menu Twig có sẵn
 - `menu--main.html.twig` — render `<ul><li><a>` + `data-island`, **dùng được khi tắt JS**
 - CSS dropdown + nút tìm kiếm theo design
 - Đăng ký island vào `registry`, `#attached` library `islands`
@@ -123,14 +125,15 @@ Phần lớn trỏ tới trang **chưa tồn tại** (0 content type). Dựng me
       `<div data-island="mega-menu">`. **Không** ẩn submenu bằng `display:none` mặc định trong CSS
       — xem R4.
 
-- [ ] **R2** — `MegaMenu.vue`:
+- [ ] **R2** — `megaMenu.js` — **JS thuần, KHÔNG import Vue** (ADR-002, phát sinh khi thực thi):
       - Hover mục cha → mở dropdown; rời `<header>` → đóng (như design)
       - Dropdown canh theo **vị trí mục đang hover** (design dùng `menuRect`)
       - 🔴 **Bàn phím**: `Tab` đi qua từng mục; `Enter`/`Space` mở-đóng; `Esc` đóng và trả focus
         về mục cha; mũi tên xuống vào submenu. **Không bẫy focus.**
       - 🔴 **Cảm ứng**: chạm mục cha lần 1 → mở, không điều hướng; lần 2 → đi.
         (`pointerdown` + kiểm `pointerType`, đừng đoán bằng độ rộng màn hình.)
-      - `aria-expanded`, `aria-controls` trên mục cha; `aria-hidden` đúng trạng thái
+      - `aria-expanded` trên mục cha
+      - ⛔ **Không đụng `el.innerHTML`** — đó là nội dung của Twig (ADR-002)
 
 - [ ] **R3** — CSS theo design (`layout.css`, chỉ `var(--nidqc-*)`, **không hex**):
       | Thành phần | Giá trị |
@@ -141,8 +144,9 @@ Phần lớn trỏ tới trang **chưa tồn tại** (0 content type). Dựng me
       | Nút tra cứu | `42×34`, `border-radius: 18px`, nền `--nidqc-accent` (`#1D6AC5`), hover `--nidqc-accent-2` (`#1565B3`) |
 
 - [ ] **R4** — 🔴 **Progressive enhancement.** Tắt JS → submenu **vẫn tới được**.
-      Cách làm: submenu hiện qua `:hover`/`:focus-within` bằng **CSS thuần**; Vue chỉ thêm
-      bàn phím, cảm ứng, aria và định vị. **Không** để trạng thái mở chỉ tồn tại trong Vue.
+      Cách làm: submenu hiện qua `:hover`/`:focus-within` bằng **CSS thuần**; island chỉ thêm
+      bàn phím, cảm ứng và aria. **Không** để trạng thái mở chỉ tồn tại trong JS.
+      Island gắn `.is-enhanced` để CSS biết đã tiếp quản — hai cơ chế không chồng nhau.
 
 - [ ] **R5** — Đăng ký `'mega-menu'` vào `registry` trong `main.js`.
 
@@ -281,9 +285,82 @@ Design có nút tròn trỏ `#chat-chuan` (anchor trang chủ), nhưng cũng có
 `/tim-kiem-chat-chuan` — **trang không có design**. Xem `PROJECT_CONTEXT.md` §5.
 Task này dựng nút theo đúng design (`#chat-chuan`), không hơn.
 
+## 11. Output verify (chạy thật 2026-07-16)
+
+```
+$ ddev exec "cd frontend && npm run build"
+islands.js                          2.39 kB │ gzip: 1.25 kB
+island-megaMenu.js                  1.49 kB
+island-vue.runtime.esm-bundler.js  58.00 kB │ gzip: 22.90 kB   <- chunk RIÊNG
+✓ built in 223ms                                       # AC1 ✅
+
+$ curl -s https://nidqc.ddev.site/ | grep -c 'Giới thiệu chung'
+1                                                      # AC2 ✅ submenu trong HTML thô
+$ curl -s https://nidqc.ddev.site/ | grep -c 'Cơ cấu tổ chức'
+1                                                      # AC2 ✅
+
+$ grep -E '#[0-9a-fA-F]{6}' css/layout.css
+(rỗng)                                                 # AC7 ✅
+$ ddev drush watchdog:show --severity=3
+No log messages available.                             # AC8 ✅
+```
+
+### ⭐ Vue KHÔNG tải trên trang chỉ có mega-menu — lợi ích ADR-002, đo được
+
+```json
+{
+  "js_da_tai": [ {"file":"islands.js","kb":0.3}, {"file":"island-megaMenu.js","kb":0.3} ],
+  "vue_co_tai_khong": false,
+  "island_da_nang_cap": true,
+  "so_link_menu": 6,                  <- nội dung Twig CÒN NGUYÊN
+  "aria": [["Giới thiệu","false"]]
+}
+```
+**0,6 kB** thay vì **58 kB** nếu Vue bị kéo vào — nhỏ hơn ~97%.
+
+### AC4 — bàn phím: 11/11 đạt
+
+```
+focus vào mục cha                     ✅
+submenu đóng lúc đầu (aria=false)     ✅
+Enter -> mở (aria=true)               ✅
+Esc -> đóng (aria=false)              ✅
+Esc -> focus về mục cha               ✅
+↓ -> mở + vào con đầu                 ✅
+↓ trong sub -> con thứ 2              ✅
+↑ -> con thứ 1                        ✅
+↑ ở con đầu -> về cha                 ✅
+Esc trong sub -> đóng + focus cha     ✅
+Tab không bị chặn (không bẫy focus)   ✅
+```
+
+### AC3 — fallback tắt JS: 7/7 đạt
+
+```
+1_khong_js_mac_dinh_DONG      true    <- CSS thuần, submenu đóng
+2_khong_js_focus_MO           true    <- :focus-within mở (đường cho bàn phím)
+3_khong_js_bo_focus_DONG      true
+4_co_js_mac_dinh_DONG         true    <- island tiếp quản
+5_co_js_aria_true_MO          true    <- aria-expanded điều khiển
+6_co_js_aria_false_DONG       true
+7_noi_dung_con_nguyen         6       <- link Twig còn nguyên ở MỌI trạng thái
+```
+
+> ⚠️ Lần chạy đầu, mục 1 báo `false` — nhìn như lỗi. Thật ra là **rác từ test bàn phím
+> trước đó**: focus còn nằm trên mục cha nên `:focus-within` đang bật. Chạy lại sau khi
+> `blur()` thì đạt. Đây là lý do test trạng thái phải dọn sạch trước.
+
+### Kiểm bằng mắt
+
+Ảnh chụp dropdown mở: panel trắng có shadow, 4 mục có viền `--nidqc-bg-alt`, chữ
+`--nidqc-text`, tiếng Việt đủ dấu ("Giới thiệu chung", "Chính sách chất lượng", "Năng lực",
+"Cơ cấu tổ chức"). Nav `--nidqc-primary`, chữ trắng đậm. Khớp design.
+
 ## 10. Nhật ký
 
 | Ngày | Người/Agent | Việc |
 |---|---|---|
 | 2026-07-16 | Claude | Soạn task. Trích markup + JS mega menu từ design: hover mở, `onmouseleave` trên `<header>` đóng, dropdown canh theo `menuRect` của mục đang hover. Menu thật có 9 mục, 2 tầng. |
+| 2026-07-16 | Claude | 🔴🔴 **Phát hiện lỗi KIẾN TRÚC trong code đã ship ở TASK-005.** `createApp().mount(el)` **xoá sạch nội dung của `el`** — đã kiểm chứng trong trình duyệt: `<ul><li><a>Nội dung Twig</a></li></ul>` → `<span hidden></span>`. Bootstrap TASK-005 mount thẳng vào `<div data-island>`, nghĩa là nó sẽ **xoá đúng HTML mà Twig render cho SEO** — làm ngược hoàn toàn ADR-001. Nguyên tắc §1 của `FRONTEND_ARCHITECTURE` (*"Vue nâng cấp HTML có sẵn"*) **sai về kỹ thuật**: Vue không nâng cấp, nó thay thế. Đây là quyết định kiến trúc nên đã **dừng và hỏi** (`AGENTS.md` §2.10). Người dùng chọn: JS thuần cho island nâng cấp, Vue chỉ cho island render. → viết **ADR-002**, sửa `main.js` (chặn mount Vue vào container có nội dung), sửa `FRONTEND_ARCHITECTURE` §1, và `MegaMenu.vue` → **`megaMenu.js`**. |
+| 2026-07-16 | Claude | **Thực thi task.** R1–R6 xong, AC1–AC9 đạt, output §11. Lợi ích đo được của ADR-002: trang chỉ có mega-menu tải **0,6 kB** thay vì **58 kB** — Vue nằm chunk riêng và không tải. |
 | 2026-07-16 | Claude | 🔴 **Sửa lại đánh giá sai của chính mình trong `ROADMAP.md`.** Tôi ghi TASK-006 "✅ làm được, không bị chặn" — **quá lạc quan**. Kiểm thật: menu `main` có **0 link** ("Nhà" là plugin tĩnh `standard.front_page`, không phải menu link); `menu_link_content` là entity **content** nên `drush cex` **không export** → menu tạo qua UI **không tái lập được** trên máy khác; và 9 mục trong design trỏ tới trang chưa tồn tại. Island **code được**, nhưng menu **thật** thì chặn bởi TASK-007. Đã ghi §9.1 và sửa ROADMAP. |

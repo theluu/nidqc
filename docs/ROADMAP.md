@@ -16,7 +16,7 @@
 | [TASK-003](../tasks/TASK-003.md) | `page.html.twig` — 5 vùng chung + sửa 2 lỗi tài liệu | ✅ xong, chờ review |
 | [TASK-004](../tasks/TASK-004.md) | Self-host font Lexend + Be Vietnam Pro | ✅ xong, chờ review |
 | [TASK-005](../tasks/TASK-005.md) | Dựng `frontend/` — Vite + island bootstrap | ✅ xong, chờ review |
-| [TASK-006](../tasks/TASK-006.md) | Island `mega-menu` | 📝 ready ⚠️ **chỉ code được island; menu THẬT chặn bởi 007** |
+| [TASK-006](../tasks/TASK-006.md) | Island `mega-menu` | ✅ xong, chờ review (menu THẬT vẫn chặn bởi 007) |
 | **TASK-007** | **Content type + field** | 🔴 **BỊ CHẶN** — xem §3 |
 | TASK-008+ | 11 trang Twig + 5 island còn lại | 🔴 chặn bởi TASK-007 |
 
@@ -107,11 +107,11 @@ python3 scripts/extract-design.py --all -o /tmp/tpl
 
 | Island | Trang | Dữ liệu từ | Chặn? |
 |---|---|---|---|
-| `mega-menu` | tất cả | Menu `main` — **hiện 0 link** | ⚠️ code được, menu thật chặn bởi 007 |
-| `faq-accordion` | FAQ | Twig render sẵn | 🔴 007 |
+| `mega-menu` | tất cả | Menu `main` — **hiện 0 link** | ✅ island xong; menu thật chặn bởi 007 |
+| `faq-accordion` | FAQ | Twig render sẵn | 🔴 007 · **JS thuần** (ADR-002) |
 | `doc-filter` | Văn bản | `/api/v1/documents` | 🔴 007 |
 | `news-filter` | Tin tức | `/api/v1/news` | 🔴 007 |
-| `tabs` | Năng lực, Đào tạo | Twig render sẵn | 🔴 007 |
+| `tabs` | Năng lực, Đào tạo | Twig render sẵn | 🔴 007 · **JS thuần** (ADR-002) |
 | `standard-search` | Trang chủ | `/api/v1/standards/search` | 🔴 thiếu design |
 
 Mọi island **phải** hoạt động khi tắt JS (`FRONTEND_ARCHITECTURE.md` §5).

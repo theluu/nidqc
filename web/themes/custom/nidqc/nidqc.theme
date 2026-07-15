@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * Hook của theme NIDQC.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_preprocess_HOOK() for menu--main.
+ *
+ * Nạp library island CHỈ ở trang có menu chính, không nạp toàn site.
+ * Nhét vào library `global` là bắt mọi trang tải JS mà 97,9% nội dung không cần
+ * (docs/ROADMAP.md §5, docs/architecture/BACKEND_ARCHITECTURE.md §4).
+ */
+function nidqc_preprocess_menu__main(array &$variables): void {
+  // Không có mục nào thì không cần island — đừng bắt tải JS vô ích.
+  if (empty($variables['items'])) {
+    return;
+  }
+
+  // Menu chỉ có mục phẳng (không submenu) thì mega menu chẳng nâng cấp được gì.
+  $has_children = FALSE;
+  foreach ($variables['items'] as $item) {
+    if (!empty($item['below'])) {
+      $has_children = TRUE;
+      break;
+    }
+  }
+  if (!$has_children) {
+    return;
+  }
+
+  $variables['#attached']['library'][] = 'nidqc/islands';
+}

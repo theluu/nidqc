@@ -2,10 +2,33 @@
 
 ## 1. Nguyên tắc số một
 
-> **Vue nâng cấp HTML có sẵn. Vue không sinh ra nội dung.**
+> **Twig SỞ HỮU nội dung. Island không được xoá nội dung Twig.**
 
 Nếu bạn đang viết Vue để render nội dung mà Google cần đọc → **sai kiến trúc, dừng lại**.
 Nội dung là việc của Twig. Xem `docs/decisions/ADR-001-frontend-architecture.md`.
+
+> 🔴 **Bản trước của mục này ghi *"Vue nâng cấp HTML có sẵn"* — SAI về kỹ thuật.**
+> `createApp().mount(el)` **xoá sạch** nội dung của `el` rồi mới render. Vue **không nâng cấp
+> được** HTML có sẵn; nó **thay thế**. Đã kiểm chứng khi làm TASK-006:
+> ```js
+> probe.innerHTML = '<ul><li><a>Nội dung Twig</a></li></ul>';
+> createApp({ render: () => h('span') }).mount(probe);
+> probe.innerHTML;   // -> '<span></span>'   ❌ nội dung biến mất
+> ```
+> Xem [`ADR-002`](../decisions/ADR-002-island-types.md).
+
+## 1b. Hai loại island (ADR-002)
+
+| Loại | Dùng khi | Cài đặt | Ví dụ |
+|---|---|---|---|
+| **Nâng cấp** | Twig **đã render** nội dung | **JS thuần** — export `enhance(el)`, trả hàm dọn. ⛔ **Không import Vue.** ⛔ **Không đụng `el.innerHTML`.** | `mega-menu`, `faq-accordion`, `tabs` |
+| **Render** | Container **rỗng**, nội dung do JS sinh | Vue component (`export default`) | `doc-filter`, `news-filter`, `standard-search` |
+
+`main.js` phân biệt bằng module export gì, và **chặn** việc mount Vue vào container còn nội dung.
+
+**Vì sao tách:** island nâng cấp không cần Vue. Đo thật trên trang chỉ có mega-menu:
+**0,6 kB JS** (bootstrap + island) thay vì **58 kB** nếu kéo Vue runtime vào — nhỏ hơn ~97%,
+và Vue chỉ tải khi trang thật sự có island render.
 
 ## 2. Cấu trúc
 

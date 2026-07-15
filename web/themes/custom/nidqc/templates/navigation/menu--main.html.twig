@@ -1,0 +1,63 @@
+{#
+/**
+ * @file
+ * Menu chính NIDQC — mega menu.
+ *
+ * QUAN TRỌNG: template này render TOÀN BỘ cây menu, kể cả submenu, ra HTML thô.
+ * Google phải đọc được mọi mục mà không cần JS (ADR-001). Submenu ẩn/hiện bằng
+ * CSS, KHÔNG bằng cách không-render.
+ *
+ * Vue island `mega-menu` chỉ NÂNG CẤP khối này: thêm bàn phím, cảm ứng, aria và
+ * định vị dropdown. Tắt JS thì :hover/:focus-within trong layout.css lo phần mở
+ * submenu. Xem tasks/TASK-006.md R4.
+ *
+ * Available variables:
+ * - items: cây menu, mỗi item có title, url, below, attributes.
+ * - attributes: thuộc tính của <ul> gốc.
+ */
+#}
+{% import _self as menus %}
+
+<div data-island="mega-menu" class="nidqc-megamenu">
+  {{ menus.menu_links(items, attributes, 0) }}
+</div>
+
+{% macro menu_links(items, attributes, menu_level) %}
+  {% import _self as menus %}
+  {% if items %}
+    {% if menu_level == 0 %}
+      <ul{{ attributes.addClass('nidqc-megamenu__list') }}>
+    {% else %}
+      <ul class="nidqc-megamenu__sub">
+    {% endif %}
+    {% for item in items %}
+      {%
+        set classes = [
+          'nidqc-megamenu__item',
+          menu_level == 0 ? 'nidqc-megamenu__item--top' : 'nidqc-megamenu__item--sub',
+          item.below ? 'nidqc-megamenu__item--has-sub',
+          item.in_active_trail ? 'is-active-trail',
+        ]
+      %}
+      <li{{ item.attributes.addClass(classes) }}>
+        {#
+          Mục có con: thêm aria-expanded để island cập nhật, và aria-haspopup.
+          Khi KHÔNG có JS, aria-expanded="false" vẫn đúng về mặt ngữ nghĩa vì
+          submenu chỉ mở khi hover/focus — người dùng bàn phím tab vào sẽ kích
+          hoạt :focus-within.
+        #}
+        {% if item.below %}
+          {{ link(item.title, item.url, {
+            'class': ['nidqc-megamenu__link', 'nidqc-megamenu__link--parent'],
+            'aria-expanded': 'false',
+            'aria-haspopup': 'true',
+          }) }}
+          {{ menus.menu_links(item.below, attributes, menu_level + 1) }}
+        {% else %}
+          {{ link(item.title, item.url, { 'class': ['nidqc-megamenu__link'] }) }}
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}

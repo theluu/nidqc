@@ -101,14 +101,138 @@
   text-decoration: none;
 }
 
-/* Menu phải dùng được khi tắt JS — Vue island chỉ nâng cấp hành vi hover
-   (FRONTEND_ARCHITECTURE.md §5). Không ẩn submenu bằng CSS ở đây. */
-.nidqc-nav-main ul {
+/* ---------- Mega menu ---------- */
+
+/* Nguyên tắc: submenu mở được bằng CSS THUẦN (:hover / :focus-within).
+   Tắt JS vẫn tới được — xem tasks/TASK-006.md R4.
+   Khi island mount xong, nó gắn .is-enhanced và tiếp quản trạng thái qua
+   aria-expanded, để bàn phím và cảm ứng dùng được. Hai cơ chế KHÔNG chồng nhau:
+   quy tắc :hover bên dưới bị tắt khi .is-enhanced có mặt. */
+
+.nidqc-megamenu {
   display: flex;
   align-items: stretch;
+  flex: 1;
+  min-width: 0;
+}
+
+.nidqc-megamenu__list,
+.nidqc-megamenu__sub {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.nidqc-megamenu__list {
+  display: flex;
+  align-items: stretch;
+}
+
+.nidqc-megamenu__item--top {
+  display: flex;
+  align-items: stretch;
+  flex: 0 0 auto;
+  position: relative;
+}
+
+.nidqc-megamenu__link {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  color: var(--nidqc-white);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nidqc-megamenu__item--top:hover > .nidqc-megamenu__link,
+.nidqc-megamenu__link:focus-visible {
+  background: var(--nidqc-primary-dark);
+}
+
+/* Focus phải NHÌN THẤY RÕ — site nhà nước, WCAG 2.1 AA. */
+.nidqc-megamenu__link:focus-visible {
+  outline: 2px solid var(--nidqc-white);
+  outline-offset: -2px;
+}
+
+/* ----- Dropdown ----- */
+
+.nidqc-megamenu__sub {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 50;
+  min-width: 220px;
+  background: var(--nidqc-white);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+  display: none;
+}
+
+/* ⭐ FALLBACK KHÔNG-JS: mở bằng CSS thuần.
+   :focus-within cho người dùng bàn phím tab vào. */
+.nidqc-megamenu:not(.is-enhanced) .nidqc-megamenu__item--has-sub:hover > .nidqc-megamenu__sub,
+.nidqc-megamenu:not(.is-enhanced) .nidqc-megamenu__item--has-sub:focus-within > .nidqc-megamenu__sub {
+  display: block;
+}
+
+/* Khi island đã mount: trạng thái do aria-expanded quyết định, không phải :hover.
+   Nhờ vậy bàn phím và cảm ứng mới điều khiển được. */
+.nidqc-megamenu.is-enhanced .nidqc-megamenu__link--parent[aria-expanded='true'] + .nidqc-megamenu__sub {
+  display: block;
+}
+
+.nidqc-megamenu__item--sub {
+  display: block;
+}
+
+.nidqc-megamenu__item--sub .nidqc-megamenu__link {
+  display: block;
+  padding: 11px 18px;
+  font-size: 13.5px;
+  line-height: 18px;
+  font-weight: 400;
+  color: var(--nidqc-text);
+  border-bottom: 1px solid var(--nidqc-bg-alt);
+  white-space: nowrap;
+  transition: background 150ms ease;
+}
+
+.nidqc-megamenu__item--sub:last-child .nidqc-megamenu__link {
+  border-bottom: 0;
+}
+
+.nidqc-megamenu__item--sub .nidqc-megamenu__link:hover,
+.nidqc-megamenu__item--sub .nidqc-megamenu__link:focus-visible {
+  background: var(--nidqc-primary-pale);
+  color: var(--nidqc-primary);
+}
+
+.nidqc-megamenu__item--sub .nidqc-megamenu__link:focus-visible {
+  outline: 2px solid var(--nidqc-primary);
+  outline-offset: -2px;
+}
+
+/* ----- Nút tra cứu chất chuẩn ----- */
+
+.nidqc-nav-search {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 34px;
+  background: var(--nidqc-accent);
+  border-radius: 18px;
+  margin-left: 10px;
+  flex: 0 0 auto;
+  transition: background 150ms ease;
+}
+
+.nidqc-nav-search:hover,
+.nidqc-nav-search:focus-visible {
+  background: var(--nidqc-accent-2);
 }
 
 /* ---------- Breadcrumb ---------- */
