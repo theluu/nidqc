@@ -1,0 +1,63 @@
+# NIDQC — .gitignore
+# Xem docs/standards/GIT_WORKFLOW.md §5
+
+# --- Dependency quản lý bởi Composer ---
+# composer.lock PHẢI được commit; những thứ dưới đây dựng lại từ nó.
+/vendor/
+/web/core/
+/web/modules/contrib/
+/web/themes/contrib/
+/web/profiles/contrib/
+/web/libraries/
+/drush/Commands/contrib/
+
+# --- Secrets — TUYỆT ĐỐI KHÔNG commit ---
+# (.ddev/.gitignore và web/sites/default/.gitignore cũng chặn một số mục này.
+#  Lặp lại ở đây có chủ đích: không phụ thuộc gitignore lồng nhau, chúng có thể bị sửa.)
+/web/sites/*/settings.php
+/web/sites/*/settings.local.php
+/web/sites/*/settings.ddev.php
+/web/sites/*/services.yml
+/web/sites/*/services.local.yml
+!/web/sites/default/default.settings.php
+!/web/sites/default/default.services.yml
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+
+# Chứng chỉ TLS local do DDEV sinh (có private key)
+/.ddev/traefik/certs/
+
+# --- Nội dung người dùng tải lên ---
+/web/sites/*/files/
+/web/sites/*/private/
+
+# --- Frontend ---
+/frontend/node_modules/
+/frontend/dist/
+/web/themes/custom/nidqc/dist/
+
+# --- DDEV (phần tự sinh) ---
+/.ddev/.global_commands/
+/.ddev/db_snapshots/
+/.ddev/mutagen/mutagen.yml
+/.ddev/.dbimageBuild
+/.ddev/.webimageBuild
+/.ddev/.sshimageBuild
+/.ddev/config.local.yaml
+/.ddev/*.local.yaml
+
+# --- Hệ điều hành / IDE ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# --- Tạm ---
+/scratchpad/
+*.log
