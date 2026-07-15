@@ -1,0 +1,16 @@
+/**
+ * @file
+ * Nền tảng tối thiểu cho theme NIDQC.
+ *
+ * File này CHỈ áp token lên body. Không style component nào ở đây —
+ * component có file riêng khi tới task của nó.
+ *
+ * KHÔNG hard-code mã hex trong file này. Mọi giá trị lấy từ css/tokens.css
+ * qua var(--nidqc-*). Xem web/themes/custom/nidqc/README.md.
+ */
+
+body {
+  font-family: var(--nidqc-font);
+  color: var(--nidqc-text);
+  background: var(--nidqc-white);
+}

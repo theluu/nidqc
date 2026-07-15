@@ -1,0 +1,50 @@
+/**
+ * @file
+ * Design token của NIDQC — NGUỒN DUY NHẤT của màu, layout và font.
+ *
+ * Giá trị trích từ design gốc (design/*.html), không phải ước lượng. Kiểm lại bằng:
+ *   python3 scripts/extract-design.py --all --colors
+ *
+ * Nguồn: docs/design/DESIGN_SYSTEM.md §7. Đổi màu thì sửa ở ĐÂY, một chỗ duy nhất.
+ * Không hard-code mã hex ở bất kỳ file nào khác — Twig và Vue đều dùng var(--nidqc-*).
+ */
+
+:root {
+  /* Brand */
+  --nidqc-primary:        #0F3093;
+  --nidqc-primary-dark:   #0D2870;
+  --nidqc-primary-light:  #7FA8E0;
+  --nidqc-primary-pale:   #E8F0F7;
+  --nidqc-accent:         #1D6AC5;
+  --nidqc-accent-2:       #1565B3;
+
+  /* Text */
+  --nidqc-text:           #212529;
+  --nidqc-text-muted:     #495057;
+  --nidqc-text-light:     #777777;
+
+  /* Nền & viền */
+  --nidqc-white:          #FFFFFF;
+  --nidqc-border:         #ECECEC;
+  --nidqc-border-strong:  #CCCCCC;
+  --nidqc-bg-subtle:      #F5F5F5;
+  --nidqc-bg-blue-1:      #F5F8FC;
+  --nidqc-bg-blue-2:      #F3F7FC;
+  --nidqc-bg-alt:         #F0F0F0;
+
+  /* Trạng thái */
+  /* Xuất hiện rất ít trong design. --nidqc-danger trên nền trắng chỉ đạt ~4.0:1,
+     KHÔNG đạt WCAG AA cho chữ thường — chỉ dùng cho icon/viền.
+     Xem docs/design/DESIGN_SYSTEM.md §1. */
+  --nidqc-danger:         #ED1B24;
+  --nidqc-success:        #1E8A4C;
+
+  /* Layout */
+  --nidqc-container:      1280px;
+  --nidqc-gutter:         24px;
+
+  /* Font — self-host, KHÔNG gọi Google Fonts CDN (site nhà nước).
+     @font-face + file woff2 là task riêng, chưa làm. Tới khi đó trình duyệt
+     fallback về -apple-system — đây là kỳ vọng đúng, không phải lỗi. */
+  --nidqc-font:           'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+}

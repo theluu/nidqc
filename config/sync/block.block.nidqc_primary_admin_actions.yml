@@ -1,0 +1,20 @@
+uuid: ca2acf34-8cc2-48a5-8159-94f150bd6589
+langcode: vi
+status: true
+dependencies:
+  theme:
+    - nidqc
+_core:
+  default_config_hash: Q9_2whdOj1YIomfvsIfopROW4FT_X5pY0DjdOiOaQ5U
+id: nidqc_primary_admin_actions
+theme: nidqc
+region: header_top
+weight: -5
+provider: null
+plugin: local_actions_block
+settings:
+  id: local_actions_block
+  label: 'Primary admin actions'
+  label_display: '0'
+  provider: core
+visibility: {  }

@@ -1,0 +1,22 @@
+uuid: 167a3608-d98e-4ea9-9e1f-845be6cb5d06
+langcode: vi
+status: true
+dependencies:
+  theme:
+    - nidqc
+_core:
+  default_config_hash: nGE3EoPQQaQCuqTUtZgw0-KIzmrqdKDzdNQf2JyPUt4
+id: nidqc_primary_local_tasks
+theme: nidqc
+region: header_top
+weight: -4
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: 'Tab chính'
+  label_display: '0'
+  provider: core
+  primary: true
+  secondary: false
+visibility: {  }

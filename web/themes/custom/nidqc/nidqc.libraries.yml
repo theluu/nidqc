@@ -1,0 +1,11 @@
+# Library của theme NIDQC.
+#
+# THỨ TỰ QUAN TRỌNG: tokens.css phải đứng trước base.css vì base.css dùng
+# biến do tokens.css định nghĩa. Drupal giữ nguyên thứ tự khai báo trong nhóm.
+global:
+  version: 1.x
+  css:
+    base:
+      css/tokens.css: {}
+    theme:
+      css/base.css: {}

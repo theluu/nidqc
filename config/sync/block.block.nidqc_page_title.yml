@@ -1,0 +1,20 @@
+uuid: f29151ff-87ca-4c77-8cfe-535579f13bbc
+langcode: vi
+status: true
+dependencies:
+  theme:
+    - nidqc
+_core:
+  default_config_hash: 6aOgWsNTXjqrDm98TXSAjP6qd2nCijD1xw45MrnbK-Y
+id: nidqc_page_title
+theme: nidqc
+region: header_top
+weight: -5
+provider: null
+plugin: page_title_block
+settings:
+  id: page_title_block
+  label: 'Tiêu đề trang'
+  label_display: '0'
+  provider: core
+visibility: {  }

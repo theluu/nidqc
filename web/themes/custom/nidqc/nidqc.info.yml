@@ -1,0 +1,21 @@
+name: NIDQC
+type: theme
+description: 'Theme chính của website Viện Kiểm nghiệm thuốc Trung ương (nidqc.gov.vn).'
+package: NIDQC
+core_version_requirement: ^11
+base theme: stable9
+
+libraries:
+  - nidqc/global
+
+# Region theo docs/design/PAGE_MAPPING.md §4 — bốn vùng dùng chung xuất hiện
+# giống hệt nhau ở cả 11 trang design, nên dựng một lần ở page.html.twig.
+regions:
+  header_top: 'Top bar'
+  header_banner: 'Banner'
+  primary_menu: 'Menu chính'
+  content: 'Nội dung'
+  footer: 'Footer'
+  # Drupal cần hai region này cho toolbar và script cuối trang.
+  page_top: 'Page top'
+  page_bottom: 'Page bottom'

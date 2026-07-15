@@ -1,0 +1,22 @@
+uuid: beadcb3e-27bb-41ce-bf5b-89b2b44fa78f
+langcode: vi
+status: true
+dependencies:
+  module:
+    - help
+  theme:
+    - nidqc
+_core:
+  default_config_hash: VfPFqqxfkomud5CO8DUijw85QIl9GIxh_nIxLOYESxg
+id: nidqc_help
+theme: nidqc
+region: header_top
+weight: 0
+provider: null
+plugin: help_block
+settings:
+  id: help_block
+  label: 'Trợ giúp'
+  label_display: '0'
+  provider: help
+visibility: {  }

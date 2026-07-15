@@ -1,0 +1,22 @@
+uuid: b7901b5c-a2ec-4368-a516-e6bde6970529
+langcode: vi
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - nidqc
+_core:
+  default_config_hash: erQSEZF2XUjNmgTl0uNRBzmg18ZGXwUcw2FhApoeuHk
+id: nidqc_content
+theme: nidqc
+region: content
+weight: 0
+provider: null
+plugin: system_main_block
+settings:
+  id: system_main_block
+  label: 'Nội dung chính của trang'
+  label_display: '0'
+  provider: system
+visibility: {  }

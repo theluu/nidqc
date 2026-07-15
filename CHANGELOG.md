@@ -9,6 +9,10 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 ## [Unreleased]
 
 ### Added
+- **Theme custom `nidqc`** (TASK-001) — site giờ chạy theme của dự án thay vì `olivero`.
+  `css/tokens.css` là **nguồn duy nhất** của màu/layout/font: 21 biến CSS trích thẳng từ design
+  gốc, đã kiểm chứng 18/18 màu tồn tại thật trong `design/`. Từ nay không ai phải mở file design
+  để dò mã màu, và đổi màu thương hiệu chỉ sửa một chỗ.
 - Khung tài liệu dự án: `docs/`, `tasks/`, `prompts/`, `scripts/`
 - `AGENTS.md` — luật và ranh giới cho AI agent
 - `docs/design/DESIGN_SYSTEM.md` — token màu/font trích trực tiếp từ 12 file design

@@ -1,0 +1,22 @@
+uuid: 4e46a7a5-d064-4bff-8336-3577bb024e6a
+langcode: vi
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - nidqc
+_core:
+  default_config_hash: eYL19CLDyinGTWYQfBD1DswWzglEotE_kHnHx3AxTXM
+id: nidqc_powered
+theme: nidqc
+region: header_top
+weight: 0
+provider: null
+plugin: system_powered_by_block
+settings:
+  id: system_powered_by_block
+  label: 'Sử dụng Drupal'
+  label_display: '0'
+  provider: system
+visibility: {  }
