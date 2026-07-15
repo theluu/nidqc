@@ -60,7 +60,14 @@ TASK-007 **không thể soạn** cho tới khi NIDQC trả lời 3 câu ở [`PR
 > ⛔ **Không đoán để đi tiếp.** Đoán sai content type thì phải migrate dữ liệu thật của Viện —
 > tốn gấp nhiều lần thời gian tiết kiệm được. `AGENTS.md` §2.
 
-**Việc cần làm:** gửi 3 câu này cho NIDQC. Đây là việc của **người**, không phải AI.
+**Việc cần làm:** gửi [`CAU_HOI_NIDQC.md`](CAU_HOI_NIDQC.md) cho Viện — văn bản đã soạn sẵn,
+chỉ việc gửi. Đây là việc của **người**, không phải AI.
+
+> 🔴 **Cập nhật 2026-07-16 — vấn đề lớn hơn 3 câu ban đầu.** Khi thử tự dựng content type từ
+> design, phát hiện **design không chứa đủ thông tin để chốt schema**. Cả trang "Văn bản tài
+> liệu" chỉ có `{ title, meta }` — không file tải về, không số hiệu, không ngày ban hành, dù hệ
+> thống văn bản thật chắc chắn cần cả ba. `ENTITY_MAPPING.md` §4 bản trước **bịa** các field đó
+> ra từ hiểu biết chung; đã gỡ. Design là mockup **thị giác**, không phải đặc tả **dữ liệu**.
 
 ## 4. Task còn lại (soạn khi hết chặn)
 

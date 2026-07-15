@@ -78,9 +78,12 @@ Kế hoạch đầy đủ: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 | [006](tasks/TASK-006.md) | Island `mega-menu` | 📝 ready (một phần) |
 | 007+ | Content type → 11 trang Twig → island | 🔴 **bị chặn** |
 
-> 🔴 **Blocker:** site có **0 content type**, và không thể chốt content type cho tới khi NIDQC
-> trả lời 3 câu ở [`PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md) §5 (tra cứu chất chuẩn ·
-> anchor menu · tiếng Anh). Đây là việc của **người**, không phải AI.
+> 🔴 **Blocker:** site có **0 content type**, và **không thể chốt** cho tới khi NIDQC trả lời.
+> Design là mockup **thị giác**, không phải đặc tả **dữ liệu** — cả trang "Văn bản tài liệu" chỉ
+> có `{ title, meta }`, không file tải về, không số hiệu, không ngày ban hành.
+>
+> 📄 **Văn bản hỏi Viện đã soạn sẵn: [`docs/CAU_HOI_NIDQC.md`](docs/CAU_HOI_NIDQC.md)** — chỉ việc gửi.
+> Câu 1, 2, 4 chặn gần như toàn bộ phần còn lại. Đây là việc của **người**, không phải AI.
 
 ### ⚠️ Không chuyển các trang design sang Vue
 

@@ -40,9 +40,15 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 - `tasks/TASK-005.md` — dựng `frontend/` (Vite + bootstrap island)
 - `tasks/TASK-006.md` — island `mega-menu` (hover + bàn phím + cảm ứng)
 - `docs/ROADMAP.md` — lộ trình, đường găng và blocker
+- `docs/CAU_HOI_NIDQC.md` — 7 câu hỏi chặn dự án, soạn sẵn để gửi Viện
 - `scripts/extract-fonts.py` — trích woff2 + sinh `@font-face` từ design bundle
 
 ### Fixed
+- 🔴 **`ENTITY_MAPPING.md` §4 bịa field cho content type `document`** — đặc tả
+  `field_document_number`, `field_issued_date`, `field_file`, `field_category` mà **không field nào
+  có trong design**. Chúng được suy ra từ hiểu biết chung về "trang văn bản pháp quy", không phải
+  từ nguồn chân lý. Ai cài theo bản đó là dựng sai schema cho dữ liệu thật của Viện. Đã gỡ và ghi
+  rõ design thật chứa gì (`{ title, meta }`, không link tải).
 - 🔴 **Bootstrap island sẽ xoá mất nội dung Twig** (TASK-006, sửa lỗi của TASK-005) —
   `createApp().mount(el)` xoá sạch nội dung container rồi mới render, nên mount vào
   `<div data-island>` sẽ phá đúng HTML mà Twig render cho SEO. Nguyên tắc *"Vue nâng cấp HTML có

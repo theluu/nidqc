@@ -69,6 +69,11 @@ Vue island cho các khối tương tác, SEO, accessibility, form liên hệ.
 | **Nguồn dữ liệu** | Migrate từ site cũ hay nhập tay? Chưa có kế hoạch migrate. |
 
 > Các mục này **chưa được quyết**. Agent gặp phải thì **dừng và hỏi**, không tự suy diễn.
+>
+> 📄 Văn bản hỏi Viện đã soạn sẵn: [`CAU_HOI_NIDQC.md`](CAU_HOI_NIDQC.md).
+>
+> 🔴 **Không chỉ 5 mục trên.** Design **không đủ để chốt cấu trúc dữ liệu** cho bất kỳ loại nội
+> dung nào — xem `database/ENTITY_MAPPING.md` §4 để biết bằng chứng cụ thể.
 
 ### Ngoài phạm vi (cho tới khi có quyết định khác)
 Đa ngôn ngữ nội dung · Cổng đăng nhập nội bộ · Migrate dữ liệu · App mobile · Thanh toán trực tuyến

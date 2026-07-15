@@ -15,8 +15,15 @@ Các vòng lặp `sc-for` trích từ design (xem `scripts/extract-design.py`):
 `related`, `cats`, `items`, `fields`, `equipment`, `certs`, `tabs`, `docs`, `newsList`,
 `announcements`, `webLinks`, `groups`, `phdInfo`, `phdSteps`, `projects`
 
-> Đây là **gợi ý**, không phải đặc tả. Design là mockup — dữ liệu trong đó là giả.
-> Cấu trúc field thật phải xác nhận với NIDQC trước khi cài.
+> 🔴 **Đây là GỢI Ý, không phải đặc tả — và khoảng cách giữa hai thứ đó lớn hơn tưởng.**
+>
+> Đã kiểm chứng 2026-07-16: **design không chứa đủ thông tin để chốt schema.** Nó là mockup
+> thị giác — cho thấy trang *trông* thế nào, không cho biết dữ liệu *là* gì. Ví dụ cụ thể ở §4:
+> cả trang "Văn bản tài liệu" chỉ có `{ title, meta }`, không có file để tải, không có số hiệu,
+> không có ngày ban hành — dù một hệ thống văn bản thật chắc chắn cần cả ba.
+>
+> **Suy field từ hiểu biết chung về loại trang đó là BỊA.** Bản trước của §4 đã mắc đúng lỗi này.
+> Cấu trúc field thật **phải** xác nhận với NIDQC trước khi cài. Xem §5.
 
 ## 2. Content type dự kiến
 
@@ -53,22 +60,57 @@ Các vòng lặp `sc-for` trích từ design (xem `scripts/extract-design.py`):
 | `document_category` | Loại văn bản (Thông tư, Quyết định, Nghị định…) |
 | `faq_category` | Nhóm câu hỏi |
 
-## 4. Field dự kiến — `document`
+## 4. Field — `document`
 
-Ví dụ mức chi tiết cần đạt trước khi cài:
+> 🔴 **BẢN TRƯỚC CỦA MỤC NÀY LÀ BỊA. Đã gỡ.**
+>
+> Tôi từng đặc tả `document` có `field_document_number` (`15/2024/TT-BYT`), `field_issued_date`,
+> `field_file`, `field_category`. **Không field nào trong số đó có trong design.** Chúng được suy
+> ra từ hiểu biết chung về "trang văn bản pháp quy", không phải từ nguồn chân lý của dự án.
+> Nếu ai đó cài theo bản đó thì đã dựng sai schema cho dữ liệu thật của Viện.
 
-| Field | Kiểu | Bắt buộc | Ghi chú |
-|---|---|---|---|
-| `title` | string | ✅ | Core |
-| `field_document_number` | string | ❌ | VD: `15/2024/TT-BYT` |
-| `field_issued_date` | datetime (date only) | ❌ | Ngày ban hành |
-| `field_category` | ER → `document_category` | ✅ | |
-| `field_file` | file | ✅ | **Chỉ cho phép** pdf, doc, docx, xls, xlsx. Giới hạn dung lượng. |
-| `body` | text_long | ❌ | Trích yếu |
+### Design thật sự chứa gì
 
-> ⚠️ `field_file` là điểm rủi ro bảo mật cao nhất trong schema này — upload file trên site
-> nhà nước. Bắt buộc whitelist extension, giới hạn size, quét kiểu MIME thật (không tin
-> extension), lưu ngoài webroot hoặc chặn thực thi. Xem `docs/security/SECURITY_POLICY.md`.
+Đã trích từ `design/NIDQC Van ban tai lieu.html` (2026-07-16):
+
+```js
+docsByTab = {
+  phapquy: [
+    { title: 'Thông tư quy định về kiểm nghiệm thuốc, nguyên liệu làm thuốc', meta: 'Bộ Y tế · Thông tư' },
+    { title: 'Quyết định ban hành quy trình kiểm nghiệm nội bộ',              meta: 'Viện KNTTW · Quyết định' },
+  ],
+  chuyenmon: [
+    { title: 'Quy trình thao tác chuẩn (SOP) phân tích hóa lý', meta: 'Tài liệu kỹ thuật · SOP' },
+  ],
+}
+```
+
+**Đúng 2 field:** `title` và `meta`. `meta` là **chuỗi hiển thị** ghép sẵn
+(`"cơ quan ban hành · loại văn bản"`), không phải dữ liệu có cấu trúc.
+
+Thẻ văn bản trong design có icon file và tiêu đề — **nhưng không có `<a href>` để tải**.
+
+### Vì sao không thể chốt schema từ design
+
+| Câu hỏi | Design trả lời được? |
+|---|---|
+| Văn bản có file đính kèm để tải không? | ❌ Không có link tải nào. Nhưng trang văn bản mà không tải được thì vô nghĩa → **design thiếu, không phải không cần**. |
+| Có số hiệu văn bản không? | ❌ Không xuất hiện |
+| Có ngày ban hành không? | ❌ Không xuất hiện |
+| "Bộ Y tế · Thông tư" là 1 field hay 2? | ❌ Không biết — trong design nó là chuỗi ghép sẵn |
+| Có bao nhiêu tab/nhóm? | ⚠️ Thấy `phapquy`, `chuyenmon` — chưa chắc đủ |
+
+**Design là mockup thị giác, không phải đặc tả dữ liệu.** Nó cho thấy trang *trông* thế nào,
+không cho biết dữ liệu *là* gì.
+
+→ **Phải hỏi NIDQC.** Xem §5.
+
+### Rủi ro bảo mật khi có `field_file`
+
+Nếu NIDQC xác nhận cần đính kèm file (nhiều khả năng), đó sẽ là **điểm rủi ro cao nhất** của
+schema: upload file trên site nhà nước. Bắt buộc whitelist extension, giới hạn dung lượng, kiểm
+MIME thật theo nội dung (không tin extension), và **kiểm tra thật** rằng nginx không thực thi PHP
+trong thư mục files (`.htaccess` **không** có tác dụng với nginx). Xem `docs/security/SECURITY_POLICY.md` §5.
 
 ## 5. Câu hỏi phải trả lời trước khi cài schema
 
