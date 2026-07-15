@@ -75,6 +75,7 @@ Kế hoạch đầy đủ: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 | [003](tasks/TASK-003.md) | `page.html.twig` — 5 vùng chung | ✅ chờ review |
 | [004](tasks/TASK-004.md) | Self-host font | ✅ chờ review |
 | [005](tasks/TASK-005.md) | Dựng `frontend/` (Vite) | ✅ chờ review |
+| [006](tasks/TASK-006.md) | Island `mega-menu` | 📝 ready (một phần) |
 | 007+ | Content type → 11 trang Twig → island | 🔴 **bị chặn** |
 
 > 🔴 **Blocker:** site có **0 content type**, và không thể chốt content type cho tới khi NIDQC

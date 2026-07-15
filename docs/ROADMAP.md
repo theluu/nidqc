@@ -16,7 +16,7 @@
 | [TASK-003](../tasks/TASK-003.md) | `page.html.twig` — 5 vùng chung + sửa 2 lỗi tài liệu | ✅ xong, chờ review |
 | [TASK-004](../tasks/TASK-004.md) | Self-host font Lexend + Be Vietnam Pro | ✅ xong, chờ review |
 | [TASK-005](../tasks/TASK-005.md) | Dựng `frontend/` — Vite + island bootstrap | ✅ xong, chờ review |
-| TASK-006 | Island `mega-menu` | ⏳ **chưa soạn — task tiếp theo, KHÔNG bị chặn** |
+| [TASK-006](../tasks/TASK-006.md) | Island `mega-menu` | 📝 ready ⚠️ **chỉ code được island; menu THẬT chặn bởi 007** |
 | **TASK-007** | **Content type + field** | 🔴 **BỊ CHẶN** — xem §3 |
 | TASK-008+ | 11 trang Twig + 5 island còn lại | 🔴 chặn bởi TASK-007 |
 
@@ -32,8 +32,13 @@ TASK-005 ✅ (Vite)  ── TASK-006 (mega menu island)  <- tiếp theo
       BỊ CHẶN bởi 3 câu hỏi chưa hỏi NIDQC
 ```
 
-**Làm được ngay (không chặn):** ~~003~~ ✅ → ~~004~~ ✅ → ~~005~~ ✅ → **TASK-006 (mega menu island)**.
-Sau TASK-006 thì **hết việc không bị chặn** — mọi thứ còn lại cần content type.
+**Làm được ngay:** ~~003~~ ✅ → ~~004~~ ✅ → ~~005~~ ✅ → **TASK-006** (một phần).
+
+> ⚠️ **Sửa đánh giá sai trước đó.** ROADMAP từng ghi TASK-006 "✅ làm được" vì menu `main` đã tồn
+> tại. Kiểm thật thì menu `main` có **0 link** ("Nhà" là plugin tĩnh, không phải menu link), và
+> 9 mục trong design trỏ tới trang **chưa tồn tại**. **Code island thì được; menu thật thì không.**
+
+Sau TASK-006 thì **hết việc làm được** — mọi thứ còn lại cần content type.
 
 **Mọi thứ còn lại chặn bởi TASK-007.**
 
@@ -102,7 +107,7 @@ python3 scripts/extract-design.py --all -o /tmp/tpl
 
 | Island | Trang | Dữ liệu từ | Chặn? |
 |---|---|---|---|
-| `mega-menu` | tất cả | Menu `main` (đã có) | ✅ làm được |
+| `mega-menu` | tất cả | Menu `main` — **hiện 0 link** | ⚠️ code được, menu thật chặn bởi 007 |
 | `faq-accordion` | FAQ | Twig render sẵn | 🔴 007 |
 | `doc-filter` | Văn bản | `/api/v1/documents` | 🔴 007 |
 | `news-filter` | Tin tức | `/api/v1/news` | 🔴 007 |
@@ -124,6 +129,7 @@ Mọi island **phải** hoạt động khi tắt JS (`FRONTEND_ARCHITECTURE.md` 
 | 7 | `site_branding` tràn mép ở banner (placeholder) | `TASK-003` §9.5 |
 | 8 | Chưa có hạ tầng test | `testing/TEST_STRATEGY.md` §1 |
 | 9 | Chưa có staging / production | `deployment/DEPLOYMENT.md` §1 |
+| 10 | 🔴 **Menu link là content → `drush cex` không export → menu không tái lập được.** Cần quyết định (hook_install / recipe / default_content). | `TASK-006` §9.1 |
 
 ## 8. Chưa có kế hoạch
 

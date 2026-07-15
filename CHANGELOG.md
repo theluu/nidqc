@@ -35,6 +35,7 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 - `tasks/TASK-003.md` — dựng `page.html.twig` (5 vùng dùng chung) + sửa 2 lỗi tài liệu design
 - `tasks/TASK-004.md` — self-host font Lexend + Be Vietnam Pro trích từ design bundle
 - `tasks/TASK-005.md` — dựng `frontend/` (Vite + bootstrap island)
+- `tasks/TASK-006.md` — island `mega-menu` (hover + bàn phím + cảm ứng)
 - `docs/ROADMAP.md` — lộ trình, đường găng và blocker
 - `scripts/extract-fonts.py` — trích woff2 + sinh `@font-face` từ design bundle
 
