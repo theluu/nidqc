@@ -1,18 +1,28 @@
 <script setup>
 // Trang chủ — SSR fetch tin tức từ Drupal JSON:API (ADR-004).
-const { data: news } = await useAsyncData('home-news', async () => {
+const { data: split } = await useAsyncData('home-news', async () => {
   const { data, included } = await fetchJsonApi('/node/news', {
-    'filter[status]': 1, sort: '-created', 'page[limit]': 7,
+    'filter[status]': 1, sort: '-field_date', 'page[limit]': 50,
     include: 'field_image,field_category',
   })
-  return data.map((n) => ({
+  const items = data.map((n) => ({
     id: n.attributes.drupal_internal__nid,
     title: n.attributes.title,
     date: formatDate(n.attributes.field_date || n.attributes.created),
     tag: n.attributes.field_tag || termLabel(n, 'field_category', included),
+    category: termLabel(n, 'field_category', included),
     image: imageUrl(n, included),
   }))
+  // Design tách 2 khối: hero = tin SỰ KIỆN, section "Thông báo" = thông báo hành chính.
+  // Lọc theo CHUYÊN MỤC (category), không phải nhãn tự do (field_tag).
+  const notice = ['Thông báo', 'Mua sắm - đấu thầu', 'Tuyển dụng', 'Đào tạo']
+  return {
+    events: items.filter((i) => !notice.includes(i.category)),
+    announcements: items.filter((i) => notice.includes(i.category)),
+  }
 })
+const news = computed(() => split.value.events)
+const announcements = computed(() => split.value.announcements)
 
 const services = [
   'Phân tích - Kiểm nghiệm', 'Đánh giá tương đương sinh học (TĐSH)',
@@ -42,21 +52,24 @@ useHead({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương' }
               <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:25px;line-height:31px;color:#212529;margin:0;">{{ news[0].title }}</h2>
             </div>
           </NuxtLink>
-          <div style="display:flex;flex-direction:column;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-              <h3 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:16px;color:#0F3093;margin:0;padding-left:10px;border-left:4px solid #0F3093;">Tin mới nhất</h3>
-              <NuxtLink to="/tin-tuc" style="color:#1D6AC5;font-size:13px;text-decoration:none;">Xem tất cả →</NuxtLink>
+          <div style="background:#fff;border:1px solid #CCCCCC;display:flex;flex-direction:column;">
+            <div style="background:#0F3093;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;">
+              <h3 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.3px;text-transform:uppercase;margin:0;">Tin mới nhất</h3>
+              <NuxtLink to="/tin-tuc" style="color:rgba(255,255,255,0.85);font-size:12.5px;text-decoration:none;display:flex;align-items:center;gap:4px;">Xem tất cả
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              </NuxtLink>
             </div>
-            <NuxtLink v-for="item in news.slice(1, 6)" :key="item.id" :to="`/tin-tuc/${item.id}`" style="display:flex;gap:12px;padding:11px 0;border-bottom:1px solid #ECECEC;text-decoration:none;">
-              <div style="width:74px;height:56px;flex:0 0 auto;background:#E8F0F7;overflow:hidden;">
-                <img v-if="item.image" :src="item.image" alt="" style="width:100%;height:100%;object-fit:cover;">
-              </div>
-              <div style="min-width:0;">
-                <span v-if="item.tag" style="display:inline-block;font-size:10.5px;font-weight:600;color:#1D6AC5;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px;">{{ item.tag }}</span>
-                <div style="font-size:13.5px;line-height:18px;color:#212529;">{{ item.title }}</div>
-                <div style="font-size:12px;color:#777;margin-top:3px;">{{ item.date }}</div>
-              </div>
-            </NuxtLink>
+            <div style="flex:1;display:flex;flex-direction:column;">
+              <NuxtLink v-for="item in news.slice(1, 6)" :key="item.id" :to="`/tin-tuc/${item.id}`" style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #ECECEC;align-items:center;flex:1;text-decoration:none;">
+                <div style="width:66px;height:52px;flex:0 0 auto;background:#E8F0F7;overflow:hidden;">
+                  <img v-if="item.image" :src="item.image" alt="" style="width:100%;height:100%;object-fit:cover;">
+                </div>
+                <span style="flex:1;min-width:0;">
+                  <span style="display:block;font-size:13.5px;line-height:19px;color:#212529;font-weight:500;">{{ item.title }}</span>
+                  <span style="display:block;font-size:12px;color:#777;margin-top:4px;">{{ item.date }}</span>
+                </span>
+              </NuxtLink>
+            </div>
           </div>
         </template>
       </div>
@@ -70,7 +83,7 @@ useHead({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương' }
           <NuxtLink to="/tin-tuc" style="color:#1D6AC5;font-size:14px;text-decoration:none;">Xem tất cả thông báo →</NuxtLink>
         </div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
-          <NuxtLink v-for="item in (news || []).slice(0, 4)" :key="item.id" :to="`/tin-tuc/${item.id}`" style="display:block;background:#fff;border:1px solid #ECECEC;text-decoration:none;">
+          <NuxtLink v-for="item in announcements.slice(0, 4)" :key="item.id" :to="`/tin-tuc/${item.id}`" style="display:block;background:#fff;border:1px solid #ECECEC;text-decoration:none;">
             <div style="width:100%;height:150px;background:#E8F0F7;overflow:hidden;">
               <img v-if="item.image" :src="item.image" alt="" style="width:100%;height:100%;object-fit:cover;">
             </div>
