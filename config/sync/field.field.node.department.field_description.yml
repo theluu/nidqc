@@ -1,0 +1,27 @@
+uuid: 708c2a24-7665-4e48-9eed-48298197db5f
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - node.type.department
+  module:
+    - text
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: RwFrslXbajCCaMDIXDnbtylZ8QENngbEObcNzuqTh7Y
+id: node.department.field_description
+field_name: field_description
+entity_type: node
+bundle: department
+label: 'Chức năng'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

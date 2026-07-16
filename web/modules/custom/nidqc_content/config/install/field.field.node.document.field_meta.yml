@@ -1,0 +1,21 @@
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_meta
+    - node.type.document
+  enforced:
+    module:
+      - nidqc_content
+id: node.document.field_meta
+field_name: field_meta
+entity_type: node
+bundle: document
+label: 'Thông tin'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

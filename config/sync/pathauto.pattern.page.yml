@@ -1,0 +1,29 @@
+uuid: 830a0115-ef6d-4b9d-bf74-54455ac5c71b
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.page
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: 07gLmQmdaXV2zSD5IEqGgCJSOzBQC3GSOCxkae1_Y0s
+id: page
+label: 'Trang tĩnh'
+type: 'canonical_entities:node'
+pattern: '/[node:title]'
+selection_criteria:
+  bundle_check:
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: node
+    bundles:
+      page: page
+    uuid: page-bundle-check
+selection_logic: and
+weight: -5
+relationships: {  }

@@ -1,0 +1,33 @@
+uuid: a03efbcf-c5ac-4796-866d-dc7a09fcd1ce
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_category
+    - node.type.news
+    - taxonomy.vocabulary.news_category
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: 5gsyvY67MUhD9JWRhWjqah5P4h5WcILMasa84JxPHrM
+id: node.news.field_category
+field_name: field_category
+entity_type: node
+bundle: news
+label: 'Chuyên mục'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      news_category: news_category
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+field_type: entity_reference

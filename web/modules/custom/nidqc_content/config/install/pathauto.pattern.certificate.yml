@@ -1,0 +1,26 @@
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.certificate
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+id: certificate
+label: 'Chứng nhận'
+type: 'canonical_entities:node'
+pattern: '/nang-luc/chung-nhan/[node:title]'
+selection_criteria:
+  bundle_check:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: certificate-bundle-check
+    context_mapping:
+      node: node
+    bundles:
+      certificate: certificate
+selection_logic: and
+weight: -5
+relationships: {  }

@@ -1,0 +1,26 @@
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.project
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+id: project
+label: 'Đề tài NCKH'
+type: 'canonical_entities:node'
+pattern: '/dao-tao-nckh/[node:title]'
+selection_criteria:
+  bundle_check:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: project-bundle-check
+    context_mapping:
+      node: node
+    bundles:
+      project: project
+selection_logic: and
+weight: -5
+relationships: {  }

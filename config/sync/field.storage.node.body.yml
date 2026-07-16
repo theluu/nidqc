@@ -1,0 +1,24 @@
+uuid: 5a0765a2-3108-4937-adb0-f17af3452669
+langcode: vi
+status: true
+dependencies:
+  module:
+    - node
+    - text
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: vNRUVD-YkpXjnEa05ngL9aZC8v1kcEtMsJ9G9-80kGU
+id: node.body
+field_name: body
+entity_type: node
+type: text_with_summary
+settings: {  }
+module: text
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

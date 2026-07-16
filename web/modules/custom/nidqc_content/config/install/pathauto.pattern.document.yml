@@ -1,0 +1,26 @@
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.document
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+id: document
+label: 'Văn bản tài liệu'
+type: 'canonical_entities:node'
+pattern: '/van-ban-tai-lieu/[node:title]'
+selection_criteria:
+  bundle_check:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: document-bundle-check
+    context_mapping:
+      node: node
+    bundles:
+      document: document
+selection_logic: and
+weight: -5
+relationships: {  }

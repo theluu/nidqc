@@ -1,0 +1,28 @@
+uuid: c1ea0aca-2e7c-474b-bb2d-ef25646eddab
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_year
+    - node.type.project
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: DpZrWsKOCf6sXuRnkMCGVPCfJk1K3QAkcnZKkx3_K40
+id: node.project.field_year
+field_name: field_year
+entity_type: node
+bundle: project
+label: Năm
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

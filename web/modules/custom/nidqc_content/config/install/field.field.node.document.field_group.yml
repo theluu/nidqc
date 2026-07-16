@@ -1,0 +1,30 @@
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_group
+    - node.type.document
+    - taxonomy.vocabulary.document_group
+  enforced:
+    module:
+      - nidqc_content
+id: node.document.field_group
+field_name: field_group
+entity_type: node
+bundle: document
+label: 'Nhóm'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      document_group: document_group
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+field_type: entity_reference

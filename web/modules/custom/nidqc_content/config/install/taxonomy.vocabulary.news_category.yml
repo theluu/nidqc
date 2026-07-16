@@ -1,0 +1,10 @@
+langcode: vi
+status: true
+dependencies:
+  enforced:
+    module:
+      - nidqc_content
+name: 'Chuyên mục tin tức'
+vid: news_category
+description: 'Lấy từ design đã duyệt.'
+weight: 0

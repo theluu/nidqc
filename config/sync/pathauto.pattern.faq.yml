@@ -1,0 +1,29 @@
+uuid: dc684f78-ff0a-4d6b-a9db-e9f8ec6c80b8
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.faq
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: qIjUbn8HZxk_Qn5ID93QmbVoeC4p1ggHH1f2Nd9uxW0
+id: faq
+label: FAQ
+type: 'canonical_entities:node'
+pattern: '/faq/[node:title]'
+selection_criteria:
+  bundle_check:
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: node
+    bundles:
+      faq: faq
+    uuid: faq-bundle-check
+selection_logic: and
+weight: -5
+relationships: {  }

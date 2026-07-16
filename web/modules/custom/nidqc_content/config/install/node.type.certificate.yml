@@ -1,0 +1,13 @@
+langcode: vi
+status: true
+dependencies:
+  enforced:
+    module:
+      - nidqc_content
+name: 'Chứng nhận'
+type: certificate
+description: 'Design: Nang luc.'
+help: ''
+new_revision: true
+preview_mode: 1
+display_submitted: false

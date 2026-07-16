@@ -1,0 +1,29 @@
+uuid: 50b11921-0fd5-4dc3-9df5-2556efb80be0
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.certificate
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: rykhEmNSyYROx-vdmaf5NWOit_SeXg_S24JBMJ7nS1k
+id: certificate
+label: 'Chứng nhận'
+type: 'canonical_entities:node'
+pattern: '/nang-luc/chung-nhan/[node:title]'
+selection_criteria:
+  bundle_check:
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: node
+    bundles:
+      certificate: certificate
+    uuid: certificate-bundle-check
+selection_logic: and
+weight: -5
+relationships: {  }

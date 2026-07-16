@@ -1,0 +1,16 @@
+uuid: aa2ab71a-4500-4857-b9dd-bcd1c12d43ae
+langcode: vi
+status: true
+dependencies:
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: Hzg5A2aK2MVfhLTbX4_Sp2mCri4FQSQIXTVi2Z-g-m4
+name: 'Văn bản tài liệu'
+type: document
+description: 'Văn bản pháp quy và tài liệu chuyên môn. Design: Van ban tai lieu.'
+help: ''
+new_revision: true
+preview_mode: 1
+display_submitted: false

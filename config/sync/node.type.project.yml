@@ -1,0 +1,16 @@
+uuid: 8bb5b22d-db05-4b93-a2a4-233d760205d5
+langcode: vi
+status: true
+dependencies:
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: C_6uQtzfKBHLIGoAco7v6u3I4RgosaJ2z94VYKPOLQ8
+name: 'Đề tài NCKH'
+type: project
+description: 'Design: Dao tao NCKH.'
+help: ''
+new_revision: true
+preview_mode: 1
+display_submitted: false

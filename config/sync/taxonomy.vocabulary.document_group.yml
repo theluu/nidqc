@@ -1,0 +1,14 @@
+uuid: 0887e08a-a1b3-41e0-89b8-20fc469a1f2c
+langcode: vi
+status: true
+dependencies:
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: kKAnoYKGRwyI1umL2UJQ_c7RpsCSEt1NYT8WD1DUxEc
+name: 'Nhóm văn bản'
+vid: document_group
+description: 'Lấy từ design đã duyệt.'
+weight: 0
+new_revision: false

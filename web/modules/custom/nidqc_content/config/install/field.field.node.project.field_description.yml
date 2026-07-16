@@ -1,0 +1,21 @@
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - node.type.project
+  enforced:
+    module:
+      - nidqc_content
+id: node.project.field_description
+field_name: field_description
+entity_type: node
+bundle: project
+label: 'Mô tả'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

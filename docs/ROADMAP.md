@@ -17,7 +17,7 @@
 | [TASK-004](../tasks/TASK-004.md) | Self-host font Lexend + Be Vietnam Pro | ✅ xong, chờ review |
 | [TASK-005](../tasks/TASK-005.md) | Dựng `frontend/` — Vite + island bootstrap | ✅ xong, chờ review |
 | [TASK-006](../tasks/TASK-006.md) | Island `mega-menu` | ✅ xong, chờ review (menu THẬT vẫn chặn bởi 007) |
-| **TASK-007** | **Content type + field** | 🔴 **BỊ CHẶN** — xem §3 |
+| [TASK-007](../tasks/TASK-007.md) | Content type + taxonomy | ✅ xong, chờ review |
 | TASK-008+ | 11 trang Twig + 5 island còn lại | 🔴 chặn bởi TASK-007 |
 
 ## 2. Đường găng
@@ -136,7 +136,9 @@ Mọi island **phải** hoạt động khi tắt JS (`FRONTEND_ARCHITECTURE.md` 
 | 7 | `site_branding` tràn mép ở banner (placeholder) | `TASK-003` §9.5 |
 | 8 | Chưa có hạ tầng test | `testing/TEST_STRATEGY.md` §1 |
 | 9 | Chưa có staging / production | `deployment/DEPLOYMENT.md` §1 |
-| 10 | 🔴 **Menu link là content → `drush cex` không export → menu không tái lập được.** Cần quyết định (hook_install / recipe / default_content). | `TASK-006` §9.1 |
+| 10 | Menu link là content → `cex` không export. **Đã có cách giải: `hook_install()`** — TASK-007 dùng cho taxonomy term và chạy được (§11). Áp dụng tương tự cho menu khi dựng menu thật. | `TASK-006` §9.1 |
+| 11 | Pathauto `ignore_words` mặc định là stopword **tiếng Anh** — cắt mất từ tiếng Việt (`Tổ`→`to`, `an`, `in`). Đã sửa về rỗng ở TASK-007. | `TASK-007` §11 |
+| 12 | `drush cim` trên môi trường mới **thất bại** nếu chưa khớp UUID site. Đã ghi vào README + DEPLOYMENT. | `TASK-007` §11 |
 
 ## 8. Chưa có kế hoạch
 

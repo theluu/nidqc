@@ -1,0 +1,14 @@
+uuid: 3f103ac5-67e3-462d-973f-fd0a6bfc7d37
+langcode: vi
+status: true
+dependencies:
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: hlGKsThGB0nyUZ0FLI4Lo_hx6X6alGBWxibi_xjwZWE
+name: 'Nhóm câu hỏi'
+vid: faq_group
+description: 'Lấy từ design đã duyệt.'
+weight: 0
+new_revision: false

@@ -1,0 +1,27 @@
+uuid: 7ec799dd-3772-4c67-9db8-8b61e36cb9b6
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - node.type.certificate
+  module:
+    - text
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: _t78YEpqAxw6tZSQgpILxdLVlrjoN-XI2p3DlEMZRLA
+id: node.certificate.field_description
+field_name: field_description
+entity_type: node
+bundle: certificate
+label: 'Mô tả'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

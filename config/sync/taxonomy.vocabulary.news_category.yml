@@ -1,0 +1,14 @@
+uuid: 2b48b453-7f2a-4ec5-bc66-93dad199b5db
+langcode: vi
+status: true
+dependencies:
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: et_nik-GIpy310wZaqGIitzmLx9P_mVT2wyOvJKTuIc
+name: 'Chuyên mục tin tức'
+vid: news_category
+description: 'Lấy từ design đã duyệt.'
+weight: 0
+new_revision: false

@@ -5,7 +5,8 @@ session:
 url:
   source: path_prefix
   prefixes:
-    vi: ''
+    vi: vi
+    en: en
   domains:
     vi: ''
 selected_langcode: site_default

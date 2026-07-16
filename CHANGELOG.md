@@ -9,6 +9,9 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 ## [Unreleased]
 
 ### Added
+- **Cấu trúc nội dung theo design đã duyệt** (TASK-007) — 8 content type, 3 taxonomy, 9 term,
+  8 pathauto pattern. Field lấy **thẳng từ design**, không suy diễn. Toàn bộ tái lập được từ
+  DB trống bằng `drush cim` + `hook_install()`.
 - **Mega menu dùng được bằng bàn phím và cảm ứng** (TASK-006) — design chỉ có hover, làm y hệt
   là loại người dùng bàn phím và điện thoại khỏi menu chính của site nhà nước. Island thêm
   Enter/Esc/mũi tên, chạm-lần-1-mở, `aria-expanded`. Tắt JS thì `:hover`/`:focus-within` lo.
@@ -44,6 +47,13 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 - `scripts/extract-fonts.py` — trích woff2 + sinh `@font-face` từ design bundle
 
 ### Fixed
+- 🔴 **Pathauto cắt mất từ tiếng Việt trong URL** (TASK-007) — `ignore_words` mặc định là stopword
+  **tiếng Anh**, trùng từ tiếng Việt thật: "Phòng **Tổ** chức" → `/phong-chuc-hanh-chinh`,
+  "Viện **in ấn** tài liệu" → `/vien-tai-lieu`. URL mất nghĩa và **đụng alias** với trang khác.
+  Đã sửa về rỗng.
+- 🔴 **`drush cim` thất bại trên môi trường mới** (TASK-007) — `si` sinh UUID site mới, Drupal từ
+  chối import config từ "site khác". **TASK-002 bỏ sót** vì chỉ kiểm `cim` trên cùng site.
+  Đã ghi bước khớp UUID vào `README.md` và `DEPLOYMENT.md`.
 - 🔴 **`ENTITY_MAPPING.md` §4 bịa field cho content type `document`** — đặc tả
   `field_document_number`, `field_issued_date`, `field_file`, `field_category` mà **không field nào
   có trong design**. Chúng được suy ra từ hiểu biết chung về "trang văn bản pháp quy", không phải

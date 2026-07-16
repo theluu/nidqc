@@ -1,0 +1,26 @@
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.news
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+id: news
+label: 'Tin tức'
+type: 'canonical_entities:node'
+pattern: '/tin-tuc/[node:title]'
+selection_criteria:
+  bundle_check:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: news-bundle-check
+    context_mapping:
+      node: node
+    bundles:
+      news: news
+selection_logic: and
+weight: -5
+relationships: {  }

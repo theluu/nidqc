@@ -1,0 +1,27 @@
+uuid: fa521bd0-8aa9-4505-ba83-b9e71a59241c
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_answer
+    - node.type.faq
+  module:
+    - text
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: q52_hOKLtDHTGSNrmtWP_yVJT4heMeRF_ZR20gHLI-M
+id: node.faq.field_answer
+field_name: field_answer
+entity_type: node
+bundle: faq
+label: 'Trả lời'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

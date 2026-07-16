@@ -1,0 +1,16 @@
+uuid: ac0d5436-b89f-4b49-8031-c45978cb724d
+langcode: vi
+status: true
+dependencies:
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: oU8Ob4TA7RvzPmcot4kRoh7ePo5i5RcVjZO7IroEQLM
+name: 'Trang tĩnh'
+type: page
+description: 'Trang nội dung tĩnh: Giới thiệu, Chính sách, Cơ cấu tổ chức...'
+help: ''
+new_revision: true
+preview_mode: 1
+display_submitted: false

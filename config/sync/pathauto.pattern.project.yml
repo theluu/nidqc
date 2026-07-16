@@ -1,0 +1,29 @@
+uuid: b6de9d60-ba40-44da-810b-f9c01f066809
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.project
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: Bu-c_4YZFDcWKceGY03Xi3oPAyISa4Zu1jpMrgsmsV4
+id: project
+label: 'Đề tài NCKH'
+type: 'canonical_entities:node'
+pattern: '/dao-tao-nckh/[node:title]'
+selection_criteria:
+  bundle_check:
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: node
+    bundles:
+      project: project
+    uuid: project-bundle-check
+selection_logic: and
+weight: -5
+relationships: {  }

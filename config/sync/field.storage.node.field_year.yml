@@ -1,0 +1,25 @@
+uuid: f22c473f-568a-4d95-8c4b-0d6b3606598e
+langcode: vi
+status: true
+dependencies:
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: UcMfb8g6N_hRIaLCNwIzw362VcEX4V4Ud45pZB31rhU
+id: node.field_year
+field_name: field_year
+entity_type: node
+type: integer
+settings:
+  unsigned: false
+  size: normal
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

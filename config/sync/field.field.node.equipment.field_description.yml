@@ -1,0 +1,27 @@
+uuid: 53294145-f127-4653-b5bb-ee32c09fc439
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - node.type.equipment
+  module:
+    - text
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: IDg_bnyQuNbGOY5LDkQ4n-na4CtG2Mamkz2HhazaYr4
+id: node.equipment.field_description
+field_name: field_description
+entity_type: node
+bundle: equipment
+label: 'Mô tả'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

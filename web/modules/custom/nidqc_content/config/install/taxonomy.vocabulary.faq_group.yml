@@ -1,0 +1,10 @@
+langcode: vi
+status: true
+dependencies:
+  enforced:
+    module:
+      - nidqc_content
+name: 'Nhóm câu hỏi'
+vid: faq_group
+description: 'Lấy từ design đã duyệt.'
+weight: 0

@@ -1,0 +1,21 @@
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_answer
+    - node.type.faq
+  enforced:
+    module:
+      - nidqc_content
+id: node.faq.field_answer
+field_name: field_answer
+entity_type: node
+bundle: faq
+label: 'Trả lời'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

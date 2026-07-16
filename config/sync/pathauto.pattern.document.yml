@@ -1,0 +1,29 @@
+uuid: b99d667d-8d7c-4316-8a1f-98457f881b6b
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.document
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: fPWRnY_jgQeDGS3Q83whPTcXnH2RT_06B2Ksk0riPfs
+id: document
+label: 'Văn bản tài liệu'
+type: 'canonical_entities:node'
+pattern: '/van-ban-tai-lieu/[node:title]'
+selection_criteria:
+  bundle_check:
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: node
+    bundles:
+      document: document
+    uuid: document-bundle-check
+selection_logic: and
+weight: -5
+relationships: {  }

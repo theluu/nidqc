@@ -1,0 +1,27 @@
+uuid: 5d298ed5-48af-42b7-8898-f9e9e8a3a86b
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - node.type.project
+  module:
+    - text
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: KHuAEJck9uQqxKG2PagOd897t00fGKd17JecGjTwXhc
+id: node.project.field_description
+field_name: field_description
+entity_type: node
+bundle: project
+label: 'Mô tả'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

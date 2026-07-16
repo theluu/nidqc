@@ -1,0 +1,12 @@
+name: 'NIDQC Content'
+type: module
+description: 'Content type, field và taxonomy của NIDQC. Cấu trúc lấy từ design đã duyệt (design/).'
+package: NIDQC
+core_version_requirement: ^11
+dependencies:
+  - drupal:node
+  - drupal:taxonomy
+  - drupal:field
+  - drupal:text
+  - drupal:image
+  - drupal:datetime

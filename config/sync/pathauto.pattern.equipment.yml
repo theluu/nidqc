@@ -1,0 +1,29 @@
+uuid: 718bd516-317c-4907-9a46-b2be856c6802
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.equipment
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: OarPQgfWltgVlKhunb9zjZdIznfQmOKyWAJBO4HUx4k
+id: equipment
+label: 'Thiết bị'
+type: 'canonical_entities:node'
+pattern: '/nang-luc/thiet-bi/[node:title]'
+selection_criteria:
+  bundle_check:
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: node
+    bundles:
+      equipment: equipment
+    uuid: equipment-bundle-check
+selection_logic: and
+weight: -5
+relationships: {  }

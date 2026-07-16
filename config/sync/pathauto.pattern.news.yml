@@ -1,0 +1,29 @@
+uuid: d4e41d50-0e2b-4ef2-9a35-da7adcd4ec02
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.news
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: 9258DpghauXmL4se8nYE3Iehg5418i655pDZo4QJVlU
+id: news
+label: 'Tin tức'
+type: 'canonical_entities:node'
+pattern: '/tin-tuc/[node:title]'
+selection_criteria:
+  bundle_check:
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: node
+    bundles:
+      news: news
+    uuid: news-bundle-check
+selection_logic: and
+weight: -5
+relationships: {  }

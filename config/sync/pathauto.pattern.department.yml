@@ -1,0 +1,29 @@
+uuid: db834b75-d6ab-42b8-b209-c8e30c56d003
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.department
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+_core:
+  default_config_hash: soZbKDry3aShxUIRzbFHSGNjUxwHZAeHNyC4XVLdtbs
+id: department
+label: 'Đơn vị'
+type: 'canonical_entities:node'
+pattern: '/co-cau-to-chuc/[node:title]'
+selection_criteria:
+  bundle_check:
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: node
+    bundles:
+      department: department
+    uuid: department-bundle-check
+selection_logic: and
+weight: -5
+relationships: {  }

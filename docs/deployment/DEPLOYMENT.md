@@ -67,6 +67,11 @@ composer install --no-dev --optimize-autoloader
 
 # 5. Cập nhật DB + config
 drush updb -y
+
+# ⚠️ Lần deploy ĐẦU TIÊN trên môi trường mới: phải khớp UUID site trước, nếu không
+# cim thất bại với "Site UUID in source storage does not match the target storage".
+# drush config:set system.site uuid $(grep '^uuid:' ../config/sync/system.site.yml | cut -d' ' -f2) -y
+
 drush cim -y
 
 # 6. Xoá cache

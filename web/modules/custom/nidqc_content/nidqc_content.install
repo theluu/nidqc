@@ -1,0 +1,97 @@
+<?php
+
+/**
+ * @file
+ * Cài đặt module NIDQC Content.
+ *
+ * VÌ SAO CÓ FILE NÀY:
+ *
+ * Taxonomy term là entity CONTENT, không phải configuration. `drush cex` KHÔNG
+ * export chúng. Nên sau khi `drush si` + `drush cim` trên máy mới, content type
+ * và pathauto pattern dựng lại đủ, nhưng chuyên mục tin tức / nhóm văn bản /
+ * nhóm câu hỏi thì RỖNG — kiểm chứng 2026-07-16.
+ *
+ * Đây là cùng một lỗ hổng với menu link (ROADMAP.md nợ kỹ thuật #10): config/sync
+ * lo được config, không lo được content.
+ *
+ * hook_install() giải bài này cho taxonomy: term trở thành CODE, vào git, chạy
+ * lại được trên mọi môi trường.
+ *
+ * ⚠️ Term ở đây lấy NGUYÊN VĂN từ design đã duyệt (design/NIDQC Tin tuc danh
+ * sach.html: catDefs; Van ban tai lieu.html: tabDefs; FAQ.html: rawGroups).
+ * Đổi term = đổi thứ NIDQC đã duyệt -> phải qua change request, không sửa lén.
+ *
+ * ⚠️ hook_install() chỉ chạy MỘT LẦN lúc cài module. Thêm/sửa term sau này phải
+ * viết hook_update_N().
+ */
+
+declare(strict_types=1);
+
+use Drupal\taxonomy\Entity\Term;
+
+/**
+ * Term lấy nguyên văn từ design đã duyệt.
+ *
+ * 'Tất cả' trong design KHÔNG phải term — nó là bộ lọc trên giao diện.
+ */
+function nidqc_content_default_terms(): array {
+  return [
+    // design/NIDQC Tin tuc danh sach.html -> catDefs
+    'news_category' => [
+      'Thông báo',
+      'Tin hoạt động',
+      'Mua sắm - đấu thầu',
+      'Đào tạo',
+      'Hội nghị - Hội thảo',
+      'Tuyển dụng',
+    ],
+    // design/NIDQC Van ban tai lieu.html -> tabDefs
+    'document_group' => [
+      'Văn bản pháp quy',
+      'Tài liệu chuyên môn',
+    ],
+    // design/NIDQC FAQ.html -> rawGroups
+    'faq_group' => [
+      'Dịch vụ kiểm nghiệm',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_install().
+ */
+function nidqc_content_install(): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+
+  foreach (nidqc_content_default_terms() as $vid => $names) {
+    foreach ($names as $weight => $name) {
+      // Idempotent: cài lại module không tạo term trùng.
+      $existing = $storage->loadByProperties(['vid' => $vid, 'name' => $name]);
+      if ($existing) {
+        continue;
+      }
+      Term::create([
+        'vid' => $vid,
+        'name' => $name,
+        'weight' => $weight,
+      ])->save();
+    }
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ *
+ * Config có `enforced` dependency nên Drupal tự dọn. Term là content nên phải
+ * tự xoá, nếu không gỡ rồi cài lại sẽ để lại term mồ côi trỏ vào vocabulary
+ * đã bị xoá.
+ */
+function nidqc_content_uninstall(): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  foreach (array_keys(nidqc_content_default_terms()) as $vid) {
+    $terms = $storage->loadByProperties(['vid' => $vid]);
+    if ($terms) {
+      $storage->delete($terms);
+    }
+  }
+}

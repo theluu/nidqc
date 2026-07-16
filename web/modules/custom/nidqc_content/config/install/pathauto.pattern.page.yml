@@ -1,0 +1,26 @@
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.page
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_content
+id: page
+label: 'Trang tĩnh'
+type: 'canonical_entities:node'
+pattern: '/[node:title]'
+selection_criteria:
+  bundle_check:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: page-bundle-check
+    context_mapping:
+      node: node
+    bundles:
+      page: page
+selection_logic: and
+weight: -5
+relationships: {  }
