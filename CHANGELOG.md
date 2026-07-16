@@ -9,6 +9,9 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 ## [Unreleased]
 
 ### Added
+- **Menu chính 9 mục theo design** — dựng bằng `hook_install()` nên **tái lập được** trên mọi máy,
+  giải xong nợ #10. Toàn bộ 37 link có trong HTML thô (Google đọc được cả submenu sâu).
+  Tắt link tĩnh `standard.front_page` trùng với "Trang chủ" của design.
 - **Cấu trúc nội dung theo design đã duyệt** (TASK-007) — 8 content type, 3 taxonomy, 9 term,
   8 pathauto pattern. Field lấy **thẳng từ design**, không suy diễn. Toàn bộ tái lập được từ
   DB trống bằng `drush cim` + `hook_install()`.

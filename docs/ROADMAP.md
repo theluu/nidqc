@@ -136,7 +136,8 @@ Mọi island **phải** hoạt động khi tắt JS (`FRONTEND_ARCHITECTURE.md` 
 | 7 | `site_branding` tràn mép ở banner (placeholder) | `TASK-003` §9.5 |
 | 8 | Chưa có hạ tầng test | `testing/TEST_STRATEGY.md` §1 |
 | 9 | Chưa có staging / production | `deployment/DEPLOYMENT.md` §1 |
-| 10 | Menu link là content → `cex` không export. **Đã có cách giải: `hook_install()`** — TASK-007 dùng cho taxonomy term và chạy được (§11). Áp dụng tương tự cho menu khi dựng menu thật. | `TASK-006` §9.1 |
+| 13 | **Bản dịch giao diện không sống sót qua `drush si`** — chúng là dữ liệu DB, không phải config. Site langcode vẫn `vi` nhưng nhãn core hiện tiếng Anh ("Log in"). Cần `drush locale:update` sau khi cài. | TASK-008 |
+| ~~10~~ | ~~Menu link là content → không tái lập được~~ | ✅ **giải xong**: `hook_install()` dựng cả term lẫn menu 9 mục |
 | 11 | Pathauto `ignore_words` mặc định là stopword **tiếng Anh** — cắt mất từ tiếng Việt (`Tổ`→`to`, `an`, `in`). Đã sửa về rỗng ở TASK-007. | `TASK-007` §11 |
 | 12 | `drush cim` trên môi trường mới **thất bại** nếu chưa khớp UUID site. Đã ghi vào README + DEPLOYMENT. | `TASK-007` §11 |
 

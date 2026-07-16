@@ -27,6 +27,7 @@
 
 declare(strict_types=1);
 
+use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\taxonomy\Entity\Term;
 
 /**
@@ -57,6 +58,104 @@ function nidqc_content_default_terms(): array {
   ];
 }
 
+
+/**
+ * Menu chính — lấy nguyên văn từ design đã duyệt.
+ *
+ * Nguồn: design/NIDQC FAQ.html -> const NAV (giống nhau ở cả 11 trang).
+ *
+ * Ánh xạ href của design sang route thật theo docs/design/PAGE_MAPPING.md §1:
+ *   NIDQC-Homepage.dc.html   -> /
+ *   Gioi-thieu-chung.dc.html -> /gioi-thieu-chung   (v.v.)
+ *
+ * Menu link là entity CONTENT -> `drush cex` KHÔNG export. Đó là lý do chúng nằm
+ * đây thay vì trong config/install. Xem ROADMAP.md nợ #10.
+ */
+function nidqc_content_default_menu(): array {
+  return [
+    ['Trang chủ', 'internal:/', []],
+    ['Giới thiệu', 'internal:/gioi-thieu-chung', [
+      ['Giới thiệu chung', 'internal:/gioi-thieu-chung'],
+      ['Chính sách chất lượng', 'internal:/chinh-sach-chat-luong'],
+      ['Năng lực', 'internal:/nang-luc'],
+      ['Cơ cấu tổ chức', 'internal:/co-cau-to-chuc'],
+    ]],
+    ['Hoạt động chuyên môn', 'internal:/#hoat-dong-chuyen-mon', [
+      ['Chỉ đạo tuyến', 'internal:/#chi-dao-tuyen'],
+      ['Kiểm nghiệm và giám sát chất lượng thuốc', 'internal:/#kiem-nghiem-giam-sat-chat-luong-thuoc'],
+      ['Hợp tác quốc tế', 'internal:/#hop-tac-quoc-te'],
+      ['Hoạt động NRA', 'internal:/#hoat-dong-nra'],
+      ['Tạp chí Kiểm nghiệm Dược và Mỹ phẩm', 'internal:/#tap-chi-kiem-nghiem'],
+    ]],
+    // Design để href='#' cho nhóm này (placeholder), nhưng trang Dao tao NCKH CÓ
+    // trong bộ design -> trỏ vào trang thật. Ghi ở TASK-008 §9.
+    ['Đào tạo & NCKH', 'internal:/dao-tao-nckh', [
+      ['Đào tạo tiến sỹ', 'internal:/dao-tao-nckh#dao-tao-tien-sy'],
+      ['Nghiên cứu khoa học', 'internal:/dao-tao-nckh#nghien-cuu-khoa-hoc'],
+    ]],
+    ['Dịch vụ', 'internal:/#dich-vu', [
+      ['Phân tích - Kiểm nghiệm', 'internal:/#dich-vu'],
+      ['Đánh giá tương đương sinh học (TĐSH)', 'internal:/#dich-vu'],
+      ['Đào tạo và tư vấn kỹ thuật', 'internal:/#dich-vu'],
+      ['Hiệu chuẩn', 'internal:/#dich-vu'],
+      ['Nghiên cứu - Chuyển giao', 'internal:/#dich-vu'],
+      ['Thử nghiệm thành thạo', 'internal:/#dich-vu'],
+      ['Cung ứng chất chuẩn', 'internal:/#chat-chuan'],
+    ]],
+    // Design trỏ cả 6 mục con vào cùng trang danh sách; bộ lọc chạy phía client.
+    // Dùng ?cat= để mỗi mục lọc đúng chuyên mục VÀ Google index được từng mục.
+    ['Tin tức & Thông báo', 'internal:/tin-tuc', [
+      ['Thông báo', 'internal:/tin-tuc?cat=thong-bao'],
+      ['Tin hoạt động', 'internal:/tin-tuc?cat=tin-hoat-dong'],
+      ['Mua sắm, đấu thầu & công khai minh bạch', 'internal:/tin-tuc?cat=mua-sam-dau-thau'],
+      ['Đào tạo', 'internal:/tin-tuc?cat=dao-tao'],
+      ['Hội nghị - Hội thảo', 'internal:/tin-tuc?cat=hoi-nghi-hoi-thao'],
+      ['Tuyển dụng', 'internal:/tin-tuc?cat=tuyen-dung'],
+    ]],
+    ['Văn bản - Tài liệu', 'internal:/van-ban-tai-lieu', [
+      ['Văn bản pháp quy', 'internal:/van-ban-tai-lieu?nhom=van-ban-phap-quy'],
+      ['Tài liệu chuyên môn', 'internal:/van-ban-tai-lieu?nhom=tai-lieu-chuyen-mon'],
+    ]],
+    ['Liên hệ & hỗ trợ', 'internal:/lien-he', [
+      ['Liên hệ', 'internal:/lien-he'],
+      ['Câu hỏi thường gặp', 'internal:/faq'],
+    ]],
+    ['Tra cứu', 'internal:/#chat-chuan', []],
+  ];
+}
+
+/**
+ * Tạo menu chính. Idempotent.
+ */
+function _nidqc_content_create_menu(): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
+  foreach (nidqc_content_default_menu() as $weight => [$title, $uri, $children]) {
+    $existing = $storage->loadByProperties(['menu_name' => 'main', 'title' => $title]);
+    $parent = $existing ? reset($existing) : MenuLinkContent::create([
+      'title' => $title,
+      'link' => ['uri' => $uri],
+      'menu_name' => 'main',
+      'weight' => $weight,
+      'expanded' => TRUE,
+    ]);
+    if (!$existing) {
+      $parent->save();
+    }
+    foreach ($children as $cw => [$ctitle, $curi]) {
+      if ($storage->loadByProperties(['menu_name' => 'main', 'title' => $ctitle])) {
+        continue;
+      }
+      MenuLinkContent::create([
+        'title' => $ctitle,
+        'link' => ['uri' => $curi],
+        'menu_name' => 'main',
+        'parent' => 'menu_link_content:' . $parent->uuid(),
+        'weight' => $cw,
+      ])->save();
+    }
+  }
+}
+
 /**
  * Implements hook_install().
  */
@@ -77,6 +176,8 @@ function nidqc_content_install(): void {
       ])->save();
     }
   }
+
+  _nidqc_content_create_menu();
 }
 
 /**
@@ -93,5 +194,12 @@ function nidqc_content_uninstall(): void {
     if ($terms) {
       $storage->delete($terms);
     }
+  }
+
+  // Menu link cũng là content -> phải tự dọn.
+  $links = \Drupal::entityTypeManager()->getStorage('menu_link_content')
+    ->loadByProperties(['menu_name' => 'main']);
+  if ($links) {
+    \Drupal::entityTypeManager()->getStorage('menu_link_content')->delete($links);
   }
 }

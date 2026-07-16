@@ -18,11 +18,12 @@ ddev drush si standard -y --account-name=admin --account-pass=<mật khẩu củ
 ddev drush config:set system.site uuid $(grep '^uuid:' config/sync/system.site.yml | cut -d' ' -f2) -y
 
 ddev drush cim -y             # dựng lại toàn bộ cấu hình từ git
+ddev drush locale:update      # nạp bản dịch tiếng Việt (không nằm trong config)
 ddev drush cr
 ddev launch
 ```
 
-Sau `cim` bạn sẽ có: 8 content type · 8 pathauto pattern · 9 taxonomy term · theme `nidqc`.
+Sau `cim` bạn sẽ có: 8 content type · 8 pathauto pattern · 9 taxonomy term · menu 9 mục · theme `nidqc`.
 Đã kiểm chứng từ DB trống (`TASK-007` §11).
 
 Yêu cầu: [DDEV](https://ddev.readthedocs.io/) + Docker.

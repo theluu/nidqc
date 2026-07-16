@@ -10,3 +10,4 @@ dependencies:
   - drupal:text
   - drupal:image
   - drupal:datetime
+  - drupal:menu_link_content
