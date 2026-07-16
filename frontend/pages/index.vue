@@ -41,6 +41,18 @@ const webLinks = [
 // Video giới thiệu (design: click-to-play, YouTube embed)
 const videoStarted = ref(false)
 
+// 2 cơ sở + bản đồ Google Maps (design/NIDQC Trang chu.html -> iframe maps)
+const offices = [
+  {
+    t: 'Cơ sở 1', addr: '48 Hai Bà Trưng, Tràng Tiền, Hoàn Kiếm, Hà Nội', tel: '(024) 3825 5075',
+    map: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.185366346867!2d105.84769501476318!3d21.025267786000292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab949db87b29%3A0xeab602afd22b8090!2zNDggSGFpIELDoCBUcsawbmcsIFRyw6BuZyBUaeG7gW4sIEhvw6BuIEtp4bq_bSwgSMOgIE7hu5lpLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1577957514119!5m2!1svi!2s',
+  },
+  {
+    t: 'Cơ sở 2', addr: 'Ngõ 135 Núi Trúc, Ba Đình, Hà Nội', tel: '(024) 3736 4738',
+    map: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3725.941679701607!2d105.8298021147619!3d20.954857086038405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ada9a6796f99%3A0xebd36f00bc31e2f4!2zVmnhu4duIEtp4buDbSBuZ2hp4buHbSB0aHXhu5FjIFRydW5nIMawxqFuZyAoQ8ahIHPhu58gSUkp!5e0!3m2!1svi!2s!4v1577958314927!5m2!1svi!2s',
+  },
+]
+
 useHead({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương' })
 </script>
 
@@ -196,19 +208,19 @@ useHead({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương' }
           <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:24px;letter-spacing:0.3px;text-transform:uppercase;color:#212529;margin:0;">Liên hệ</h2>
         </div>
         <div class="nidqc-two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-          <div v-for="(cs, i) in [
-            {t:'Cơ sở 1', addr:'48 Hai Bà Trưng, Hoàn Kiếm, Hà Nội', tel:'(024) 3825 5075'},
-            {t:'Cơ sở 2', addr:'Ngõ 135 Núi Trúc, Ba Đình, Hà Nội', tel:'(024) 3736 4738'},
-          ]" :key="i" style="background:#fff;border:1px solid #CCCCCC;padding:18px 20px;">
-            <h3 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:17px;color:#0F3093;margin:0 0 10px;">{{ cs.t }}</h3>
-            <p style="display:flex;align-items:flex-start;gap:8px;font-size:13.5px;line-height:20px;color:#495057;margin:0 0 8px;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6AC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px;margin-top:2px;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              {{ cs.addr }}
-            </p>
-            <p style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:#495057;margin:0;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6AC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              {{ cs.tel }}
-            </p>
+          <div v-for="(cs, i) in offices" :key="i" style="background:#fff;border:1px solid #CCCCCC;">
+            <div style="padding:18px 20px;border-bottom:1px solid #ECECEC;">
+              <h3 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:17px;color:#0F3093;margin:0 0 10px;">{{ cs.t }}</h3>
+              <p style="display:flex;align-items:flex-start;gap:8px;font-size:13.5px;line-height:20px;color:#495057;margin:0 0 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6AC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px;margin-top:2px;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ cs.addr }}
+              </p>
+              <p style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:#495057;margin:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6AC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                {{ cs.tel }}
+              </p>
+            </div>
+            <iframe :src="cs.map" style="width:100%;height:220px;border:0;display:block;" loading="lazy" referrerpolicy="no-referrer-when-downgrade" :title="`Bản đồ ${cs.t}`"></iframe>
           </div>
         </div>
         <div style="margin-top:24px;">

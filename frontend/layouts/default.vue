@@ -8,6 +8,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 
 const now = ref('');
 const openMenu = ref(null);
+const mobileOpen = ref(false);
 let timer;
 
 const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
@@ -110,26 +111,39 @@ const footerLinks = [
     <!-- ===== NAV ===== -->
     <header style="background:#0F3093;box-shadow:0 2px 4px rgba(0,0,0,0.10);position:sticky;top:0;z-index:40;"
             @mouseleave="openMenu = null">
-      <div class="nidqc-nav-inner" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;height:50px;display:flex;align-items:stretch;">
-        <nav style="display:flex;align-items:stretch;flex:1;min-width:0;">
-          <div v-for="(item, i) in nav" :key="i"
+      <div class="nidqc-nav-inner" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;min-height:50px;display:flex;align-items:stretch;">
+        <!-- Hamburger: chỉ hiện trên mobile -->
+        <button class="nidqc-hamburger" @click="mobileOpen = !mobileOpen" :aria-expanded="mobileOpen" aria-label="Mở menu"
+          style="display:none;align-items:center;justify-content:center;width:44px;height:50px;background:none;border:0;cursor:pointer;color:#fff;">
+          <svg v-if="!mobileOpen" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <svg v-else width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+
+        <nav class="nidqc-nav-list" :class="{ 'is-open': mobileOpen }" style="display:flex;align-items:stretch;flex:1;min-width:0;">
+          <div v-for="(item, i) in nav" :key="i" class="nidqc-nav-item"
                style="display:flex;align-items:stretch;flex:0 0 auto;position:relative;"
                @mouseenter="openMenu = item.children.length ? i : null">
-            <NuxtLink :to="item.to"
+            <NuxtLink :to="item.to" @click="mobileOpen = false"
               style="display:flex;align-items:center;padding:0 14px;color:#fff;font-weight:600;font-size:14px;text-decoration:none;white-space:nowrap;"
               :style="openMenu === i ? 'background:#0D2870;' : ''">
               {{ item.label }}
             </NuxtLink>
-            <div v-if="item.children.length && openMenu === i"
+            <!-- nút mở submenu trên mobile -->
+            <button v-if="item.children.length" class="nidqc-sub-toggle" @click="openMenu = openMenu === i ? null : i"
+              :aria-label="`Mở mục con ${item.label}`"
+              style="display:none;background:none;border:0;color:#fff;padding:0 14px;cursor:pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" :style="openMenu===i?'transform:rotate(180deg)':''"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div v-if="item.children.length && openMenu === i" class="nidqc-submenu"
                  style="position:absolute;top:100%;left:0;min-width:220px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.14);z-index:50;">
-              <NuxtLink v-for="(c, j) in item.children" :key="j" :to="c.to"
+              <NuxtLink v-for="(c, j) in item.children" :key="j" :to="c.to" @click="mobileOpen = false"
                 style="display:block;padding:11px 18px;font-size:13.5px;line-height:18px;color:#212529;border-bottom:1px solid #F0F0F0;white-space:nowrap;text-decoration:none;">
                 {{ c.label }}
               </NuxtLink>
             </div>
           </div>
         </nav>
-        <a href="https://nidqc.gov.vn/tim-kiem-chat-chuan" title="Tra cứu"
+        <a href="https://nidqc.gov.vn/tim-kiem-chat-chuan" title="Tra cứu" class="nidqc-nav-search"
            style="align-self:center;display:flex;align-items:center;justify-content:center;width:42px;height:34px;background:#1D6AC5;border-radius:18px;margin-left:10px;flex:0 0 auto;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         </a>
