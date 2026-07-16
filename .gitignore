@@ -67,3 +67,8 @@ Thumbs.db
 
 # Vue SPA build output (ADR-003) — build từ frontend/, không commit
 /web/app/
+
+# Nuxt (ADR-004)
+/frontend/.nuxt/
+/frontend/.output/
+/frontend/.data/

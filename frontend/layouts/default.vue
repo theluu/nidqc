@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { RouterLink } from 'vue-router';
 
 /**
  * Layout dùng chung mọi trang — tái tạo từ design đã duyệt.
@@ -77,10 +76,10 @@ const footerLinks = [
 
     <!-- ===== BANNER ===== -->
     <div style="background:#fff;border-bottom:1px solid #ECECEC;">
-      <RouterLink to="/" style="display:block;">
+      <NuxtLink to="/" style="display:block;">
         <img src="https://nidqc.gov.vn/sites/all/themes/nidqc/images/upload/banner-header.jpg"
              alt="Viện Kiểm nghiệm thuốc Trung ương" style="display:block;width:100%;height:auto;">
-      </RouterLink>
+      </NuxtLink>
     </div>
 
     <!-- ===== NAV ===== -->
@@ -91,17 +90,17 @@ const footerLinks = [
           <div v-for="(item, i) in nav" :key="i"
                style="display:flex;align-items:stretch;flex:0 0 auto;position:relative;"
                @mouseenter="openMenu = item.children.length ? i : null">
-            <RouterLink :to="item.to"
+            <NuxtLink :to="item.to"
               style="display:flex;align-items:center;padding:0 14px;color:#fff;font-weight:600;font-size:14px;text-decoration:none;white-space:nowrap;"
               :style="openMenu === i ? 'background:#0D2870;' : ''">
               {{ item.label }}
-            </RouterLink>
+            </NuxtLink>
             <div v-if="item.children.length && openMenu === i"
                  style="position:absolute;top:100%;left:0;min-width:220px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.14);z-index:50;">
-              <RouterLink v-for="(c, j) in item.children" :key="j" :to="c.to"
+              <NuxtLink v-for="(c, j) in item.children" :key="j" :to="c.to"
                 style="display:block;padding:11px 18px;font-size:13.5px;line-height:18px;color:#212529;border-bottom:1px solid #F0F0F0;white-space:nowrap;text-decoration:none;">
                 {{ c.label }}
-              </RouterLink>
+              </NuxtLink>
             </div>
           </div>
         </nav>
@@ -127,7 +126,7 @@ const footerLinks = [
         <div>
           <h4 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:0.5px;text-transform:uppercase;color:rgba(255,255,255,0.6);margin:0 0 14px;">Liên kết nhanh</h4>
           <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px;">
-            <RouterLink v-for="(l, i) in footerLinks" :key="i" :to="l.to" style="color:rgba(255,255,255,0.85);text-decoration:none;">{{ l.label }}</RouterLink>
+            <NuxtLink v-for="(l, i) in footerLinks" :key="i" :to="l.to" style="color:rgba(255,255,255,0.85);text-decoration:none;">{{ l.label }}</NuxtLink>
           </div>
         </div>
         <div>

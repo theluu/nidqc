@@ -9,6 +9,10 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 ## [Unreleased]
 
 ### Changed
+- 🔴 **SSR cho SEO/GEO (ADR-004)** — chuyển Vue SPA → **Nuxt SSR**. Nội dung render phía server,
+  crawler (Google + AI) đọc được không cần JS. **Cả 11 trang** convert từ design, dữ liệu động từ
+  JSON:API, đã kiểm SSR bằng `curl`: HTML thô chứa nội dung thật (tiêu đề tin, văn bản, FAQ...).
+  Production cần Node runtime (hosting đã xác nhận). ADR-003 SPA được nâng cấp lên SSR.
 - 🔴 **PIVOT KIẾN TRÚC (ADR-003)** — chuyển sang **Vue SPA + Drupal headless**, đúng plan gốc
   ("API contract → Drupal Backend → Vue Frontend"). ADR-001 (Twig + islands) đã hiểu sai plan và
   bị thay thế. Trang chủ giờ convert **trực tiếp** từ design HTML sang Vue → **giống hệt design**
