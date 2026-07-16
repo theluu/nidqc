@@ -293,3 +293,8 @@ corepack_enable: true
 #   - exec: drush sql:sanitize
 #   - exec: drush updatedb
 #   - exec: drush cache:rebuild
+
+web_extra_daemons:
+  - name: nuxt-ssr
+    command: "cd /var/www/html/frontend && NODE_TLS_REJECT_UNAUTHORIZED=0 DRUPAL_INTERNAL=https://nidqc.ddev.site npx nuxt dev --port 3000 --host 0.0.0.0"
+    directory: /var/www/html/frontend

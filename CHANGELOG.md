@@ -9,6 +9,11 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 ## [Unreleased]
 
 ### Changed
+- 🔴 **Nối Nuxt vào URL chính** — trước đó Nuxt chạy ở `localhost:3000` trong container còn
+  `nidqc.ddev.site/` vẫn render Twig cũ (bản "quá khác xa design"). Nay nginx reverse proxy:
+  `/` → Nuxt SSR, còn `/jsonapi` `/admin` `/user` `/sites` `/core` `/themes` → Drupal. Nuxt tự
+  chạy qua `web_extra_daemons`. **`nidqc.ddev.site/` giờ hiển thị đúng design, động, SSR.**
+  Reset mật khẩu admin (đã bị đổi khi test tái lập config).
 - 🔴 **SSR cho SEO/GEO (ADR-004)** — chuyển Vue SPA → **Nuxt SSR**. Nội dung render phía server,
   crawler (Google + AI) đọc được không cần JS. **Cả 11 trang** convert từ design, dữ liệu động từ
   JSON:API, đã kiểm SSR bằng `curl`: HTML thô chứa nội dung thật (tiêu đề tin, văn bản, FAQ...).
