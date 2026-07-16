@@ -2,8 +2,8 @@
 
 > Kế hoạch đưa 11 trang design vào project. Cập nhật 2026-07-16.
 >
-> Kiến trúc: **Drupal Twig render nội dung + Vue island cho tương tác** (`decisions/ADR-001`).
-> **Không** chuyển trang sang Vue SPA — xem §5.
+> 🔴 **Kiến trúc đã đổi (ADR-003):** Vue SPA convert từ design + Drupal headless (JSON:API).
+> ADR-001 (islands) đã bị thay thế — nó hiểu sai plan gốc. Xem `decisions/ADR-003`.
 
 ---
 

@@ -8,6 +8,14 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 
 ## [Unreleased]
 
+### Changed
+- 🔴 **PIVOT KIẾN TRÚC (ADR-003)** — chuyển sang **Vue SPA + Drupal headless**, đúng plan gốc
+  ("API contract → Drupal Backend → Vue Frontend"). ADR-001 (Twig + islands) đã hiểu sai plan và
+  bị thay thế. Trang chủ giờ convert **trực tiếp** từ design HTML sang Vue → **giống hệt design**
+  (banner ảnh thật, top bar đầy đủ, hero động). Drupal bật JSON:API, cung cấp 50 node cho Vue.
+  Frontend build ra `/app/`, fetch `/jsonapi` cùng origin. Cài `vue-router` (SPA cần).
+  Rủi ro SEO (client-render) — cần prerender trước go-live, ghi trong ADR-003.
+
 ### Added
 - **Trang chủ theo design** (`page--front.html.twig`) — thay view frontpage mặc định của Drupal.
   5 section: hero (tin nổi bật + danh sách tin mới, **động từ node**), hoạt động chuyên môn, dịch

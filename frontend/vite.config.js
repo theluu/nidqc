@@ -3,42 +3,27 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 
 /**
- * Vite build cho Vue island của NIDQC.
+ * Vite build cho Vue SPA của NIDQC (ADR-003).
  *
- * KHÔNG phải SPA. Drupal render nội dung; Vue chỉ nâng cấp các khối tương tác.
- * Xem docs/decisions/ADR-001-frontend-architecture.md.
- *
- * Production KHÔNG chạy Node — Vite chỉ chạy lúc build, xuất ra JS/CSS tĩnh cho
- * Drupal library nạp.
+ * Frontend tách rời: convert design HTML -> Vue, Drupal làm backend qua JSON:API.
+ * SPA build ra web/app/, phục vụ tại /app/, fetch dữ liệu từ /jsonapi (cùng origin).
  */
 export default defineConfig({
+  base: '/app/',
   plugins: [vue()],
-
   resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
+    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
-
   build: {
-    // Drupal library trỏ tới đường dẫn CỐ ĐỊNH, nên không được có hash trong tên file.
-    outDir: fileURLToPath(new URL('../web/themes/custom/nidqc/dist', import.meta.url)),
+    outDir: fileURLToPath(new URL('../web/app', import.meta.url)),
     emptyOutDir: true,
-    manifest: false,
-
-    // Không sinh source map ra production: nó lộ đường dẫn máy dev và toàn bộ
-    // source. Xem tasks/TASK-005.md §8.
     sourcemap: false,
-
-    rollupOptions: {
-      input: fileURLToPath(new URL('./src/main.js', import.meta.url)),
-      output: {
-        entryFileNames: 'islands.js',
-        // Island lazy-load riêng: trang chỉ có FAQ thì không tải code mega menu.
-        // Tên chunk cũng phải cố định để không rác thư mục dist qua mỗi lần build.
-        chunkFileNames: 'island-[name].js',
-        assetFileNames: 'islands.[ext]',
-      },
+  },
+  server: {
+    // Dev: proxy /jsonapi tới Drupal để cùng origin.
+    proxy: {
+      '/jsonapi': { target: 'https://nidqc.ddev.site', changeOrigin: true, secure: false },
+      '/themes': { target: 'https://nidqc.ddev.site', changeOrigin: true, secure: false },
     },
   },
 });

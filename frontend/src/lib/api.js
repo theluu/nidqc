@@ -1,58 +1,70 @@
 /**
  * @file
- * Mọi request của island đi qua đây. Không fetch rải rác trong component.
+ * JSON:API client cho Drupal headless backend (ADR-003).
  *
- * Lỗi theo chuẩn docs/api/API_ERROR_STANDARD.md:
- *   { "error": { "code": "INVALID_PARAMETER", "message": "...", "details": [...] } }
+ * Drupal cung cấp nội dung tại /jsonapi. Vue fetch qua đây, không fetch rải rác
+ * trong component.
  */
 
-/** Lỗi API đã chuẩn hoá. Bắt theo `code`, KHÔNG so khớp `message`. */
+const BASE = '/jsonapi';
+
 export class ApiError extends Error {
-  constructor(code, message, status) {
+  constructor(message, status) {
     super(message);
     this.name = 'ApiError';
-    this.code = code;
     this.status = status;
   }
 }
 
-const BASE = '/api/v1';
-
-/** Thông báo cho người dùng cuối. Tiếng Việt, không lộ chi tiết kỹ thuật. */
-const FALLBACK_MESSAGE = 'Không kết nối được máy chủ. Vui lòng thử lại.';
-
-export async function get(path, params = {}) {
+/** Gọi JSON:API, trả { data, included }. Ném ApiError khi lỗi. */
+export async function jsonapi(path, params = {}) {
   const url = new URL(`${BASE}${path}`, window.location.origin);
   for (const [k, v] of Object.entries(params)) {
-    // Bỏ tham số rỗng thay vì gửi ?cat=undefined lên server.
-    if (v !== null && v !== undefined && v !== '') {
+    if (v !== undefined && v !== null && v !== '') {
       url.searchParams.set(k, v);
     }
   }
 
   let res;
   try {
-    res = await fetch(url, { headers: { Accept: 'application/json' } });
+    res = await fetch(url, { headers: { Accept: 'application/vnd.api+json' } });
   } catch (e) {
-    // Mất mạng, DNS hỏng, request bị huỷ — chưa từng chạm tới server.
-    throw new ApiError('NETWORK_ERROR', FALLBACK_MESSAGE, 0);
+    throw new ApiError('Không kết nối được máy chủ.', 0);
   }
-
   if (!res.ok) {
-    // Response lỗi KHÔNG chắc là JSON: nginx 502 trả HTML, gateway trả text.
-    // Không bọc catch ở đây thì island nổ bằng SyntaxError khó hiểu thay vì
-    // hiện thông báo dùng được.
-    const body = await res.json().catch(() => null);
-    throw new ApiError(
-      body?.error?.code ?? 'INTERNAL_ERROR',
-      body?.error?.message ?? FALLBACK_MESSAGE,
-      res.status,
-    );
+    throw new ApiError(`Lỗi máy chủ (${res.status}).`, res.status);
   }
+  const body = await res.json();
+  return { data: body.data ?? [], included: body.included ?? [], meta: body.meta ?? {} };
+}
 
-  try {
-    return await res.json();
-  } catch (e) {
-    throw new ApiError('INVALID_RESPONSE', FALLBACK_MESSAGE, res.status);
-  }
+/** Tra một entity trong `included` theo type + id. */
+export function findIncluded(included, type, id) {
+  return included.find((r) => r.type === type && r.id === id) ?? null;
+}
+
+/** URL ảnh từ relationship field_image (nếu có). */
+export function imageUrl(node, included) {
+  const rel = node.relationships?.field_image?.data;
+  if (!rel) return null;
+  const file = findIncluded(included, rel.type, rel.id);
+  const uri = file?.attributes?.uri?.url;
+  return uri ? new URL(uri, window.location.origin).href : null;
+}
+
+/** Nhãn taxonomy term từ relationship (đã include). */
+export function termLabel(node, field, included) {
+  const rel = node.relationships?.[field]?.data;
+  if (!rel) return '';
+  const term = findIncluded(included, rel.type, rel.id);
+  return term?.attributes?.name ?? '';
+}
+
+/** Ngày dd/mm/yyyy từ field datetime (Y-m-d) hoặc created. */
+export function formatDate(value) {
+  if (!value) return '';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '';
+  const p = (n) => String(n).padStart(2, '0');
+  return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()}`;
 }

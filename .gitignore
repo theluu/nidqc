@@ -64,3 +64,6 @@ Thumbs.db
 # --- Tạm ---
 /scratchpad/
 *.log
+
+# Vue SPA build output (ADR-003) — build từ frontend/, không commit
+/web/app/
