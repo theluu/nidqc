@@ -34,3 +34,59 @@ function nidqc_preprocess_menu__main(array &$variables): void {
 
   $variables['#attached']['library'][] = 'nidqc/islands';
 }
+
+/**
+ * Implements hook_preprocess_HOOK() for page.
+ *
+ * Chuẩn bị dữ liệu ĐỘNG cho trang chủ: tin nổi bật + danh sách tin mới nhất,
+ * lấy từ node `news` (biên tập viên sửa node -> trang chủ đổi theo).
+ *
+ * Chỉ chạy ở trang chủ để không tốn query ở trang khác.
+ */
+function nidqc_preprocess_page(array &$variables): void {
+  if (empty($variables['is_front'])) {
+    return;
+  }
+  $variables['#attached']['library'][] = 'nidqc/front';
+
+  $storage = \Drupal::entityTypeManager()->getStorage('node');
+  $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
+  $alias = \Drupal::service('path_alias.manager');
+  $date_formatter = \Drupal::service('date.formatter');
+
+  // 6 tin mới nhất, đã publish. accessCheck để không lộ nội dung chưa duyệt.
+  $ids = $storage->getQuery()
+    ->condition('type', 'news')
+    ->condition('status', 1)
+    ->sort('created', 'DESC')
+    ->range(0, 6)
+    ->accessCheck(TRUE)
+    ->execute();
+
+  $items = [];
+  foreach ($storage->loadMultiple($ids) as $node) {
+    $date = '';
+    if ($node->hasField('field_date') && !$node->get('field_date')->isEmpty()) {
+      $ts = strtotime($node->get('field_date')->value);
+      $date = $ts ? $date_formatter->format($ts, 'custom', 'd/m/Y') : '';
+    }
+    $items[] = [
+      'title' => $node->label(),
+      'url' => $alias->getAliasByPath('/node/' . $node->id()),
+      'date' => $date,
+      'tag' => $node->hasField('field_tag') ? $node->get('field_tag')->value : '',
+    ];
+  }
+
+  // Tin đầu làm "nổi bật", còn lại vào danh sách bên cạnh.
+  $variables['nidqc_news_featured'] = $items ? reset($items) : NULL;
+  $variables['nidqc_news_list'] = array_slice($items, 1);
+
+  // Liên kết ngoài — design/NIDQC Trang chu.html -> webLinks.
+  $variables['nidqc_web_links'] = [
+    ['label' => 'Bộ Y Tế', 'url' => 'https://moh.gov.vn'],
+    ['label' => 'Cục Quản lý Dược', 'url' => 'https://dav.gov.vn'],
+    ['label' => 'Viện Kiểm nghiệm thuốc TP. Hồ Chí Minh', 'url' => '#'],
+    ['label' => 'Tổ chức Y tế Thế giới (WHO)', 'url' => 'https://www.who.int'],
+  ];
+}

@@ -9,6 +9,10 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 ## [Unreleased]
 
 ### Added
+- **Trang chủ theo design** (`page--front.html.twig`) — thay view frontpage mặc định của Drupal.
+  5 section: hero (tin nổi bật + danh sách tin mới, **động từ node**), hoạt động chuyên môn, dịch
+  vụ, CTA chất chuẩn, liên kết + liên hệ. Anchor `#dich-vu`/`#chat-chuan`/`#hoat-dong-chuyen-mon`
+  khớp menu. Class + token (không hex), CSS `front.css` chỉ nạp ở trang chủ. Sửa node → trang đổi theo.
 - **50 node nội dung thật từ design** — 12 tin tức · 12 văn bản · 7 FAQ · 8 đơn vị · 5 thiết bị ·
   3 chứng nhận · 3 đề tài. Trích bằng `scripts/extract-content.py` (design → JSON) rồi nhập bằng
   `scripts/import-content.php` (idempotent). Alias tiếng Việt sinh đúng, node chi tiết truy cập được.

@@ -76,7 +76,7 @@ Chưa soạn **có chủ đích** — soạn task về content mà chưa biết 
 | # | Việc | Phụ thuộc |
 |---|---|---|
 | 007 | Content type + field theo `database/ENTITY_MAPPING.md` | 🔴 NIDQC trả lời |
-| 008 | `page--front.html.twig` — trang chủ (cấu trúc khác hẳn) | 007 |
+| ~~008~~ | ✅ `page--front.html.twig` — trang chủ 5 section, tin tức động | xong |
 | 009 | `node--page` — Giới thiệu, Chính sách, Cơ cấu, Năng lực, Đào tạo | 007 |
 | 010 | Tin tức: danh sách + chi tiết | 007 |
 | 011 | Văn bản + island `doc-filter` | 007 |

@@ -26,3 +26,10 @@ islands:
   version: 1.x
   js:
     dist/islands.js: { attributes: { type: module, defer: true } }
+
+# Trang chủ — chỉ nạp ở front (nidqc_preprocess_page).
+front:
+  version: 1.x
+  css:
+    theme:
+      css/front.css: {}

@@ -1,0 +1,141 @@
+{#
+/**
+ * @file
+ * Trang chủ NIDQC — cấu trúc riêng, khác 10 trang con.
+ *
+ * Giữ khung dùng chung (top bar, banner, nav, footer) giống page.html.twig,
+ * nhưng KHÔNG có breadcrumb và thay <main> bằng các section của design.
+ *
+ * Nội dung tĩnh (dịch vụ, chất chuẩn, liên hệ...) lấy từ design đã duyệt.
+ * Tin tức ĐỘNG từ node `news` qua nidqc_preprocess_page() -> nidqc_news_*.
+ *
+ * Class + token (ADR: convert inline style sang class). CSS: css/front.css.
+ */
+#}
+<div class="nidqc-page">
+
+  {% if page.header_top %}
+    <div class="nidqc-header-top">
+      <div class="nidqc-container nidqc-header-top__inner">{{ page.header_top }}</div>
+    </div>
+  {% endif %}
+
+  {% if page.header_banner %}
+    <div class="nidqc-header-banner">{{ page.header_banner }}</div>
+  {% endif %}
+
+  <header class="nidqc-nav-main" role="banner">
+    <div class="nidqc-container nidqc-nav-main__inner">{{ page.primary_menu }}</div>
+  </header>
+
+  <main class="nidqc-front" role="main">
+    <a id="main-content" tabindex="-1"></a>
+
+    {# ===== 1. HERO: tin nổi bật + danh sách tin mới ===== #}
+    {% if nidqc_news_featured %}
+      <section class="nidqc-hero">
+        <div class="nidqc-container nidqc-hero__grid">
+          <a href="{{ nidqc_news_featured.url }}" class="nidqc-hero__featured">
+            <div class="nidqc-hero__media">
+              <span class="nidqc-hero__badge">Tin tức &amp; sự kiện</span>
+            </div>
+            <div class="nidqc-hero__body">
+              {% if nidqc_news_featured.date %}
+                <div class="nidqc-hero__meta">Cập nhật: {{ nidqc_news_featured.date }}</div>
+              {% endif %}
+              <h2 class="nidqc-hero__title">{{ nidqc_news_featured.title }}</h2>
+            </div>
+          </a>
+
+          <div class="nidqc-hero__list">
+            <h3 class="nidqc-section__label">Tin mới nhất</h3>
+            {% for item in nidqc_news_list %}
+              <a href="{{ item.url }}" class="nidqc-newsitem">
+                {% if item.tag %}<span class="nidqc-newsitem__tag">{{ item.tag }}</span>{% endif %}
+                <span class="nidqc-newsitem__title">{{ item.title }}</span>
+                {% if item.date %}<span class="nidqc-newsitem__date">{{ item.date }}</span>{% endif %}
+              </a>
+            {% endfor %}
+            <a href="/tin-tuc" class="nidqc-btn nidqc-btn--ghost">Xem tất cả tin tức</a>
+          </div>
+        </div>
+      </section>
+    {% endif %}
+
+    {# ===== 2. Hoạt động chuyên môn ===== #}
+    <section class="nidqc-section nidqc-section--soft" id="hoat-dong-chuyen-mon">
+      <div class="nidqc-container">
+        <h2 class="nidqc-section__title">Hoạt động chuyên môn</h2>
+        <div class="nidqc-cardgrid">
+          {% for card in [
+            {t:'Chỉ đạo tuyến', d:'Hướng dẫn, giám sát chuyên môn hệ thống kiểm nghiệm địa phương.', a:'/#chi-dao-tuyen'},
+            {t:'Kiểm nghiệm và giám sát chất lượng thuốc', d:'Kiểm tra, giám sát chất lượng thuốc lưu hành trên toàn quốc.', a:'/#kiem-nghiem-giam-sat-chat-luong-thuoc'},
+            {t:'Hợp tác quốc tế', d:'Hợp tác với các tổ chức kiểm nghiệm và y tế quốc tế.', a:'/#hop-tac-quoc-te'},
+            {t:'Hoạt động NRA', d:'Cơ quan quản lý quốc gia về vắc xin theo chuẩn WHO.', a:'/#hoat-dong-nra'},
+          ] %}
+            <a href="{{ card.a }}" class="nidqc-card">
+              <h3 class="nidqc-card__title">{{ card.t }}</h3>
+              <p class="nidqc-card__desc">{{ card.d }}</p>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    {# ===== 3. Dịch vụ & tra cứu ===== #}
+    <section class="nidqc-section" id="dich-vu">
+      <div class="nidqc-container">
+        <h2 class="nidqc-section__title">Dịch vụ &amp; tra cứu</h2>
+        <p class="nidqc-section__lead">Các dịch vụ khoa học kỹ thuật và công cụ tra cứu của Viện.</p>
+        <div class="nidqc-cardgrid nidqc-cardgrid--3">
+          {% for s in [
+            'Phân tích - Kiểm nghiệm', 'Đánh giá tương đương sinh học (TĐSH)',
+            'Đào tạo và tư vấn kỹ thuật', 'Hiệu chuẩn',
+            'Nghiên cứu - Chuyển giao', 'Thử nghiệm thành thạo',
+          ] %}
+            <a href="/#dich-vu" class="nidqc-card nidqc-card--service">
+              <h3 class="nidqc-card__title">{{ s }}</h3>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    {# ===== 4. Chất chuẩn – chất đối chiếu ===== #}
+    <section class="nidqc-section nidqc-section--primary" id="chat-chuan">
+      <div class="nidqc-container nidqc-cta">
+        <div>
+          <h2 class="nidqc-cta__title">Chất chuẩn – chất đối chiếu</h2>
+          <p class="nidqc-cta__desc">Tra cứu và đăng ký cung ứng chất chuẩn, chất đối chiếu phục vụ kiểm nghiệm.</p>
+        </div>
+        <a href="https://nidqc.gov.vn/tim-kiem-chat-chuan" class="nidqc-btn nidqc-btn--light">Tra cứu chất chuẩn</a>
+      </div>
+    </section>
+
+    {# ===== 5. Liên kết & Liên hệ ===== #}
+    <section class="nidqc-section nidqc-section--soft" id="lien-he">
+      <div class="nidqc-container nidqc-front__foot">
+        <div>
+          <h2 class="nidqc-section__title">Liên kết</h2>
+          <div class="nidqc-linklist">
+            {% for link in nidqc_web_links %}
+              <a href="{{ link.url }}" class="nidqc-linklist__item"{% if link.url starts with 'http' %} target="_blank" rel="noopener"{% endif %}>{{ link.label }}</a>
+            {% endfor %}
+          </div>
+        </div>
+        <div>
+          <h2 class="nidqc-section__title">Liên hệ</h2>
+          <a href="/lien-he" class="nidqc-btn">Trang liên hệ &amp; hỗ trợ</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  {% if page.footer %}
+    <footer class="nidqc-footer" role="contentinfo">
+      <div class="nidqc-container nidqc-footer__inner">{{ page.footer }}</div>
+    </footer>
+  {% endif %}
+
+</div>

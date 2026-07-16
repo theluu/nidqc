@@ -1,0 +1,311 @@
+/**
+ * @file
+ * Trang chủ NIDQC. Chỉ nạp ở front (nidqc/front).
+ *
+ * ⛔ KHÔNG hex — chỉ var(--nidqc-*). rgba() trên nền xanh cho phép (chưa có token).
+ */
+
+.nidqc-front {
+  background: var(--nidqc-white);
+}
+
+/* ---------- Tiêu đề section dùng chung ---------- */
+
+.nidqc-section {
+  padding: 44px 0;
+}
+
+.nidqc-section--soft {
+  background: var(--nidqc-bg-subtle);
+  border-top: 1px solid var(--nidqc-border);
+  border-bottom: 1px solid var(--nidqc-border);
+}
+
+.nidqc-section__title {
+  font-family: var(--nidqc-font-heading);
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--nidqc-primary);
+  margin: 0 0 6px;
+}
+
+.nidqc-section__lead {
+  color: var(--nidqc-text-muted);
+  font-size: 15px;
+  margin: 0 0 24px;
+}
+
+.nidqc-section__label {
+  font-family: var(--nidqc-font-heading);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--nidqc-primary);
+  margin: 0 0 14px;
+}
+
+/* ---------- Hero ---------- */
+
+.nidqc-hero {
+  background: var(--nidqc-bg-subtle);
+  border-bottom: 1px solid var(--nidqc-border);
+  padding: 36px 0 40px;
+}
+
+.nidqc-hero__grid {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.nidqc-hero__featured {
+  display: block;
+  background: var(--nidqc-white);
+  border: 1px solid var(--nidqc-border-strong);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  text-decoration: none;
+  transition: box-shadow 150ms ease, border-color 150ms ease;
+}
+
+.nidqc-hero__featured:hover {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.13);
+  border-color: var(--nidqc-primary-light);
+}
+
+.nidqc-hero__media {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  background: var(--nidqc-primary-dark);
+}
+
+.nidqc-hero__badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: var(--nidqc-primary);
+  color: var(--nidqc-white);
+  font-family: var(--nidqc-font-heading);
+  font-weight: 700;
+  font-size: 11.5px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+}
+
+.nidqc-hero__body {
+  padding: 22px 24px 26px;
+}
+
+.nidqc-hero__meta {
+  color: var(--nidqc-text-light);
+  font-size: 12.5px;
+  margin-bottom: 10px;
+}
+
+.nidqc-hero__title {
+  font-family: var(--nidqc-font-heading);
+  font-weight: 700;
+  font-size: 25px;
+  line-height: 31px;
+  color: var(--nidqc-text);
+  margin: 0;
+}
+
+.nidqc-hero__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ---------- Tin trong danh sách ---------- */
+
+.nidqc-newsitem {
+  display: block;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--nidqc-border);
+  text-decoration: none;
+}
+
+.nidqc-newsitem__tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--nidqc-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 4px;
+}
+
+.nidqc-newsitem__title {
+  display: block;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--nidqc-text);
+}
+
+.nidqc-newsitem:hover .nidqc-newsitem__title {
+  color: var(--nidqc-primary);
+}
+
+.nidqc-newsitem__date {
+  display: block;
+  font-size: 12px;
+  color: var(--nidqc-text-light);
+  margin-top: 3px;
+}
+
+/* ---------- Card grid ---------- */
+
+.nidqc-cardgrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.nidqc-cardgrid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.nidqc-card {
+  display: block;
+  background: var(--nidqc-white);
+  border: 1px solid var(--nidqc-border-strong);
+  padding: 20px 22px;
+  text-decoration: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.nidqc-card:hover {
+  border-color: var(--nidqc-primary-light);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.nidqc-card__title {
+  font-family: var(--nidqc-font-heading);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--nidqc-primary);
+  margin: 0 0 8px;
+}
+
+.nidqc-card--service .nidqc-card__title {
+  margin: 0;
+}
+
+.nidqc-card__desc {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--nidqc-text-muted);
+  margin: 0;
+}
+
+/* ---------- CTA chất chuẩn ---------- */
+
+.nidqc-section--primary {
+  background: var(--nidqc-primary);
+}
+
+.nidqc-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.nidqc-cta__title {
+  font-family: var(--nidqc-font-heading);
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--nidqc-white);
+  margin: 0 0 6px;
+}
+
+.nidqc-cta__desc {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
+  margin: 0;
+  max-width: 620px;
+}
+
+/* ---------- Nút ---------- */
+
+.nidqc-btn {
+  display: inline-block;
+  background: var(--nidqc-primary);
+  color: var(--nidqc-white);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 11px 22px;
+  text-decoration: none;
+  border: 1px solid var(--nidqc-primary);
+  transition: background 150ms ease;
+}
+
+.nidqc-btn:hover {
+  background: var(--nidqc-primary-dark);
+}
+
+.nidqc-btn--light {
+  background: var(--nidqc-white);
+  color: var(--nidqc-primary);
+  border-color: var(--nidqc-white);
+}
+
+.nidqc-btn--light:hover {
+  background: var(--nidqc-primary-pale);
+}
+
+.nidqc-btn--ghost {
+  background: transparent;
+  color: var(--nidqc-primary);
+  margin-top: 10px;
+  text-align: center;
+}
+
+.nidqc-btn--ghost:hover {
+  background: var(--nidqc-primary-pale);
+}
+
+/* ---------- Liên kết + liên hệ ---------- */
+
+.nidqc-front__foot {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 40px;
+}
+
+.nidqc-linklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nidqc-linklist__item {
+  color: var(--nidqc-accent);
+  font-size: 14.5px;
+  text-decoration: none;
+}
+
+.nidqc-linklist__item:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .nidqc-hero__grid,
+  .nidqc-cardgrid,
+  .nidqc-cardgrid--3,
+  .nidqc-front__foot {
+    grid-template-columns: 1fr;
+  }
+
+  .nidqc-hero__media {
+    height: 220px;
+  }
+}
