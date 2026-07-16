@@ -3,7 +3,7 @@ const { data: depts } = await useAsyncData('depts', async () => {
   const { data } = await fetchJsonApi('/node/department', { 'filter[status]': 1, 'page[limit]': 50 })
   return data.map((n) => ({ title: n.attributes.title, desc: n.attributes.field_description?.processed || n.attributes.field_description?.value || '' }))
 })
-useHead({ title: 'Cơ cấu tổ chức — NIDQC' })
+useSeoMeta({ title: 'Cơ cấu tổ chức — NIDQC', description: 'Các phòng, khoa và đơn vị trực thuộc Viện Kiểm nghiệm thuốc Trung ương.', ogTitle: 'Cơ cấu tổ chức — NIDQC', ogDescription: 'Các phòng, khoa và đơn vị trực thuộc Viện Kiểm nghiệm thuốc Trung ương.' })
 </script>
 <template>
   <div>

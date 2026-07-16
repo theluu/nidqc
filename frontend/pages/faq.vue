@@ -9,7 +9,7 @@ const grouped = computed(() => {
   for (const it of items.value) (m[it.group || 'Khác'] ??= []).push(it)
   return m
 })
-useHead({ title: 'Câu hỏi thường gặp — NIDQC' })
+useSeoMeta({ title: 'Câu hỏi thường gặp — NIDQC', description: 'Giải đáp thắc mắc về dịch vụ, quy trình và hoạt động kiểm nghiệm của Viện.', ogTitle: 'Câu hỏi thường gặp — NIDQC', ogDescription: 'Giải đáp thắc mắc về dịch vụ, quy trình và hoạt động kiểm nghiệm của Viện.' })
 </script>
 <template>
   <div>

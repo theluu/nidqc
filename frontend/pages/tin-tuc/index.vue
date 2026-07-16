@@ -19,7 +19,7 @@ const { data } = await useAsyncData('news-list', async () => {
 })
 if (route.query.cat) activeCat.value = route.query.cat
 const filtered = computed(() => activeCat.value === 'all' ? data.value.news : data.value.news.filter((n) => n.catId === activeCat.value))
-useHead({ title: 'Tin tức & Thông báo — NIDQC' })
+useSeoMeta({ title: 'Tin tức & Thông báo — NIDQC', description: 'Thông báo, tin hoạt động, mua sắm - đấu thầu, tuyển dụng và các sự kiện của Viện Kiểm nghiệm thuốc Trung ương.', ogTitle: 'Tin tức & Thông báo — NIDQC', ogDescription: 'Thông báo, tin hoạt động, mua sắm - đấu thầu, tuyển dụng và các sự kiện của Viện Kiểm nghiệm thuốc Trung ương.' })
 </script>
 <template>
   <div>

@@ -5,7 +5,7 @@ const { data: body } = await useAsyncData('lien-he', async () => {
 })
 const form = ref({ name: '', email: '', message: '' })
 const sent = ref(false)
-useHead({ title: 'Liên hệ & hỗ trợ — NIDQC' })
+useSeoMeta({ title: 'Liên hệ & hỗ trợ — NIDQC', description: 'Thông tin liên hệ, địa chỉ hai cơ sở và biểu mẫu hỗ trợ của Viện Kiểm nghiệm thuốc Trung ương.', ogTitle: 'Liên hệ & hỗ trợ — NIDQC', ogDescription: 'Thông tin liên hệ, địa chỉ hai cơ sở và biểu mẫu hỗ trợ của Viện Kiểm nghiệm thuốc Trung ương.' })
 </script>
 <template>
   <div>

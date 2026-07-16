@@ -3,7 +3,7 @@ const { data: projects } = await useAsyncData('projects', async () => {
   const { data } = await fetchJsonApi('/node/project', { 'filter[status]': 1, 'page[limit]': 50 })
   return data.map((n) => ({ title: n.attributes.title, year: n.attributes.field_year || '', desc: n.attributes.field_description?.processed || n.attributes.field_description?.value || '' }))
 })
-useHead({ title: 'Đào tạo & NCKH — NIDQC' })
+useSeoMeta({ title: 'Đào tạo & NCKH — NIDQC', description: 'Đào tạo tiến sỹ và các đề tài nghiên cứu khoa học của Viện Kiểm nghiệm thuốc Trung ương.', ogTitle: 'Đào tạo & NCKH — NIDQC', ogDescription: 'Đào tạo tiến sỹ và các đề tài nghiên cứu khoa học của Viện Kiểm nghiệm thuốc Trung ương.' })
 </script>
 <template>
   <div>

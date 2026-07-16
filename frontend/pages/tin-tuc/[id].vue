@@ -14,7 +14,37 @@ const { data: node } = await useAsyncData(`news-${route.params.id}`, async () =>
     body: n.attributes.body?.processed || '',
   }
 })
-useHead({ title: () => (node.value ? node.value.title : 'Chi tiết tin') + ' — NIDQC' })
+// Tóm tắt từ body (bỏ thẻ HTML) cho meta description.
+const excerpt = computed(() => {
+  const t = (node.value?.body || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+  return t.slice(0, 160) || node.value?.title || ''
+})
+const site = useRuntimeConfig().public.drupalBase
+
+useSeoMeta({
+  title: () => (node.value ? node.value.title : 'Chi tiết tin') + ' — NIDQC',
+  description: () => excerpt.value,
+  ogTitle: () => node.value?.title,
+  ogDescription: () => excerpt.value,
+  ogType: 'article',
+  ogImage: () => node.value?.image,
+})
+
+// JSON-LD Article — cho GEO (AI crawler) hiểu đây là bài viết.
+useHead({
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: () => JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'NewsArticle',
+      headline: node.value?.title,
+      image: node.value?.image ? [node.value.image] : undefined,
+      articleSection: node.value?.tag,
+      inLanguage: 'vi',
+      publisher: { '@type': 'GovernmentOrganization', name: 'Viện Kiểm nghiệm thuốc Trung ương' },
+    }),
+  }],
+})
 </script>
 <template>
   <div>

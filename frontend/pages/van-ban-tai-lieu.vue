@@ -12,7 +12,7 @@ const { data } = await useAsyncData('documents', async () => {
   }
 })
 const filtered = computed(() => activeGroup.value === 'all' ? data.value.docs : data.value.docs.filter((d) => d.groupId === activeGroup.value))
-useHead({ title: 'Văn bản - Tài liệu — NIDQC' })
+useSeoMeta({ title: 'Văn bản - Tài liệu — NIDQC', description: 'Văn bản pháp quy và tài liệu chuyên môn phục vụ hoạt động kiểm nghiệm thuốc.', ogTitle: 'Văn bản - Tài liệu — NIDQC', ogDescription: 'Văn bản pháp quy và tài liệu chuyên môn phục vụ hoạt động kiểm nghiệm thuốc.' })
 </script>
 <template>
   <div>

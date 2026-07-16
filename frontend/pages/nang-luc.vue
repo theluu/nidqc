@@ -8,7 +8,7 @@ const { data } = await useAsyncData('capacity', async () => {
   const map = (d) => d.map((n) => ({ title: n.attributes.title, desc: n.attributes.field_description?.processed || n.attributes.field_description?.value || '' }))
   return { equipment: map(e.data), certs: map(c.data) }
 })
-useHead({ title: 'Năng lực — NIDQC' })
+useSeoMeta({ title: 'Năng lực — NIDQC', description: 'Trang thiết bị hiện đại và các chứng nhận, công nhận năng lực của Viện.', ogTitle: 'Năng lực — NIDQC', ogDescription: 'Trang thiết bị hiện đại và các chứng nhận, công nhận năng lực của Viện.' })
 </script>
 <template>
   <div>
