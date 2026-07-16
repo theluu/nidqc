@@ -9,6 +9,9 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 ## [Unreleased]
 
 ### Added
+- **50 node nội dung thật từ design** — 12 tin tức · 12 văn bản · 7 FAQ · 8 đơn vị · 5 thiết bị ·
+  3 chứng nhận · 3 đề tài. Trích bằng `scripts/extract-content.py` (design → JSON) rồi nhập bằng
+  `scripts/import-content.php` (idempotent). Alias tiếng Việt sinh đúng, node chi tiết truy cập được.
 - **Menu chính 9 mục theo design** — dựng bằng `hook_install()` nên **tái lập được** trên mọi máy,
   giải xong nợ #10. Toàn bộ 37 link có trong HTML thô (Google đọc được cả submenu sâu).
   Tắt link tĩnh `standard.front_page` trùng với "Trang chủ" của design.

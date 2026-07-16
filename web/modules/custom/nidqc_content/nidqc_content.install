@@ -51,9 +51,11 @@ function nidqc_content_default_terms(): array {
       'Văn bản pháp quy',
       'Tài liệu chuyên môn',
     ],
-    // design/NIDQC FAQ.html -> rawGroups
+    // design/NIDQC FAQ.html -> rawGroups (đủ 3 nhóm — bản đầu chỉ có 1, thiếu 2)
     'faq_group' => [
       'Dịch vụ kiểm nghiệm',
+      'Chất chuẩn - chất đối chiếu',
+      'Văn bản - tài liệu',
     ],
   ];
 }
