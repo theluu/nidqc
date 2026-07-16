@@ -38,6 +38,9 @@ const webLinks = [
   { label: 'Tổ chức Y tế Thế giới (WHO)', href: 'https://www.who.int' },
 ]
 
+// Video giới thiệu (design: click-to-play, YouTube embed)
+const videoStarted = ref(false)
+
 useHead({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương' })
 </script>
 
@@ -151,18 +154,64 @@ useHead({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương' }
       </div>
     </section>
 
-    <!-- LIÊN KẾT & LIÊN HỆ -->
-    <section style="background:#F5F5F5;padding:44px 0;" id="lien-he">
-      <div class="nidqc-two-col" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1.5fr 1fr;gap:40px;">
+    <!-- THƯ VIỆN VIDEO + LIÊN KẾT WEB -->
+    <section style="background:#fff;padding:44px 0;">
+      <div class="nidqc-two-col" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1.6fr 1fr;gap:32px;">
         <div>
-          <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:22px;color:#0F3093;margin:0 0 18px;padding-left:12px;border-left:4px solid #0F3093;">Liên kết</h2>
-          <div style="display:flex;flex-direction:column;gap:9px;">
-            <a v-for="(l, i) in webLinks" :key="i" :href="l.href" target="_blank" rel="noopener" style="color:#1D6AC5;font-size:14.5px;text-decoration:none;">{{ l.label }}</a>
+          <div style="display:flex;align-items:center;gap:11px;border-bottom:2px solid #0F3093;padding-bottom:12px;margin-bottom:20px;">
+            <span style="width:6px;height:26px;background:#0F3093;display:inline-block;"></span>
+            <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:24px;letter-spacing:0.3px;text-transform:uppercase;color:#212529;margin:0;">Thư viện video</h2>
+          </div>
+          <div style="position:relative;width:100%;padding-top:56.25%;background:#000;border:1px solid #CCCCCC;">
+            <iframe v-if="videoStarted" src="https://www.youtube.com/embed/7k9OhYB8Q5A?autoplay=1" title="NIDQC" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>
+            <button v-else @click="videoStarted = true" aria-label="Phát video giới thiệu"
+              style="position:absolute;inset:0;width:100%;height:100%;border:0;padding:0;cursor:pointer;background-image:url('/sites/default/files/design-images/video-poster.png');background-size:cover;background-position:center;">
+              <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:66px;height:66px;background:rgba(15,48,147,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+              </span>
+            </button>
           </div>
         </div>
         <div>
-          <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:22px;color:#0F3093;margin:0 0 18px;padding-left:12px;border-left:4px solid #0F3093;">Liên hệ</h2>
-          <p style="font-size:14.5px;line-height:24px;color:#495057;margin:0 0 16px;">48 Hai Bà Trưng, Hoàn Kiếm, Hà Nội<br>ĐT: (024) 3825 5075</p>
+          <div style="display:flex;align-items:center;gap:11px;border-bottom:2px solid #0F3093;padding-bottom:12px;margin-bottom:20px;">
+            <span style="width:6px;height:26px;background:#0F3093;display:inline-block;"></span>
+            <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:24px;letter-spacing:0.3px;text-transform:uppercase;color:#212529;margin:0;">Liên kết web</h2>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <a v-for="(l, i) in webLinks" :key="i" :href="l.href" target="_blank" rel="noopener"
+              style="display:flex;align-items:center;gap:10px;background:#F5F8FC;border:1px solid #ECECEC;padding:14px 16px;color:#212529;font-size:14px;font-weight:500;text-decoration:none;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6AC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              {{ l.label }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIÊN HỆ (Cơ sở 1 & 2) -->
+    <section style="background:#F5F5F5;padding:44px 0;" id="lien-he">
+      <div data-container style="max-width:1280px;margin:0 auto;padding:0 24px;">
+        <div style="display:flex;align-items:center;gap:11px;border-bottom:2px solid #0F3093;padding-bottom:12px;margin-bottom:20px;">
+          <span style="width:6px;height:26px;background:#0F3093;display:inline-block;"></span>
+          <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:24px;letter-spacing:0.3px;text-transform:uppercase;color:#212529;margin:0;">Liên hệ</h2>
+        </div>
+        <div class="nidqc-two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+          <div v-for="(cs, i) in [
+            {t:'Cơ sở 1', addr:'48 Hai Bà Trưng, Hoàn Kiếm, Hà Nội', tel:'(024) 3825 5075'},
+            {t:'Cơ sở 2', addr:'Ngõ 135 Núi Trúc, Ba Đình, Hà Nội', tel:'(024) 3736 4738'},
+          ]" :key="i" style="background:#fff;border:1px solid #CCCCCC;padding:18px 20px;">
+            <h3 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:17px;color:#0F3093;margin:0 0 10px;">{{ cs.t }}</h3>
+            <p style="display:flex;align-items:flex-start;gap:8px;font-size:13.5px;line-height:20px;color:#495057;margin:0 0 8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6AC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px;margin-top:2px;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              {{ cs.addr }}
+            </p>
+            <p style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:#495057;margin:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6AC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              {{ cs.tel }}
+            </p>
+          </div>
+        </div>
+        <div style="margin-top:24px;">
           <NuxtLink to="/lien-he" style="display:inline-block;background:#0F3093;color:#fff;font-weight:600;font-size:14px;padding:11px 22px;text-decoration:none;">Trang liên hệ &amp; hỗ trợ</NuxtLink>
         </div>
       </div>
