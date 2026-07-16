@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   ssr: true,
+  css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
     // Server-side fetch Drupal (trong DDEV container).

@@ -30,6 +30,14 @@ const services = [
   'Nghiên cứu - Chuyển giao', 'Thử nghiệm thành thạo',
 ]
 
+// Liên kết ngoài — design/NIDQC Trang chu.html -> webLinks
+const webLinks = [
+  { label: 'Bộ Y Tế', href: 'https://moh.gov.vn' },
+  { label: 'Cục Quản lý Dược', href: 'https://dav.gov.vn' },
+  { label: 'Viện Kiểm nghiệm thuốc TP. Hồ Chí Minh', href: '#' },
+  { label: 'Tổ chức Y tế Thế giới (WHO)', href: 'https://www.who.int' },
+]
+
 useHead({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương' })
 </script>
 
@@ -37,7 +45,7 @@ useHead({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương' }
   <div>
     <!-- HERO -->
     <section style="background:#F5F5F5;border-bottom:1px solid #ECECEC;">
-      <div style="max-width:1280px;margin:0 auto;padding:36px 24px 40px;display:grid;grid-template-columns:1.55fr 1fr;gap:28px;align-items:stretch;">
+      <div class="nidqc-hero-grid" data-container style="max-width:1280px;margin:0 auto;padding:36px 24px 40px;display:grid;grid-template-columns:1.55fr 1fr;gap:28px;align-items:stretch;">
         <template v-if="news && news.length">
           <NuxtLink :to="`/tin-tuc/${news[0].id}`" style="display:block;background:#fff;border:1px solid #CCCCCC;box-shadow:0 2px 4px rgba(0,0,0,0.06);text-decoration:none;">
             <div style="position:relative;width:100%;height:340px;overflow:hidden;background:#0D2870;">
@@ -75,14 +83,33 @@ useHead({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương' }
       </div>
     </section>
 
+    <!-- HOẠT ĐỘNG CHUYÊN MÔN -->
+    <section style="background:#F3F7FC;border-bottom:1px solid #ECECEC;padding:44px 0;" id="hoat-dong-chuyen-mon">
+      <div data-container style="max-width:1280px;margin:0 auto;padding:0 24px;">
+        <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:22px;color:#0F3093;margin:0 0 24px;padding-left:12px;border-left:4px solid #0F3093;">Hoạt động chuyên môn</h2>
+        <div class="nidqc-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+          <a v-for="(a, i) in [
+            {t:'Chỉ đạo tuyến', d:'Hướng dẫn, giám sát chuyên môn hệ thống kiểm nghiệm địa phương.'},
+            {t:'Kiểm nghiệm và giám sát chất lượng thuốc', d:'Kiểm tra, giám sát chất lượng thuốc lưu hành trên toàn quốc.'},
+            {t:'Hợp tác quốc tế', d:'Hợp tác với các tổ chức kiểm nghiệm và y tế quốc tế.'},
+            {t:'Hoạt động NRA', d:'Cơ quan quản lý quốc gia về vắc xin theo chuẩn WHO.'},
+            {t:'Tạp chí Kiểm nghiệm Dược và Mỹ phẩm', d:'Ấn phẩm khoa học công bố nghiên cứu, kết quả kiểm nghiệm.'},
+          ]" :key="i" href="#hoat-dong-chuyen-mon" style="display:block;background:#fff;border:1px solid #CCCCCC;padding:22px 24px;text-decoration:none;">
+            <h3 style="font-family:'Lexend',sans-serif;font-weight:600;font-size:16px;line-height:22px;color:#0F3093;margin:0 0 10px;">{{ a.t }}</h3>
+            <p style="font-size:14px;line-height:21px;color:#495057;margin:0;">{{ a.d }}</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- THÔNG BÁO -->
-    <section style="background:#F5F5F5;border-bottom:1px solid #ECECEC;padding:44px 0;" id="hoat-dong">
-      <div style="max-width:1280px;margin:0 auto;padding:0 24px;">
+    <section style="background:#F5F5F5;border-bottom:1px solid #ECECEC;padding:44px 0;" id="thong-bao">
+      <div data-container style="max-width:1280px;margin:0 auto;padding:0 24px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
           <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:22px;color:#0F3093;margin:0;padding-left:12px;border-left:4px solid #0F3093;">Thông báo</h2>
           <NuxtLink to="/tin-tuc" style="color:#1D6AC5;font-size:14px;text-decoration:none;">Xem tất cả thông báo →</NuxtLink>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
+        <div class="nidqc-grid-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
           <NuxtLink v-for="item in announcements.slice(0, 4)" :key="item.id" :to="`/tin-tuc/${item.id}`" style="display:block;background:#fff;border:1px solid #ECECEC;text-decoration:none;">
             <div style="width:100%;height:150px;background:#E8F0F7;overflow:hidden;">
               <img v-if="item.image" :src="item.image" alt="" style="width:100%;height:100%;object-fit:cover;">
@@ -105,7 +132,7 @@ useHead({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương' }
       <div style="max-width:1280px;margin:0 auto;padding:0 24px;">
         <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:22px;color:#0F3093;margin:0 0 6px;">Dịch vụ &amp; tra cứu</h2>
         <p style="color:#495057;font-size:15px;margin:0 0 24px;">Các dịch vụ khoa học kỹ thuật và công cụ tra cứu của Viện.</p>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+        <div class="nidqc-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
           <a v-for="(s, i) in services" :key="i" href="#dich-vu" style="display:block;background:#F5F8FC;border:1px solid #CCCCCC;padding:20px 22px;text-decoration:none;">
             <h3 style="font-family:'Lexend',sans-serif;font-weight:600;font-size:16px;color:#0F3093;margin:0;">{{ s }}</h3>
           </a>
@@ -121,6 +148,23 @@ useHead({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương' }
           <p style="color:rgba(255,255,255,0.85);font-size:15px;margin:0;max-width:620px;">Tra cứu và đăng ký cung ứng chất chuẩn, chất đối chiếu phục vụ kiểm nghiệm.</p>
         </div>
         <a href="https://nidqc.gov.vn/tim-kiem-chat-chuan" style="display:inline-block;background:#fff;color:#0F3093;font-weight:600;font-size:14px;padding:11px 22px;text-decoration:none;">Tra cứu chất chuẩn</a>
+      </div>
+    </section>
+
+    <!-- LIÊN KẾT & LIÊN HỆ -->
+    <section style="background:#F5F5F5;padding:44px 0;" id="lien-he">
+      <div class="nidqc-two-col" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1.5fr 1fr;gap:40px;">
+        <div>
+          <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:22px;color:#0F3093;margin:0 0 18px;padding-left:12px;border-left:4px solid #0F3093;">Liên kết</h2>
+          <div style="display:flex;flex-direction:column;gap:9px;">
+            <a v-for="(l, i) in webLinks" :key="i" :href="l.href" target="_blank" rel="noopener" style="color:#1D6AC5;font-size:14.5px;text-decoration:none;">{{ l.label }}</a>
+          </div>
+        </div>
+        <div>
+          <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:22px;color:#0F3093;margin:0 0 18px;padding-left:12px;border-left:4px solid #0F3093;">Liên hệ</h2>
+          <p style="font-size:14.5px;line-height:24px;color:#495057;margin:0 0 16px;">48 Hai Bà Trưng, Hoàn Kiếm, Hà Nội<br>ĐT: (024) 3825 5075</p>
+          <NuxtLink to="/lien-he" style="display:inline-block;background:#0F3093;color:#fff;font-weight:600;font-size:14px;padding:11px 22px;text-decoration:none;">Trang liên hệ &amp; hỗ trợ</NuxtLink>
+        </div>
       </div>
     </section>
   </div>

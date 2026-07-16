@@ -31,7 +31,7 @@ useHead({ title: 'Tin tức & Thông báo — NIDQC' })
           <button v-for="c in data.categories" :key="c.id" @click="activeCat=c.id" :style="`border:1px solid #CCCCCC;padding:7px 16px;font-size:13.5px;cursor:pointer;background:${activeCat===c.id?'#0F3093':'#fff'};color:${activeCat===c.id?'#fff':'#495057'};`">{{ c.label }}</button>
         </div>
         <p v-if="!filtered.length" style="color:#777;">Không có tin nào trong chuyên mục này.</p>
-        <div v-else style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
+        <div v-else class="nidqc-grid-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
           <NuxtLink v-for="item in filtered" :key="item.id" :to="`/tin-tuc/${item.id}`" style="display:block;background:#fff;border:1px solid #ECECEC;text-decoration:none;">
             <div style="width:100%;height:150px;background:#E8F0F7;overflow:hidden;"><img v-if="item.image" :src="item.image" style="width:100%;height:100%;object-fit:cover;"></div>
             <div style="padding:16px 18px 20px;">

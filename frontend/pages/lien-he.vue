@@ -10,7 +10,7 @@ useHead({ title: 'Liên hệ & hỗ trợ — NIDQC' })
 <template>
   <div>
     <PageBand title="Liên hệ & hỗ trợ" description="Mọi ý kiến đóng góp, yêu cầu hỗ trợ hoặc phối hợp công tác, xin liên hệ theo thông tin dưới đây hoặc gửi qua biểu mẫu." />
-    <section style="background:#fff;padding:34px 0 60px;"><div style="max-width:1280px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr 1fr;gap:40px;">
+    <section style="background:#fff;padding:34px 0 60px;"><div class="nidqc-two-col" style="max-width:1280px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr 1fr;gap:40px;">
       <div v-html="body" style="font-size:15.5px;line-height:25px;color:#212529;"></div>
       <div>
         <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:18px;color:#0F3093;margin:0 0 18px;">Gửi liên hệ</h2>

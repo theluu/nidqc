@@ -1,0 +1,50 @@
+/* Responsive toàn cục cho NIDQC (design có bản Mobile Preview).
+   Inline style không hỗ trợ media query -> dùng class ở đây cho các khối chính. */
+
+* { box-sizing: border-box; }
+
+/* Container: co padding trên mobile */
+@media (max-width: 768px) {
+  [data-container] { padding-left: 16px !important; padding-right: 16px !important; }
+}
+
+/* ===== NAV: mobile cuộn ngang, ẩn nút search nếu chật ===== */
+@media (max-width: 900px) {
+  .nidqc-nav-inner { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .nidqc-nav-inner nav { flex-wrap: nowrap !important; }
+  .nidqc-nav-inner a { white-space: nowrap; }
+}
+
+/* ===== HERO: 2 cột -> 1 cột ===== */
+@media (max-width: 900px) {
+  .nidqc-hero-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ===== GRID card: giảm cột theo màn hình ===== */
+@media (max-width: 1100px) {
+  .nidqc-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+  .nidqc-grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 640px) {
+  .nidqc-grid-4, .nidqc-grid-3, .nidqc-grid-2 { grid-template-columns: 1fr !important; }
+}
+
+/* ===== FOOTER: grid -> 1 cột ===== */
+@media (max-width: 768px) {
+  .nidqc-footer-grid { grid-template-columns: 1fr !important; gap: 28px !important; }
+}
+
+/* ===== 2 cột chung (liên hệ, cơ cấu, năng lực) ===== */
+@media (max-width: 768px) {
+  .nidqc-two-col { grid-template-columns: 1fr !important; }
+}
+
+/* ===== Banner: cao vừa trên mobile ===== */
+@media (max-width: 640px) {
+  .nidqc-banner img { min-height: 90px; object-fit: cover; }
+}
+
+/* ===== Tiêu đề trang nhỏ lại trên mobile ===== */
+@media (max-width: 640px) {
+  .nidqc-page-title { font-size: 24px !important; }
+}

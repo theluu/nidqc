@@ -20,6 +20,7 @@ onMounted(() => { tick(); timer = setInterval(tick, 30000); });
 onUnmounted(() => clearInterval(timer));
 
 // Menu lấy từ design (const NAV). href trỏ route Vue.
+// Menu đầy đủ theo design (const NAV). 9 mục, submenu 2 tầng.
 const nav = [
   { label: 'Trang chủ', to: '/', children: [] },
   { label: 'Giới thiệu', to: '/gioi-thieu-chung', children: [
@@ -28,14 +29,38 @@ const nav = [
     { label: 'Năng lực', to: '/nang-luc' },
     { label: 'Cơ cấu tổ chức', to: '/co-cau-to-chuc' },
   ] },
-  { label: 'Hoạt động chuyên môn', to: '/#hoat-dong', children: [] },
-  { label: 'Đào tạo & NCKH', to: '/dao-tao-nckh', children: [] },
-  { label: 'Dịch vụ', to: '/#dich-vu', children: [] },
+  { label: 'Hoạt động chuyên môn', to: '/#hoat-dong-chuyen-mon', children: [
+    { label: 'Chỉ đạo tuyến', to: '/#hoat-dong-chuyen-mon' },
+    { label: 'Kiểm nghiệm và giám sát chất lượng thuốc', to: '/#hoat-dong-chuyen-mon' },
+    { label: 'Hợp tác quốc tế', to: '/#hoat-dong-chuyen-mon' },
+    { label: 'Hoạt động NRA', to: '/#hoat-dong-chuyen-mon' },
+    { label: 'Tạp chí Kiểm nghiệm Dược và Mỹ phẩm', to: '/#hoat-dong-chuyen-mon' },
+  ] },
+  { label: 'Đào tạo & NCKH', to: '/dao-tao-nckh', children: [
+    { label: 'Đào tạo tiến sỹ', to: '/dao-tao-nckh' },
+    { label: 'Nghiên cứu khoa học', to: '/dao-tao-nckh' },
+  ] },
+  { label: 'Dịch vụ', to: '/#dich-vu', children: [
+    { label: 'Phân tích - Kiểm nghiệm', to: '/#dich-vu' },
+    { label: 'Đánh giá tương đương sinh học (TĐSH)', to: '/#dich-vu' },
+    { label: 'Đào tạo và tư vấn kỹ thuật', to: '/#dich-vu' },
+    { label: 'Hiệu chuẩn', to: '/#dich-vu' },
+    { label: 'Nghiên cứu - Chuyển giao', to: '/#dich-vu' },
+    { label: 'Thử nghiệm thành thạo', to: '/#dich-vu' },
+    { label: 'Cung ứng chất chuẩn', to: '/#chat-chuan' },
+  ] },
   { label: 'Tin tức & Thông báo', to: '/tin-tuc', children: [
     { label: 'Thông báo', to: '/tin-tuc' },
     { label: 'Tin hoạt động', to: '/tin-tuc' },
+    { label: 'Mua sắm, đấu thầu & công khai minh bạch', to: '/tin-tuc' },
+    { label: 'Đào tạo', to: '/tin-tuc' },
+    { label: 'Hội nghị - Hội thảo', to: '/tin-tuc' },
+    { label: 'Tuyển dụng', to: '/tin-tuc' },
   ] },
-  { label: 'Văn bản - Tài liệu', to: '/van-ban-tai-lieu', children: [] },
+  { label: 'Văn bản - Tài liệu', to: '/van-ban-tai-lieu', children: [
+    { label: 'Văn bản pháp quy', to: '/van-ban-tai-lieu' },
+    { label: 'Tài liệu chuyên môn', to: '/van-ban-tai-lieu' },
+  ] },
   { label: 'Liên hệ & hỗ trợ', to: '/lien-he', children: [
     { label: 'Liên hệ', to: '/lien-he' },
     { label: 'Câu hỏi thường gặp', to: '/faq' },
@@ -75,7 +100,7 @@ const footerLinks = [
     </div>
 
     <!-- ===== BANNER ===== -->
-    <div style="background:#fff;border-bottom:1px solid #ECECEC;">
+    <div class="nidqc-banner" style="background:#fff;border-bottom:1px solid #ECECEC;">
       <NuxtLink to="/" style="display:block;">
         <img src="https://nidqc.gov.vn/sites/all/themes/nidqc/images/upload/banner-header.jpg"
              alt="Viện Kiểm nghiệm thuốc Trung ương" style="display:block;width:100%;height:auto;">
@@ -85,7 +110,7 @@ const footerLinks = [
     <!-- ===== NAV ===== -->
     <header style="background:#0F3093;box-shadow:0 2px 4px rgba(0,0,0,0.10);position:sticky;top:0;z-index:40;"
             @mouseleave="openMenu = null">
-      <div style="max-width:1280px;margin:0 auto;padding:0 24px;height:50px;display:flex;align-items:stretch;">
+      <div class="nidqc-nav-inner" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;height:50px;display:flex;align-items:stretch;">
         <nav style="display:flex;align-items:stretch;flex:1;min-width:0;">
           <div v-for="(item, i) in nav" :key="i"
                style="display:flex;align-items:stretch;flex:0 0 auto;position:relative;"
@@ -118,7 +143,7 @@ const footerLinks = [
 
     <!-- ===== FOOTER ===== -->
     <footer style="background:#0D2870;color:#fff;">
-      <div style="max-width:1280px;margin:0 auto;padding:46px 24px 20px;display:grid;grid-template-columns:2fr 1fr 1.3fr;gap:40px;">
+      <div class="nidqc-footer-grid" data-container style="max-width:1280px;margin:0 auto;padding:46px 24px 20px;display:grid;grid-template-columns:2fr 1fr 1.3fr;gap:40px;">
         <div>
           <h3 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:18px;margin:0 0 12px;line-height:24px;">Viện Kiểm nghiệm thuốc Trung ương</h3>
           <p style="font-size:13.5px;line-height:21px;color:rgba(255,255,255,0.72);margin:0;max-width:430px;">Cơ quan khoa học kỹ thuật đầu ngành về kiểm tra, giám sát chất lượng thuốc, nguyên liệu làm thuốc và mỹ phẩm trên phạm vi cả nước.</p>

@@ -21,7 +21,7 @@ defineProps({
   <!-- Title band -->
   <div style="background:#F3F7FC;border-bottom:1px solid #ECECEC;">
     <div style="max-width:1280px;margin:0 auto;padding:44px 24px 34px;">
-      <h1 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:34px;color:#212529;margin:0 0 12px;">{{ title }}</h1>
+      <h1 class="nidqc-page-title" style="font-family:'Lexend',sans-serif;font-weight:700;font-size:34px;color:#212529;margin:0 0 12px;">{{ title }}</h1>
       <p v-if="description" style="font-size:15.5px;line-height:24px;color:#495057;margin:0;max-width:760px;">{{ description }}</p>
     </div>
   </div>
