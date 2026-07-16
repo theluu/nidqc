@@ -296,5 +296,5 @@ corepack_enable: true
 
 web_extra_daemons:
   - name: nuxt-ssr
-    command: "cd /var/www/html/frontend && NODE_TLS_REJECT_UNAUTHORIZED=0 DRUPAL_INTERNAL=https://nidqc.ddev.site npx nuxt dev --port 3000 --host 0.0.0.0"
+    command: "cd /var/www/html/frontend && NODE_TLS_REJECT_UNAUTHORIZED=0 DRUPAL_INTERNAL=https://nidqc.ddev.site NUXT_HOST=0.0.0.0 NUXT_PORT=3000 node .output/server/index.mjs"
     directory: /var/www/html/frontend
