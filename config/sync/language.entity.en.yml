@@ -1,0 +1,9 @@
+uuid: 4201c713-52d7-4daf-a091-3cf710bacb40
+langcode: vi
+status: true
+dependencies: {  }
+id: en
+label: English
+direction: ltr
+weight: 0
+locked: false

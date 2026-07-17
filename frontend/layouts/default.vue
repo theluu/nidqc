@@ -9,6 +9,8 @@ import { ref, onMounted, onUnmounted } from 'vue';
 const now = ref('');
 const openMenu = ref(null);
 const mobileOpen = ref(false);
+const langOpen = ref(false);
+const curLang = ref('vi');
 let timer;
 
 const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
@@ -17,7 +19,70 @@ function tick() {
   const p = (n) => String(n).padStart(2, '0');
   now.value = `${days[d.getDay()]}, ${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} · ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
-onMounted(() => { tick(); timer = setInterval(tick, 30000); });
+
+/**
+ * Đa ngôn ngữ:
+ *  - Việt/Anh: nội dung chính thức (Drupal đã bật 2 ngôn ngữ vi/en).
+ *  - Mọi thứ tiếng khác: Google Translate dịch máy toàn trang (client-side).
+ *
+ * ⚠️ Đây là site về THUỐC. Dịch MÁY nội dung y tế/dược có thể sai nghĩa. Bản dịch
+ * máy chỉ để tham khảo; nội dung chính thức là tiếng Việt.
+ */
+const languages = [
+  { code: 'vi', label: 'Tiếng Việt' },
+  { code: 'en', label: 'English' },
+  { code: 'zh-CN', label: '中文' },
+  { code: 'ja', label: '日本語' },
+  { code: 'ko', label: '한국어' },
+  { code: 'fr', label: 'Français' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'ru', label: 'Русский' },
+  { code: 'lo', label: 'ລາວ' },
+  { code: 'km', label: 'ខ្មែរ' },
+];
+
+function loadGoogleTranslate() {
+  if (window.__gtLoaded) return;
+  window.__gtLoaded = true;
+  window.googleTranslateElementInit = () => {
+    // includedLanguages rỗng = tất cả ngôn ngữ Google hỗ trợ.
+    new window.google.translate.TranslateElement(
+      { pageLanguage: 'vi', autoDisplay: false },
+      'google_translate_element',
+    );
+  };
+  const s = document.createElement('script');
+  s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+  document.head.appendChild(s);
+}
+
+/** Đổi ngôn ngữ: 'vi' = gốc; còn lại = Google Translate dịch toàn trang. */
+function setLang(code) {
+  curLang.value = code;
+  langOpen.value = false;
+  // Google Translate đọc cookie googtrans để chọn ngôn ngữ đích.
+  const val = code === 'vi' ? '/vi/vi' : `/vi/${code}`;
+  document.cookie = `googtrans=${val};path=/`;
+  document.cookie = `googtrans=${val};path=/;domain=.${location.hostname}`;
+  // Nếu về tiếng Việt gốc thì reload để bỏ bản dịch; ngược lại kích hoạt combo.
+  if (code === 'vi') {
+    location.reload();
+    return;
+  }
+  const combo = document.querySelector('.goog-te-combo');
+  if (combo) {
+    combo.value = code;
+    combo.dispatchEvent(new Event('change'));
+  } else {
+    location.reload();
+  }
+}
+
+onMounted(() => {
+  tick();
+  timer = setInterval(tick, 30000);
+  loadGoogleTranslate();
+});
 onUnmounted(() => clearInterval(timer));
 
 // Menu lấy từ design (const NAV). href trỏ route Vue.
@@ -89,13 +154,30 @@ const footerLinks = [
           <span>{{ now }}</span>
         </div>
         <div style="display:flex;align-items:center;gap:14px;font-size:12.5px;">
-          <a href="#" style="color:#fff;font-weight:700;border-bottom:2px solid #fff;padding-bottom:1px;">Tiếng Việt</a>
-          <a href="#" style="color:rgba(255,255,255,0.7);text-decoration:none;">English</a>
+          <!-- VI/EN nhanh -->
+          <button @click="setLang('vi')" :style="`background:none;border:0;cursor:pointer;font-size:12.5px;color:#fff;${curLang==='vi'?'font-weight:700;border-bottom:2px solid #fff;padding-bottom:1px;':'opacity:.75;'}`">Tiếng Việt</button>
+          <button @click="setLang('en')" :style="`background:none;border:0;cursor:pointer;font-size:12.5px;color:#fff;${curLang==='en'?'font-weight:700;border-bottom:2px solid #fff;padding-bottom:1px;':'opacity:.75;'}`">English</button>
+          <!-- Dropdown mọi thứ tiếng (Google Translate) -->
+          <div style="position:relative;">
+            <button @click="langOpen = !langOpen" style="background:none;border:0;cursor:pointer;color:#fff;display:flex;align-items:center;gap:4px;font-size:12.5px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
+              Ngôn ngữ
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div v-if="langOpen" style="position:absolute;top:100%;right:0;margin-top:6px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.2);z-index:70;min-width:150px;padding:6px 0;">
+              <button v-for="l in languages" :key="l.code" @click="setLang(l.code)"
+                :style="`display:block;width:100%;text-align:left;background:none;border:0;cursor:pointer;padding:8px 16px;font-size:13px;color:#212529;${curLang===l.code?'font-weight:700;background:#E8F0F7;':''}`">
+                {{ l.label }}
+              </button>
+            </div>
+          </div>
           <span style="width:1px;height:14px;background:rgba(255,255,255,0.25);"></span>
-          <a href="#" style="color:#fff;display:flex;align-items:center;gap:5px;text-decoration:none;">
+          <a href="/user/login" style="color:#fff;display:flex;align-items:center;gap:5px;text-decoration:none;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
             Đăng nhập hệ thống
           </a>
+          <!-- Element ẩn cho Google Translate -->
+          <div id="google_translate_element" style="display:none;"></div>
         </div>
       </div>
     </div>
