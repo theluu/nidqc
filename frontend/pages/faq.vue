@@ -9,10 +9,15 @@ const grouped = computed(() => {
   for (const it of items.value) (m[it.group || 'Khác'] ??= []).push(it)
   return m
 })
+const lienHeLinks = [
+  { label: 'Liên hệ', to: '/lien-he' },
+  { label: 'Câu hỏi thường gặp', to: '/faq' },
+]
 useSeoMeta({ title: 'Câu hỏi thường gặp — NIDQC', description: 'Giải đáp thắc mắc về dịch vụ, quy trình và hoạt động kiểm nghiệm của Viện.', ogTitle: 'Câu hỏi thường gặp — NIDQC', ogDescription: 'Giải đáp thắc mắc về dịch vụ, quy trình và hoạt động kiểm nghiệm của Viện.' })
 </script>
 <template>
   <div>
+    <SectionSubNav :links="lienHeLinks" />
     <PageBand title="Câu hỏi thường gặp" :crumbs="['Liên hệ & hỗ trợ']" description="Giải đáp các thắc mắc thường gặp về dịch vụ, quy trình và hoạt động của Viện." />
     <section style="background:#fff;padding:34px 0 70px;">
       <div style="max-width:900px;margin:0 auto;padding:0 24px;">

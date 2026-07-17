@@ -5,10 +5,15 @@ const { data: body } = await useAsyncData('lien-he', async () => {
 })
 const form = ref({ name: '', email: '', message: '' })
 const sent = ref(false)
+const lienHeLinks = [
+  { label: 'Liên hệ', to: '/lien-he' },
+  { label: 'Câu hỏi thường gặp', to: '/faq' },
+]
 useSeoMeta({ title: 'Liên hệ & hỗ trợ — NIDQC', description: 'Thông tin liên hệ, địa chỉ hai cơ sở và biểu mẫu hỗ trợ của Viện Kiểm nghiệm thuốc Trung ương.', ogTitle: 'Liên hệ & hỗ trợ — NIDQC', ogDescription: 'Thông tin liên hệ, địa chỉ hai cơ sở và biểu mẫu hỗ trợ của Viện Kiểm nghiệm thuốc Trung ương.' })
 </script>
 <template>
   <div>
+    <SectionSubNav :links="lienHeLinks" />
     <PageBand title="Liên hệ & hỗ trợ" description="Mọi ý kiến đóng góp, yêu cầu hỗ trợ hoặc phối hợp công tác, xin liên hệ theo thông tin dưới đây hoặc gửi qua biểu mẫu." />
     <section style="background:#fff;padding:34px 0 60px;"><div class="nidqc-two-col" style="max-width:1280px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr 1fr;gap:40px;">
       <div v-html="body" style="font-size:15.5px;line-height:25px;color:#212529;"></div>
