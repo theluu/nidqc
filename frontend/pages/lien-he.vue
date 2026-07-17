@@ -1,7 +1,7 @@
 <script setup>
 const { data: body } = await useAsyncData('lien-he', async () => {
-  const { data } = await fetchJsonApi('/node/page', { 'filter[path.alias]': '/lien-he', 'page[limit]': 1 })
-  return data.length ? (data[0].attributes.body?.processed || '') : ''
+  const page = await fetchPageByAlias('/lien-he')
+  return page?.body || ''
 })
 const form = ref({ name: '', email: '', message: '' })
 const sent = ref(false)

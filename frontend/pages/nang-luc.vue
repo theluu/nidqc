@@ -8,10 +8,17 @@ const { data } = await useAsyncData('capacity', async () => {
   const map = (d) => d.map((n) => ({ title: n.attributes.title, desc: n.attributes.field_description?.processed || n.attributes.field_description?.value || '' }))
   return { equipment: map(e.data), certs: map(c.data) }
 })
+const gioiThieuLinks = [
+  { label: 'Giới thiệu chung', to: '/gioi-thieu-chung' },
+  { label: 'Chính sách chất lượng', to: '/chinh-sach-chat-luong' },
+  { label: 'Năng lực', to: '/nang-luc' },
+  { label: 'Cơ cấu tổ chức', to: '/co-cau-to-chuc' },
+]
 useSeoMeta({ title: 'Năng lực — NIDQC', description: 'Trang thiết bị hiện đại và các chứng nhận, công nhận năng lực của Viện.', ogTitle: 'Năng lực — NIDQC', ogDescription: 'Trang thiết bị hiện đại và các chứng nhận, công nhận năng lực của Viện.' })
 </script>
 <template>
   <div>
+    <SectionSubNav :links="gioiThieuLinks" />
     <PageBand title="Năng lực" :crumbs="['Giới thiệu']" description="Trang thiết bị hiện đại và các chứng nhận, công nhận năng lực của Viện." />
     <section style="background:#fff;padding:28px 0 60px;"><div style="max-width:1280px;margin:0 auto;padding:0 24px;">
       <div style="display:flex;gap:6px;border-bottom:1px solid #ECECEC;margin-bottom:26px;">

@@ -38,6 +38,19 @@ export function imageUrl(node: any, included: any[]) {
   return uri.startsWith('http') ? uri : drupalBase() + uri
 }
 
+// Lấy 1 node "page" theo path alias.
+// KHÔNG dùng filter[path.alias]: JSON:API không lọc được trên computed field 'path'
+// (trả 500 "'path' not found"). Thay vào đó liệt kê rồi khớp alias phía JS.
+export async function fetchPageByAlias(alias: string) {
+  const { data } = await fetchJsonApi('/node/page', { 'filter[status]': 1, 'page[limit]': 50 })
+  const n = data.find((x: any) => (x.attributes?.path?.alias || '') === alias)
+  if (!n) return null
+  return {
+    title: n.attributes.title,
+    body: n.attributes.body?.processed || n.attributes.body?.value || '',
+  }
+}
+
 export function termLabel(node: any, field: string, included: any[]) {
   const rel = node.relationships?.[field]?.data
   if (!rel) return ''
