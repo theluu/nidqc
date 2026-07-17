@@ -1,0 +1,11 @@
+# NIDQC — Viện Kiểm nghiệm thuốc Trung ương
+# Cho phép mọi crawler (Google/Bing) và AI crawler (GEO) index toàn site.
+User-agent: *
+Allow: /
+
+# Chặn khu vực quản trị Drupal (không phải nội dung công khai).
+Disallow: /admin
+Disallow: /user
+Disallow: /jsonapi
+
+Sitemap: https://nidqc.gov.vn/sitemap.xml
