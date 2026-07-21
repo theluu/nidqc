@@ -37,6 +37,7 @@ Các vòng lặp `sc-for` trích từ design (xem `scripts/extract-design.py`):
 | `equipment` | Trang thiết bị | `equipment` | Trang Năng lực |
 | `certificate` | Chứng nhận | `certs` | Trang Năng lực |
 | `project` | Đề tài NCKH | `projects`, `phdInfo`, `phdSteps` | Trang Đào tạo |
+| `contact_submission` | Liên hệ gửi từ website | Form `/lien-he` | TASK-009 — node không publish, chỉ dùng trong backend |
 
 ### Không phải content type
 
@@ -60,7 +61,23 @@ Các vòng lặp `sc-for` trích từ design (xem `scripts/extract-design.py`):
 | `document_category` | Loại văn bản (Thông tư, Quyết định, Nghị định…) |
 | `faq_category` | Nhóm câu hỏi |
 
-## 4. Field — `document`
+## 4. Field — `news`
+
+| Field | Kiểu | Bắt buộc | Nguồn | Ghi chú |
+|---|---|---|---|---|
+| `title` | base field | có | Site cũ / design | Tiêu đề tin |
+| `body` | text_with_summary | không | Site cũ | TASK-010 — nội dung chi tiết bài viết import từ site cũ |
+| `field_date` | datetime date | có | Site cũ / design | Ngày đăng |
+| `field_category` | ER → `news_category` | có | Site cũ / design | Mapping category cũ sang taxonomy mới |
+| `field_tag` | string | không | Design | Nhãn hiển thị ngắn nếu có |
+| `field_image` | image | không | Site cũ / design | Ảnh đại diện, whitelist extension theo field config |
+
+Quy tắc import từ site cũ:
+- Không tạo category mới khi chưa duyệt schema/taxonomy; category cũ được map vào 6 term đã có.
+- Không lưu tài khoản, mật khẩu hoặc cookie scrape.
+- Nội dung HTML cũ phải lọc thẻ nguy hiểm trước khi lưu vào `body`.
+
+## 5. Field — `document`
 
 > 🔴 **BẢN TRƯỚC CỦA MỤC NÀY LÀ BỊA. Đã gỡ.**
 >
@@ -112,7 +129,7 @@ schema: upload file trên site nhà nước. Bắt buộc whitelist extension, g
 MIME thật theo nội dung (không tin extension), và **kiểm tra thật** rằng nginx không thực thi PHP
 trong thư mục files (`.htaccess` **không** có tác dụng với nginx). Xem `docs/security/SECURITY_POLICY.md` §5.
 
-## 5. Câu hỏi phải trả lời trước khi cài schema
+## 6. Câu hỏi phải trả lời trước khi cài schema
 
 | Câu hỏi | Vì sao chặn |
 |---|---|
@@ -123,7 +140,25 @@ trong thư mục files (`.htaccess` **không** có tác dụng với nginx). Xem
 
 **Không tự trả lời các câu này bằng suy đoán.** Hỏi NIDQC.
 
-## 6. Quy tắc
+## 7. Field — `contact_submission`
+
+> Đã chốt trong TASK-009 theo yêu cầu trực tiếp: tạo content type lưu dữ liệu từ form contact.
+
+| Field | Kiểu | Bắt buộc | Nguồn | Ghi chú |
+|---|---|---|---|---|
+| `title` | base field | có | Sinh tự động | `Liên hệ: {name} - {Y-m-d H:i}` |
+| `field_contact_name` | string | có | Form design | Họ và tên, 2–120 ký tự |
+| `field_contact_email` | string | có | Form design | Validate bằng email validator, 5–254 ký tự |
+| `field_contact_phone` | string | không | Form design | Tối đa 40 ký tự |
+| `field_contact_subject` | string | có | Form design | Whitelist 4 chủ đề trong API contract |
+| `field_contact_message` | text_long | có | Form design | Nội dung liên hệ, 10–4000 ký tự, lưu plain text |
+
+Quy tắc lưu:
+- Node `contact_submission` do API tạo luôn `status = 0` để không publish ra public.
+- Không lưu token reCAPTCHA, IP thô, SMTP credential hoặc dữ liệu kỹ thuật không cần cho nghiệp vụ.
+- Không dùng bảng custom; Drupal Field API tự quản lý bảng field và access control.
+
+## 8. Quy tắc
 
 1. Machine name: `snake_case`, tiền tố `field_`.
 2. Không đổi machine name sau khi có dữ liệu — phải migrate.
@@ -131,6 +166,6 @@ trong thư mục files (`.htaccess` **không** có tác dụng với nginx). Xem
 4. Không tạo field "phòng khi cần".
 5. Content type mới phải có trong file này **trước** khi cài.
 
-## 7. Liên quan
+## 9. Liên quan
 
 `docs/database/DATABASE_SCHEMA.md` · `docs/design/PAGE_MAPPING.md` · `docs/architecture/BACKEND_ARCHITECTURE.md`

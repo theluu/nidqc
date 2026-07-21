@@ -114,6 +114,14 @@ drush state:set system.maintenance_mode 0
 - [ ] Cache bật, CSS/JS aggregate bật
 - [ ] `settings.local.php` **không** nằm trong git
 - [ ] `hash_salt` riêng cho production
+- [ ] reCAPTCHA v3 cho form liên hệ:
+      `NIDQC_RECAPTCHA_SITE_KEY`, `NIDQC_RECAPTCHA_SECRET`, `NIDQC_RECAPTCHA_MIN_SCORE`
+      đặt ngoài git; `NIDQC_RECAPTCHA_BYPASS` không được bật trên production.
+- [ ] SMTP cho form liên hệ dùng Drupal `symfony_mailer`; credential thật đặt bằng config override
+      trong `settings.local.php` hoặc cơ chế secret của hạ tầng, không commit vào `config/sync`.
+- [ ] `NIDQC_CONTACT_ADMIN_EMAIL` trỏ tới hộp thư admin thật của Viện.
+- [ ] CSP production cho phép ngoại lệ tối thiểu cho reCAPTCHA v3 và Google Maps nếu các chức năng
+      này được bật: script/frame/connect tới domain Google cần thiết.
 - [ ] nginx **không thực thi PHP** trong `sites/default/files/`
       (⚠️ `.htaccess` không có tác dụng với nginx — phải cấu hình thủ công)
 - [ ] Tài khoản `admin` mật khẩu mạnh, không dùng hằng ngày

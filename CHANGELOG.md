@@ -9,6 +9,10 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 ## [Unreleased]
 
 ### Changed
+- **Google Translate trên top bar** — mặc định tiếng Việt trên mỗi lần tải trang/F5,
+  xoá trạng thái dịch cũ trước khi nạp Google Translate, và dropdown lấy toàn bộ
+  ngôn ngữ từ select thật của Google thay vì danh sách rút gọn hard-code; bỏ hai
+  nút nhanh `Tiếng Việt`/`English` để chỉ còn một dropdown.
 - 🔴 **Nối Nuxt vào URL chính** — trước đó Nuxt chạy ở `localhost:3000` trong container còn
   `nidqc.ddev.site/` vẫn render Twig cũ (bản "quá khác xa design"). Nay nginx reverse proxy:
   `/` → Nuxt SSR, còn `/jsonapi` `/admin` `/user` `/sites` `/core` `/themes` → Drupal. Nuxt tự
@@ -26,6 +30,10 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
   Rủi ro SEO (client-render) — cần prerender trước go-live, ghi trong ADR-003.
 
 ### Added
+- **Form liên hệ thật tại `/lien-he`** (TASK-009) — submit qua Drupal API có CSRF,
+  reCAPTCHA v3, flood control, validate dữ liệu và lưu thành node `contact_submission`
+  unpublished. DDEV dùng SMTP Mailpit, gửi 1 email cho admin và 1 email xác nhận cho user.
+  Trang liên hệ có thêm Google Maps cho địa chỉ 48 Hai Bà Trưng.
 - **Trang chủ theo design** (`page--front.html.twig`) — thay view frontpage mặc định của Drupal.
   5 section: hero (tin nổi bật + danh sách tin mới, **động từ node**), hoạt động chuyên môn, dịch
   vụ, CTA chất chuẩn, liên kết + liên hệ. Anchor `#dich-vu`/`#chat-chuan`/`#hoat-dong-chuyen-mon`
@@ -110,6 +118,8 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
   site chạy langcode `vi` (Drush khớp nhãn severity đã dịch) — phải dùng `--severity=3`
 
 ### Security
+- Form liên hệ (TASK-009) không lưu reCAPTCHA token, không lưu SMTP secret, không publish submission
+  mặc định, và mailer chỉ log lỗi generic để tránh ghi PII vào watchdog.
 - `settings.php` được đưa vào git để đặt `config_sync_directory`. Đã xác minh không chứa secret
   (`hash_salt = ''`, không có `$databases`). Secret vẫn nằm ngoài git: `settings.ddev.php`
   (DDEV tự sinh) và `settings.local.php` (mới bật include — chỗ đặt secret cho staging/production).

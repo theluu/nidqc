@@ -2,9 +2,10 @@
 
 ## 1. Trạng thái
 
-> **Chưa cài đặt schema nào.** Drupal core đã có, chưa có content type custom.
->
-> Thiết kế entity dự kiến: `docs/database/ENTITY_MAPPING.md`.
+Drupal core đã có và dự án đã có schema custom qua module `nidqc_content`.
+TASK-009 bổ sung content type `contact_submission` để lưu dữ liệu form liên hệ theo yêu cầu.
+
+Thiết kế entity: `docs/database/ENTITY_MAPPING.md`.
 
 ## 2. Nền tảng
 
@@ -38,6 +39,19 @@ Với content type `document` + field `field_issued_date`, Drupal tạo:
 | `node_revision__field_issued_date` | Lịch sử phiên bản |
 
 Đây là lý do **không** đổi machine name sau khi có dữ liệu — tên bảng gắn với machine name.
+
+Với content type `contact_submission`, Drupal sinh các bảng field tương ứng:
+
+| Bảng | Nội dung |
+|---|---|
+| `node_field_data` | Node submission, `type = contact_submission`, `status = 0` |
+| `node__field_contact_name` | Họ và tên |
+| `node__field_contact_email` | Email người gửi |
+| `node__field_contact_phone` | Số điện thoại |
+| `node__field_contact_subject` | Chủ đề liên hệ |
+| `node__field_contact_message` | Nội dung liên hệ |
+
+Submission không lưu token reCAPTCHA, IP thô hoặc credential SMTP.
 
 ## 5. Khi nào cần bảng custom
 

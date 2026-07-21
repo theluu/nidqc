@@ -35,21 +35,98 @@
 
 ## 3. Endpoint
 
-> **Trạng thái hiện tại: chưa có endpoint nào được chốt.**
->
-> Danh sách dưới đây là **dự kiến**, suy ra từ các island trong `docs/design/DESIGN_SYSTEM.md` §5.
-> Mỗi endpoint phải được đặc tả đầy đủ và duyệt trước khi code. Agent **không được** tự
-> đặc tả rồi tự code — đó là bỏ qua bước 3.
+Danh sách dưới đây gồm endpoint đã chốt và endpoint dự kiến. Endpoint chưa có đặc tả đầy đủ
+thì chưa được gọi, chưa được viết.
 
 | Endpoint | Island | Trạng thái |
 |---|---|---|
+| `GET /api/v1/contact/csrf-token` | contact form `/lien-he` | 🟢 Chốt trong TASK-009 |
+| `POST /api/v1/contact` | contact form `/lien-he` | 🟢 Chốt trong TASK-009 |
 | `GET /api/v1/documents` | `doc-filter` | 🔴 Chưa đặc tả |
 | `GET /api/v1/news` | `news-filter` | 🔴 Chưa đặc tả |
 | `GET /api/v1/standards/search` | `standard-search` | 🔴 Chưa đặc tả — **phạm vi chưa rõ**, xem `PROJECT_CONTEXT.md` §5 |
 
 `mega-menu`, `faq-accordion`, `tabs` **không cần API** — dữ liệu render sẵn từ Twig.
 
-## 4. Mẫu đặc tả endpoint
+## 4. Endpoint đã chốt
+
+### `POST /api/v1/contact`
+
+**Mục đích:** nhận form liên hệ trên `/lien-he`, xác thực CSRF + reCAPTCHA v3, lưu submission
+thành node `contact_submission` không publish, gửi email cho admin và email xác nhận cho người gửi.
+
+**Headers**
+
+| Tên | Bắt buộc | Ràng buộc |
+|---|---|---|
+| `Content-Type` | có | `application/json` |
+| `X-CSRF-Token` | có | Lấy từ `GET /session/token`; token sai/thiếu trả `403 CSRF_TOKEN_INVALID` |
+
+**JSON body**
+
+| Tên | Kiểu | Bắt buộc | Mặc định | Ràng buộc |
+|---|---|---|---|---|
+| `name` | string | có | — | trim, 2–120 ký tự |
+| `email` | string | có | — | email hợp lệ, 5–254 ký tự |
+| `phone` | string | không | `''` | trim, tối đa 40 ký tự, chỉ chữ số, khoảng trắng và `+ . ( ) -` |
+| `subject` | string | không | `Khác` | một trong: `Dịch vụ kiểm nghiệm`, `Chất chuẩn - chất đối chiếu`, `Văn bản - tài liệu`, `Khác` |
+| `message` | string | có | — | trim, 10–4000 ký tự |
+| `recaptchaToken` | string | có | — | token reCAPTCHA v3, tối đa 4096 ký tự |
+
+Param ngoài contract bị từ chối bằng `400 INVALID_PARAMETER`.
+
+**Response 200**
+
+```json
+{
+  "data": {
+    "id": 123,
+    "message": "Cảm ơn bạn đã gửi liên hệ. Viện sẽ phản hồi sớm nhất có thể."
+  }
+}
+```
+
+**Lỗi:** `400 MISSING_PARAMETER` · `400 INVALID_PARAMETER` · `403 CSRF_TOKEN_INVALID` ·
+`403 ACCESS_DENIED` khi reCAPTCHA không đạt · `429 RATE_LIMITED` · `500 INTERNAL_ERROR`
+
+**Cache:** không cache. Response có `Cache-Control: no-store`.
+
+**Bảo mật:**
+- Route public có chủ đích vì đây là form cho người dùng ẩn danh.
+- POST luôn kiểm `X-CSRF-Token`.
+- reCAPTCHA v3 verify server-side, action phải là `contact_submit`, score tối thiểu cấu hình được
+  và mặc định `0.5`.
+- Flood control: tối đa 5 submit / 1 giờ / IP.
+- Submission lưu thành node `contact_submission` với `status = 0`, không publish ra public.
+- Không log token reCAPTCHA, nội dung message hoặc dữ liệu cá nhân.
+- Không commit reCAPTCHA secret hoặc SMTP password; production đặt trong `settings.local.php` hoặc
+  biến môi trường ngoài git.
+
+**Progressive enhancement:** reCAPTCHA v3 cần JavaScript. Không JS → trang vẫn hiển thị đầy đủ
+thông tin liên hệ và link mở bản đồ; người dùng liên hệ qua email/điện thoại hiển thị server-side.
+
+---
+
+### `GET /api/v1/contact/csrf-token`
+
+**Mục đích:** tạo anonymous session cho form liên hệ và trả token CSRF core của Drupal để gửi
+`POST /api/v1/contact`.
+
+**Response 200**
+
+Plain text UTF-8, một token 43 ký tự.
+
+**Lỗi:** `500 INTERNAL_ERROR`
+
+**Cache:** không cache. Response có `Cache-Control: no-store`.
+
+**Bảo mật:**
+- Route public có chủ đích vì token tự nó không submit được nếu không có session cookie tương ứng.
+- Frontend phải gọi với `credentials: include` và gửi lại cookie khi POST.
+
+---
+
+## 5. Mẫu đặc tả endpoint
 
 Mỗi endpoint phải điền đủ mẫu này trước khi chuyển sang bước 4.
 
@@ -102,7 +179,7 @@ Drupal Views lọc phía server, trả HTML đầy đủ.
 
 ---
 
-## 5. Checklist trước khi chốt một endpoint
+## 6. Checklist trước khi chốt một endpoint
 
 - [ ] Đã điền đủ mẫu §4
 - [ ] Mọi param có kiểu + ràng buộc + giá trị mặc định

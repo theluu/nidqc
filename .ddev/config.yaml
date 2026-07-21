@@ -11,7 +11,10 @@ database:
     version: "11.8"
 use_dns_when_possible: true
 composer_version: "2"
-web_environment: []
+web_environment:
+    - NIDQC_RECAPTCHA_BYPASS=1
+    - NIDQC_RECAPTCHA_MIN_SCORE=0.5
+    - NIDQC_CONTACT_ADMIN_EMAIL=noreply@nidqc.gov.vn
 corepack_enable: true
 
 # Key features of DDEV's config.yaml:
