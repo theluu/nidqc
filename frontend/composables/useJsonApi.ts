@@ -83,6 +83,27 @@ export async function fetchNewsNidByAlias(alias: string): Promise<number | null>
   return null
 }
 
+// Đếm tổng số tin (đã xuất bản, tuỳ chọn theo chuyên mục) để tính số trang.
+// JSON:API của Drupal KHÔNG trả tổng số (chỉ có link next/prev) và page[limit] bị
+// chặn ở 50, nên phải liệt kê rồi cộng. Chỉ lấy id (fields[...]=drupal_internal__nid)
+// để payload cực nhẹ, và gọi theo BATCH song song để giảm số vòng round-trip.
+export async function countNews(catId?: string | null): Promise<number> {
+  const base: Record<string, any> = {
+    'filter[status]': 1, 'page[limit]': 50, 'fields[node--news]': 'drupal_internal__nid',
+  }
+  if (catId && catId !== 'all') base['filter[field_category.id]'] = catId
+  const BATCH = 6 // 6 × 50 = 300 mục mỗi vòng song song
+  let total = 0
+  for (let start = 0; start < 200; start += BATCH) {
+    const reqs = Array.from({ length: BATCH }, (_, i) =>
+      fetchJsonApi('/node/news', { ...base, 'page[offset]': (start + i) * 50 }))
+    const counts = (await Promise.all(reqs)).map((r) => r.data.length)
+    total += counts.reduce((a, b) => a + b, 0)
+    if (counts.some((c) => c < 50)) break // gặp trang chưa đầy => đã tới mục cuối
+  }
+  return total
+}
+
 export function termLabel(node: any, field: string, included: any[]) {
   const rel = node.relationships?.[field]?.data
   if (!rel) return ''
