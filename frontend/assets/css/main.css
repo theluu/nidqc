@@ -55,15 +55,18 @@
   .nidqc-hamburger { display: flex !important; }
   .nidqc-nav-search { display: none !important; }
 
-  /* Nav thành drawer dọc, ẩn mặc định */
+  /* Nav thành drawer dọc, ẩn mặc định.
+     position:fixed (KHÔNG absolute): drawer absolute bị nhốt trong stacking context
+     của <header> sticky nên bị nội dung trang vẽ đè. top bám đáy nav bar qua biến
+     --nav-bottom (JS cập nhật khi cuộn); fallback 50px khi header đã dính đỉnh. */
   .nidqc-nav-list {
     display: none !important;
-    position: absolute;
-    top: 50px; left: 0; right: 0;
+    position: fixed;
+    top: var(--nav-bottom, 50px); left: 0; right: 0;
     flex-direction: column;
     background: #0F3093;
     box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-    max-height: calc(100vh - 50px);
+    max-height: calc(100vh - var(--nav-bottom, 50px));
     overflow-y: auto;
     z-index: 60;
   }

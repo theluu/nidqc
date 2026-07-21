@@ -9,6 +9,8 @@ import { ref, onMounted, onUnmounted } from 'vue';
 const now = ref('');
 const openMenu = ref(null);
 const mobileOpen = ref(false);
+const navBottom = ref(50);
+const headerEl = ref(null);
 const langOpen = ref(false);
 const curLang = ref('vi');
 let timer;
@@ -122,6 +124,26 @@ function setLang(code) {
   }
 }
 
+// Drawer menu mobile dùng position:fixed (KHÔNG absolute) để nổi TRÊN nội dung
+// trang: drawer absolute bị "nhốt" trong stacking context của <header> sticky nên
+// bị nội dung <main> vẽ đè (bấm hamburger như không hiện gì); z-index không cứu được.
+// top của drawer bám đáy nav bar qua biến CSS --nav-bottom, cập nhật khi cuộn/resize.
+function syncNavBottom() {
+  if (headerEl.value) navBottom.value = Math.round(headerEl.value.getBoundingClientRect().bottom);
+}
+function setMobile(open) {
+  mobileOpen.value = open;
+  if (open) {
+    syncNavBottom();
+    window.addEventListener('scroll', syncNavBottom, { passive: true });
+    window.addEventListener('resize', syncNavBottom);
+  } else {
+    openMenu.value = null;
+    window.removeEventListener('scroll', syncNavBottom);
+    window.removeEventListener('resize', syncNavBottom);
+  }
+}
+
 onMounted(() => {
   tick();
   timer = setInterval(tick, 30000);
@@ -131,6 +153,8 @@ onMounted(() => {
 onUnmounted(() => {
   clearInterval(timer);
   clearTimeout(googleLanguageSyncTimer);
+  window.removeEventListener('scroll', syncNavBottom);
+  window.removeEventListener('resize', syncNavBottom);
 });
 
 // Menu lấy từ design (const NAV). href trỏ route Vue.
@@ -236,11 +260,11 @@ const footerLinks = [
     </div>
 
     <!-- ===== NAV ===== -->
-    <header style="background:#0F3093;box-shadow:0 2px 4px rgba(0,0,0,0.10);position:sticky;top:0;z-index:40;"
+    <header ref="headerEl" :style="{ '--nav-bottom': navBottom + 'px' }" style="background:#0F3093;box-shadow:0 2px 4px rgba(0,0,0,0.10);position:sticky;top:0;z-index:40;"
             @mouseleave="openMenu = null">
       <div class="nidqc-nav-inner" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;min-height:50px;display:flex;align-items:stretch;">
         <!-- Hamburger: chỉ hiện trên mobile -->
-        <button class="nidqc-hamburger" @click="mobileOpen = !mobileOpen" :aria-expanded="mobileOpen" aria-label="Mở menu"
+        <button class="nidqc-hamburger" @click="setMobile(!mobileOpen)" :aria-expanded="mobileOpen" aria-label="Mở menu"
           style="display:none;align-items:center;justify-content:center;width:44px;height:50px;background:none;border:0;cursor:pointer;color:#fff;">
           <svg v-if="!mobileOpen" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
           <svg v-else width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -250,7 +274,7 @@ const footerLinks = [
           <div v-for="(item, i) in nav" :key="i" class="nidqc-nav-item"
                style="display:flex;align-items:stretch;flex:0 0 auto;position:relative;"
                @mouseenter="openMenu = item.children.length ? i : null">
-            <NuxtLink :to="item.to" @click="mobileOpen = false"
+            <NuxtLink :to="item.to" @click="setMobile(false)"
               style="display:flex;align-items:center;padding:0 14px;color:#fff;font-weight:600;font-size:14px;text-decoration:none;white-space:nowrap;"
               :style="openMenu === i ? 'background:#0D2870;' : ''">
               {{ item.label }}
@@ -263,7 +287,7 @@ const footerLinks = [
             </button>
             <div v-if="item.children.length && openMenu === i" class="nidqc-submenu"
                  style="position:absolute;top:100%;left:0;min-width:220px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.14);z-index:50;">
-              <NuxtLink v-for="(c, j) in item.children" :key="j" :to="c.to" @click="mobileOpen = false"
+              <NuxtLink v-for="(c, j) in item.children" :key="j" :to="c.to" @click="setMobile(false)"
                 style="display:block;padding:11px 18px;font-size:13.5px;line-height:18px;color:#212529;border-bottom:1px solid #F0F0F0;white-space:nowrap;text-decoration:none;">
                 {{ c.label }}
               </NuxtLink>
