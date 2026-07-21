@@ -67,25 +67,8 @@ export function attachments(node: any, included: any[]) {
     .filter(Boolean)
 }
 
-// Resolve slug (path alias không có prefix /tin-tuc) -> drupal_internal__nid.
-// JSON:API không lọc được trên computed field 'path' nên phải phân trang & khớp JS.
-export async function fetchNewsNidByAlias(alias: string): Promise<number | null> {
-  // Alias tin tức nay ở cấp gốc: /<slug> (khớp trang gốc nidqc.gov.vn, bỏ prefix /tin-tuc).
-  const full = alias.startsWith('/') ? alias : `/${alias}`
-  for (let offset = 0; offset < 2000; offset += 50) {
-    const { data } = await fetchJsonApi('/node/news', {
-      'filter[status]': 1, sort: 'drupal_internal__nid', 'page[limit]': 50, 'page[offset]': offset,
-      // CHỈ lấy path (+nid) để dò alias — KHÔNG kéo cả body. Có bài body ~15MB (ảnh
-      // base64); tải full node mỗi vòng khiến trang chi tiết chậm chục giây (16s→<1s
-      // sau khi field-limit giảm ~54x payload) và dễ ngốn hết PHP memory (fatal 500).
-      'fields[node--news]': 'path,drupal_internal__nid',
-    })
-    const hit = data.find((x: any) => (x.attributes?.path?.alias || '') === full)
-    if (hit) return hit.attributes.drupal_internal__nid
-    if (data.length < 50) break
-  }
-  return null
-}
+// Phân giải slug -> nid nay dùng server/api/news-nid (map cache Nitro), xem
+// server/utils/newsAlias.ts. Bỏ hàm lặp JSON:API cũ (mở node lần đầu ~16 request, chậm).
 
 // Đếm tổng số tin (đã xuất bản, tuỳ chọn theo chuyên mục) để tính số trang.
 // JSON:API của Drupal KHÔNG trả tổng số (chỉ có link next/prev) và page[limit] bị

@@ -7,7 +7,9 @@ const reqUrl = useRequestURL()
 const slug = computed(() => String(route.params.slug))
 
 const { data } = await useCachedData(`news-slug-${route.params.slug}`, async () => {
-  const nid = await fetchNewsNidByAlias(slug.value)
+  // Phân giải alias -> nid qua endpoint cache (/__resolve-news) thay vì lặp JSON:API
+  // (trước đây mở node lần đầu tốn ~16 request, cold ~15s). Xem server/utils/newsAlias.ts.
+  const { nid } = await $fetch('/__resolve-news', { params: { alias: `/${slug.value}` } })
   if (!nid) return null
   const res = await fetchJsonApi('/node/news', {
     'filter[drupal_internal__nid]': nid, include: 'field_image,field_category,field_attachments',
