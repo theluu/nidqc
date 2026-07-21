@@ -30,7 +30,7 @@ const byCategory = (cats, limit) => {
   return params
 }
 
-const { data: split } = await useAsyncData('home-news', async () => {
+const { data: split } = await useCachedData('home-news', async () => {
   const [ev, an] = await Promise.all([
     fetchJsonApi('/node/news', byCategory(EVENT_CATS, 6)),
     fetchJsonApi('/node/news', byCategory(NOTICE_CATS, 4)),
@@ -45,7 +45,7 @@ const announcements = computed(() => split.value.announcements)
 
 // Khối trang chủ động (quản trị trong Drupal): Hoạt động chuyên môn, Dịch vụ,
 // Cơ sở/Liên hệ, và CTA + Video (node home_block).
-const { data: blocks } = await useAsyncData('home-blocks', async () => {
+const { data: blocks } = await useCachedData('home-blocks', async () => {
   const [exp, svc, off, hb] = await Promise.all([
     fetchJsonApi('/node/expertise', { 'filter[status]': 1, sort: 'field_weight', 'page[limit]': 30 }),
     fetchJsonApi('/node/service', { 'filter[status]': 1, sort: 'field_weight', 'page[limit]': 30 }),
@@ -75,7 +75,7 @@ const cta = computed(() => blocks.value?.cta || null)
 const videoUrl = computed(() => blocks.value?.videoUrl || null)
 
 // Liên kết web — quản trị trong Drupal (node type web_link): title + URL + logo + mô tả.
-const { data: webLinks } = await useAsyncData('home-weblinks', async () => {
+const { data: webLinks } = await useCachedData('home-weblinks', async () => {
   const { data, included } = await fetchJsonApi('/node/web_link', {
     'filter[status]': 1, sort: 'field_weight', 'page[limit]': 12, include: 'field_image',
   })

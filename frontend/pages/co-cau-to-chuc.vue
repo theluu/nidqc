@@ -1,5 +1,5 @@
 <script setup>
-const { data: depts } = await useAsyncData('depts', async () => {
+const { data: depts } = await useCachedData('depts', async () => {
   const { data } = await fetchJsonApi('/node/department', { 'filter[status]': 1, 'page[limit]': 50 })
   return data.map((n) => ({ title: n.attributes.title, desc: n.attributes.field_description?.processed || n.attributes.field_description?.value || '' }))
 })

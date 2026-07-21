@@ -1,6 +1,6 @@
 <script setup>
 const tab = ref('equipment')
-const { data } = await useAsyncData('capacity', async () => {
+const { data } = await useCachedData('capacity', async () => {
   const [e, c] = await Promise.all([
     fetchJsonApi('/node/equipment', { 'filter[status]': 1, 'page[limit]': 50 }),
     fetchJsonApi('/node/certificate', { 'filter[status]': 1, 'page[limit]': 50 }),

@@ -1,5 +1,5 @@
 <script setup>
-const { data: page } = await useAsyncData('lien-he', async () => {
+const { data: page } = await useCachedData('lien-he', async () => {
   const [pg, off] = await Promise.all([
     fetchPageByAlias('/lien-he'),
     fetchJsonApi('/node/office', { 'filter[status]': 1, sort: 'field_weight', 'page[limit]': 10 }),

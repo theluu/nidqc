@@ -6,7 +6,7 @@ const route = useRoute()
 const reqUrl = useRequestURL()
 const slug = computed(() => String(route.params.slug))
 
-const { data } = await useAsyncData(`news-slug-${route.params.slug}`, async () => {
+const { data } = await useCachedData(`news-slug-${route.params.slug}`, async () => {
   const nid = await fetchNewsNidByAlias(slug.value)
   if (!nid) return null
   const res = await fetchJsonApi('/node/news', {

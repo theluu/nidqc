@@ -1,5 +1,5 @@
 <script setup>
-const { data: node } = await useAsyncData('page-chinh-sach', () => fetchPageByAlias('/chinh-sach-chat-luong'))
+const { data: node } = await useCachedData('page-chinh-sach', () => fetchPageByAlias('/chinh-sach-chat-luong'))
 const gioiThieuLinks = [
   { label: 'Giới thiệu chung', to: '/gioi-thieu-chung' },
   { label: 'Chính sách chất lượng', to: '/chinh-sach-chat-luong' },

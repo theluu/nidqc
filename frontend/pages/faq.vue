@@ -1,6 +1,6 @@
 <script setup>
 const open = ref(0)
-const { data: items } = await useAsyncData('faq', async () => {
+const { data: items } = await useCachedData('faq', async () => {
   const { data, included } = await fetchJsonApi('/node/faq', { 'filter[status]': 1, include: 'field_group', 'page[limit]': 50 })
   return data.map((n, i) => ({ id: i, q: n.attributes.title, a: n.attributes.field_answer?.processed || n.attributes.field_answer?.value || '', group: termLabel(n, 'field_group', included) }))
 })

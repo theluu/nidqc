@@ -6,7 +6,7 @@ const raw = String(route.params.id)
 let target = null
 if (/^\d+$/.test(raw)) {
   // nid -> tra alias gốc của node.
-  const { data } = await useAsyncData(`redir-news-${raw}`, async () => {
+  const { data } = await useCachedData(`redir-news-${raw}`, async () => {
     const { data } = await fetchJsonApi('/node/news', {
       'filter[drupal_internal__nid]': Number(raw), 'page[limit]': 1,
     })

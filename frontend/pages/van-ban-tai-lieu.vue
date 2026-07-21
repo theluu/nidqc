@@ -1,6 +1,6 @@
 <script setup>
 const activeGroup = ref('all')
-const { data } = await useAsyncData('documents', async () => {
+const { data } = await useCachedData('documents', async () => {
   const g = await fetchJsonApi('/taxonomy_term/document_group', { sort: 'weight' })
   const { data, included } = await fetchJsonApi('/node/document', { 'filter[status]': 1, sort: '-created', include: 'field_group', 'page[limit]': 50 })
   return {
