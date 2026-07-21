@@ -75,6 +75,10 @@ export async function fetchNewsNidByAlias(alias: string): Promise<number | null>
   for (let offset = 0; offset < 2000; offset += 50) {
     const { data } = await fetchJsonApi('/node/news', {
       'filter[status]': 1, sort: 'drupal_internal__nid', 'page[limit]': 50, 'page[offset]': offset,
+      // CHỈ lấy path (+nid) để dò alias — KHÔNG kéo cả body. Có bài body ~15MB (ảnh
+      // base64); tải full node mỗi vòng khiến trang chi tiết chậm chục giây (16s→<1s
+      // sau khi field-limit giảm ~54x payload) và dễ ngốn hết PHP memory (fatal 500).
+      'fields[node--news]': 'path,drupal_internal__nid',
     })
     const hit = data.find((x: any) => (x.attributes?.path?.alias || '') === full)
     if (hit) return hit.attributes.drupal_internal__nid
