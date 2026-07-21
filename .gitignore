@@ -43,6 +43,14 @@
 /frontend/dist/
 /web/themes/custom/nidqc/dist/
 
+# --- DB dump (cách A: DB KHÔNG nằm trong git; backup ở server/object storage) ---
+*.sql
+*.sql.gz
+*.sql.zip
+*.mysql
+/db/
+/database/
+
 # --- DDEV (phần tự sinh) ---
 /.ddev/.global_commands/
 /.ddev/db_snapshots/

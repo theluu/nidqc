@@ -84,6 +84,28 @@ drush state:set system.maintenance_mode 0
 > `composer install`, **không bao giờ** `composer update` trên production.
 > `update` đọc `composer.json` và có thể nâng phiên bản ngoài ý muốn. `install` bám `composer.lock`.
 
+> **Script gói sẵn:** `scripts/deploy.sh` (deploy thường) và `scripts/deploy.sh --seed`
+> (seed nội dung baseline lần đầu). Nhớ chỉnh dòng restart Nuxt SSR cho hạ tầng prod.
+
+### Chiến lược nội dung & DB (cách A — DB KHÔNG nằm trong git)
+
+Git chỉ mang **code + cấu trúc** (`config/sync`: node type, field, pathauto, display…).
+**Nội dung** (node tin tức, web_link, expertise, office, home_block…, tài khoản, ảnh)
+**chỉ sống trong DB production** và tồn tại qua mọi lần deploy — deploy không ghi đè.
+
+| Thứ | Nguồn | Lên prod bằng |
+|-----|-------|---------------|
+| Code, frontend | git | `git pull` + `npm run build` |
+| Cấu trúc backend | git (`config/sync`) | `drush deploy` / `drush cim` |
+| Nội dung (DB), ảnh | DB prod (không qua git) | migrate/seed **1 lần**, sau đó quản trị qua `/admin` |
+
+**Nạp nội dung lần đầu** — chọn 1:
+- Seed từ script trong git: `scripts/deploy.sh --seed` (chạy `import-old-news`, `setup-web-links`, `setup-home-blocks`).
+- Hoặc migrate 1 lần từ dev: `ddev export-db` → chuyển qua SSH → `drush sql:cli` trên prod.
+
+**Backup DB prod** (thay cho "DB trên git"): cron `drush sql:dump --gzip` phía server, đẩy lên object storage.
+Không commit dump SQL vào git — `.gitignore` đã chặn `*.sql` / `*.sql.gz`.
+
 ## 5. Trước khi deploy
 
 - [ ] UAT đã ký — `docs/testing/UAT_CHECKLIST.md`
