@@ -196,12 +196,12 @@ const footerLinks = [
 
     <!-- ===== TOP BAR ===== -->
     <div style="background:#0D2870;color:#fff;">
-      <div style="max-width:1280px;margin:0 auto;padding:0 24px;height:34px;display:flex;align-items:center;justify-content:space-between;">
-        <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(255,255,255,0.82);">
+      <div class="nidqc-topbar" style="max-width:1280px;margin:0 auto;padding:0 24px;height:34px;display:flex;align-items:center;justify-content:space-between;">
+        <div class="nidqc-topbar-date" style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(255,255,255,0.82);min-width:0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
           <span>{{ now }}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:14px;font-size:12.5px;">
+        <div class="nidqc-topbar-actions" style="display:flex;align-items:center;gap:14px;font-size:12.5px;">
           <!-- Dropdown mọi thứ tiếng (Google Translate) -->
           <div style="position:relative;">
             <button data-testid="language-menu-toggle" @click="langOpen = !langOpen" style="background:none;border:0;cursor:pointer;color:#fff;display:flex;align-items:center;gap:4px;font-size:12.5px;">
@@ -217,9 +217,9 @@ const footerLinks = [
             </div>
           </div>
           <span style="width:1px;height:14px;background:rgba(255,255,255,0.25);"></span>
-          <a href="/user/login" style="color:#fff;display:flex;align-items:center;gap:5px;text-decoration:none;">
+          <a href="/user/login" class="nidqc-login" style="color:#fff;display:flex;align-items:center;gap:5px;text-decoration:none;white-space:nowrap;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
-            Đăng nhập hệ thống
+            <span class="nidqc-login-text">Đăng nhập hệ thống</span>
           </a>
           <!-- Element ẩn cho Google Translate -->
           <div id="google_translate_element" style="display:none;"></div>

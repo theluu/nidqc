@@ -102,6 +102,19 @@
 /* Header cho phép drawer absolute */
 .nidqc-nav-inner { position: relative; }
 
+/* ===== Top bar responsive: khử tràn ngang trên mobile =====
+   Nội dung top bar (ngày/giờ + ngôn ngữ + đăng nhập) cần ~484px; màn mobile
+   hẹp hơn -> tràn ngang, vỡ header top và sinh cuộn ngang (kéo drawer menu ra
+   ngoài vùng nhìn). Ẩn ngày/giờ (trang trí) + rút gọn nút đăng nhập cho vừa. */
+@media (max-width: 640px) {
+  .nidqc-topbar { padding-left: 16px !important; padding-right: 16px !important; }
+  .nidqc-topbar-actions { gap: 12px !important; }
+  .nidqc-topbar-date { display: none !important; }
+}
+@media (max-width: 380px) {
+  .nidqc-login-text { display: none !important; }
+}
+
 /* ===== Google Translate: ẩn banner/tooltip mặc định, tránh xô layout ===== */
 .goog-te-banner-frame,
 .skiptranslate { display: none !important; }
