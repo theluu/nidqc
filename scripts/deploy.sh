@@ -44,9 +44,11 @@ if [ "$SEED" = "1" ]; then
 fi
 
 echo "==> 6. Khởi động lại tiến trình Nuxt SSR"
-# Tùy hạ tầng prod — thay bằng lệnh thực tế của bạn, ví dụ:
-#   systemctl restart nidqc-nuxt
-#   pm2 restart nidqc-nuxt
-echo "   (!) Nhớ restart daemon Nuxt SSR bằng systemd/pm2 của prod."
+# Mặc định dùng systemd unit `nidqc-nuxt` (xem docs/deployment/DEPLOYMENT.md).
+# Hạ tầng khác (pm2…) thì đặt SSR_RESTART_CMD, ví dụ:
+#   SSR_RESTART_CMD="pm2 restart nidqc-nuxt" ./scripts/deploy.sh
+SSR_RESTART_CMD="${SSR_RESTART_CMD:-systemctl restart nidqc-nuxt}"
+echo "   \$ $SSR_RESTART_CMD"
+eval "$SSR_RESTART_CMD"
 
 echo "==> Xong. Nội dung do prod quản lý (admin /admin/content), không đến từ git."

@@ -21,8 +21,10 @@ export default defineNuxtConfig({
       link: [
         { rel: 'icon', type: 'image/png', href: '/favicon.png' },
         { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
-        { rel: 'stylesheet', href: 'https://nidqc.ddev.site/themes/custom/nidqc/css/fonts.css' },
-        { rel: 'stylesheet', href: 'https://nidqc.ddev.site/themes/custom/nidqc/css/tokens.css' },
+        // Same-origin: nginx (dev DDEV và prod) route /themes → Drupal. Không hard-code domain
+        // để build chạy đúng ở mọi môi trường (ddev.site, staging, production).
+        { rel: 'stylesheet', href: '/themes/custom/nidqc/css/fonts.css' },
+        { rel: 'stylesheet', href: '/themes/custom/nidqc/css/tokens.css' },
       ],
     },
   },
