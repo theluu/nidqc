@@ -65,11 +65,23 @@
   list-style: none;
 }
 
+/* Ngày bên trái (icon + text), tài khoản bên phải. */
+.nidqc-header-top__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
 /* ---------- Banner (full-width) ---------- */
 
 .nidqc-header-banner {
   background: var(--nidqc-white);
   border-bottom: 1px solid var(--nidqc-border);
+}
+
+.nidqc-header-banner__link {
+  display: block;
 }
 
 .nidqc-header-banner img {
@@ -300,6 +312,47 @@
 
 .nidqc-footer a:hover {
   color: var(--nidqc-white);
+}
+
+/* Cột 1: tên Viện + mô tả. */
+.nidqc-footer__brand {
+  font-size: 18px;
+  line-height: 24px;
+  margin: 0 0 12px;
+}
+
+.nidqc-footer__desc {
+  margin: 0;
+  max-width: 430px;
+}
+
+/* Cột 2/3: tiêu đề nhóm (chữ hoa, mờ). */
+.nidqc-footer__heading {
+  font-size: 13.5px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 14px;
+}
+
+.nidqc-footer__links {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 13.5px;
+}
+
+/* Thanh bản quyền dưới cùng. */
+.nidqc-footer__bar {
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.nidqc-footer__bar > .nidqc-container {
+  padding-top: 16px;
+  padding-bottom: 16px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
 }
 
 /* ---------- Responsive ---------- */
