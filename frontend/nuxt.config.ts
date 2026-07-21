@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     public: {
       // Client-side fetch (trình duyệt) — cùng domain qua reverse proxy ở production.
       drupalBase: process.env.DRUPAL_BASE || 'https://nidqc.ddev.site',
+      recaptchaSiteKey: process.env.NIDQC_RECAPTCHA_SITE_KEY || '',
     },
   },
 
@@ -17,7 +18,10 @@ export default defineNuxtConfig({
     head: {
       htmlAttrs: { lang: 'vi' },
       title: 'Viện Kiểm nghiệm thuốc Trung ương',
-      link: [{ rel: 'stylesheet', href: 'https://nidqc.ddev.site/themes/custom/nidqc/css/fonts.css' }],
+      link: [
+        { rel: 'stylesheet', href: 'https://nidqc.ddev.site/themes/custom/nidqc/css/fonts.css' },
+        { rel: 'stylesheet', href: 'https://nidqc.ddev.site/themes/custom/nidqc/css/tokens.css' },
+      ],
     },
   },
 

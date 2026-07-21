@@ -115,3 +115,82 @@ body { top: 0 !important; position: static !important; }
   .nidqc-org-vice { flex-direction: column !important; gap: 12px !important; }
   .nidqc-org-vice > div[style*="absolute"] { display: none !important; }
 }
+
+/* ===== TRANG CHI TIẾT TIN: bố cục 2 cột bài viết + sidebar ===== */
+.nidqc-article-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 40px;
+  align-items: start;
+}
+.nidqc-article-aside { position: sticky; top: 24px; }
+@media (max-width: 980px) {
+  .nidqc-article-grid { grid-template-columns: 1fr; gap: 32px; }
+  .nidqc-article-aside { position: static; }
+}
+
+/* Typography cho nội dung bài viết (v-html) */
+.nidqc-article-body { font-size: 16.5px; line-height: 28px; color: #212529; }
+.nidqc-article-body p { margin: 0 0 18px; }
+.nidqc-article-body a { color: #1D6AC5; text-decoration: underline; }
+.nidqc-article-body img,
+.nidqc-article-body figure img {
+  max-width: 100%; height: auto; display: block;
+  margin: 22px auto; border: 1px solid #E4E9F0;
+}
+.nidqc-article-body figure { margin: 22px 0; }
+.nidqc-article-body figcaption,
+.nidqc-article-body .caption { text-align: center; font-size: 13px; color: #777; margin-top: 8px; }
+.nidqc-article-body h2 {
+  font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 22px;
+  color: #0F3093; margin: 34px 0 12px; line-height: 30px;
+}
+.nidqc-article-body h3 {
+  font-family: 'Lexend', sans-serif; font-weight: 600; font-size: 18px;
+  color: #0F3093; margin: 28px 0 10px; line-height: 26px;
+}
+.nidqc-article-body h4 { font-weight: 600; font-size: 16.5px; color: #212529; margin: 22px 0 8px; }
+.nidqc-article-body ul, .nidqc-article-body ol { margin: 0 0 18px; padding-left: 22px; }
+.nidqc-article-body li { margin-bottom: 8px; }
+.nidqc-article-body blockquote {
+  margin: 22px 0; padding: 14px 20px; border-left: 4px solid #0F3093;
+  background: #F5F8FC; color: #495057; font-style: italic;
+}
+.nidqc-article-body blockquote p:last-child { margin-bottom: 0; }
+.nidqc-article-body table { width: 100%; border-collapse: collapse; margin: 22px 0; font-size: 15px; }
+.nidqc-article-body th, .nidqc-article-body td { border: 1px solid #E4E9F0; padding: 9px 12px; text-align: left; }
+.nidqc-article-body th { background: #F3F7FC; color: #0F3093; font-weight: 600; }
+.nidqc-article-body strong, .nidqc-article-body b { font-weight: 600; }
+
+/* Thẻ tin liên quan: ảnh zoom + thẻ nhấc khi hover */
+.nidqc-related-card { transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease; }
+.nidqc-related-card:hover { border-color: #0F3093; box-shadow: 0 10px 22px rgba(15,48,147,0.12); transform: translateY(-3px); }
+.nidqc-related-card .nidqc-related-thumb { overflow: hidden; }
+.nidqc-related-card .nidqc-related-thumb img { transition: transform .35s ease; }
+.nidqc-related-card:hover .nidqc-related-thumb img { transform: scale(1.06); }
+.nidqc-related-card:hover .nidqc-related-title { color: #0F3093; }
+
+/* Mục sidebar: gạch nhấn khi hover */
+.nidqc-aside-item { transition: background .15s ease; }
+.nidqc-aside-item:hover { background: #F5F8FC; }
+.nidqc-aside-item:hover .nidqc-aside-title { color: #0F3093; }
+
+/* Clamp tiêu đề nhiều dòng */
+.nidqc-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.nidqc-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Nút chia sẻ */
+.nidqc-share-btn { transition: background .15s ease, color .15s ease, border-color .15s ease; cursor: pointer; }
+.nidqc-share-btn:hover { background: #0F3093; color: #fff; border-color: #0F3093; }
+.nidqc-share-btn:hover svg { stroke: #fff; }
+
+/* Hàng "Liên kết web" ở trang chủ */
+.nidqc-weblink { transition: border-color .15s ease, background .15s ease; }
+a.nidqc-weblink:hover { border-color: #0F3093; background: #EEF4FB; }
+
+@media (prefers-reduced-motion: reduce) {
+  .nidqc-related-card, .nidqc-related-card .nidqc-related-thumb img,
+  .nidqc-aside-item, .nidqc-share-btn, .nidqc-weblink { transition: none; }
+  .nidqc-related-card:hover { transform: none; }
+  .nidqc-related-card:hover .nidqc-related-thumb img { transform: none; }
+}

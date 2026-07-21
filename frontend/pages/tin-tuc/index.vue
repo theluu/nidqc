@@ -4,7 +4,7 @@ const route = useRoute()
 const { data } = await useAsyncData('news-list', async () => {
   const cats = await fetchJsonApi('/taxonomy_term/news_category', { sort: 'weight' })
   const { data, included } = await fetchJsonApi('/node/news', {
-    'filter[status]': 1, sort: '-created', include: 'field_image,field_category', 'page[limit]': 50,
+    'filter[status]': 1, sort: '-field_date,-created', include: 'field_image,field_category', 'page[limit]': 50,
   })
   return {
     categories: cats.data.map((t) => ({ id: t.id, label: t.attributes.name })),
@@ -14,6 +14,7 @@ const { data } = await useAsyncData('news-list', async () => {
       tag: n.attributes.field_tag || termLabel(n, 'field_category', included),
       catId: n.relationships?.field_category?.data?.id ?? null,
       image: imageUrl(n, included),
+      alias: n.attributes.path?.alias || `/tin-tuc/${n.attributes.drupal_internal__nid}`,
     })),
   }
 })
@@ -32,7 +33,7 @@ useSeoMeta({ title: 'Tin tức & Thông báo — NIDQC', description: 'Thông b�
         </div>
         <p v-if="!filtered.length" style="color:#777;">Không có tin nào trong chuyên mục này.</p>
         <div v-else class="nidqc-grid-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
-          <NuxtLink v-for="item in filtered" :key="item.id" :to="`/tin-tuc/${item.id}`" style="display:block;background:#fff;border:1px solid #ECECEC;text-decoration:none;">
+          <NuxtLink v-for="item in filtered" :key="item.id" :to="item.alias" style="display:block;background:#fff;border:1px solid #ECECEC;text-decoration:none;">
             <div style="width:100%;height:150px;background:#E8F0F7;overflow:hidden;"><img v-if="item.image" :src="item.image" style="width:100%;height:100%;object-fit:cover;"></div>
             <div style="padding:16px 18px 20px;">
               <span v-if="item.tag" style="display:inline-block;background:#E8F0F7;color:#0F3093;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;padding:3px 9px;margin-bottom:10px;">{{ item.tag }}</span>

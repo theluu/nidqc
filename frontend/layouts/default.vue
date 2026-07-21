@@ -12,6 +12,7 @@ const mobileOpen = ref(false);
 const langOpen = ref(false);
 const curLang = ref('vi');
 let timer;
+let googleLanguageSyncTimer;
 
 const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
 function tick() {
@@ -22,34 +23,77 @@ function tick() {
 
 /**
  * Đa ngôn ngữ:
- *  - Việt/Anh: nội dung chính thức (Drupal đã bật 2 ngôn ngữ vi/en).
- *  - Mọi thứ tiếng khác: Google Translate dịch máy toàn trang (client-side).
+ *  - Tiếng Việt: nội dung chính thức.
+ *  - English và các ngôn ngữ khác: Google Translate dịch máy toàn trang.
  *
  * ⚠️ Đây là site về THUỐC. Dịch MÁY nội dung y tế/dược có thể sai nghĩa. Bản dịch
  * máy chỉ để tham khảo; nội dung chính thức là tiếng Việt.
  */
-const languages = [
-  { code: 'vi', label: 'Tiếng Việt' },
-  { code: 'en', label: 'English' },
-  { code: 'zh-CN', label: '中文' },
-  { code: 'ja', label: '日本語' },
-  { code: 'ko', label: '한국어' },
-  { code: 'fr', label: 'Français' },
-  { code: 'de', label: 'Deutsch' },
-  { code: 'ru', label: 'Русский' },
-  { code: 'lo', label: 'ລາວ' },
-  { code: 'km', label: 'ខ្មែរ' },
-];
+const defaultLanguage = { code: 'vi', label: 'Tiếng Việt' };
+const languages = ref([defaultLanguage]);
+
+function googleTranslateCookieDomains() {
+  const hostname = location.hostname;
+  const domains = [hostname, `.${hostname}`];
+  const parts = hostname.split('.');
+
+  if (parts.length > 2) {
+    domains.push(`.${parts.slice(1).join('.')}`);
+  }
+
+  return [...new Set(domains)];
+}
+
+function writeGoogleTranslateCookie(value, maxAge) {
+  const secure = location.protocol === 'https:' ? ';secure' : '';
+  const base = `googtrans=${value};path=/;SameSite=Lax;max-age=${maxAge}${secure}`;
+
+  document.cookie = base;
+  googleTranslateCookieDomains().forEach((domain) => {
+    document.cookie = `${base};domain=${domain}`;
+  });
+}
+
+function resetGoogleTranslate() {
+  curLang.value = defaultLanguage.code;
+  writeGoogleTranslateCookie('', 0);
+  writeGoogleTranslateCookie('/vi/vi', 60);
+}
+
+function syncGoogleLanguages(attempt = 0) {
+  const combo = document.querySelector('.goog-te-combo');
+  const options = combo ? Array.from(combo.options).filter((option) => option.value) : [];
+
+  if (options.length) {
+    languages.value = [
+      defaultLanguage,
+      ...options
+        .map((option) => ({
+          code: option.value,
+          label: (option.textContent || '').trim().replace(/\s+/g, ' ') || option.value,
+        }))
+        .filter((language) => language.code !== defaultLanguage.code),
+    ];
+    return;
+  }
+
+  if (attempt < 40) {
+    googleLanguageSyncTimer = window.setTimeout(() => syncGoogleLanguages(attempt + 1), 250);
+  }
+}
 
 function loadGoogleTranslate() {
-  if (window.__gtLoaded) return;
+  if (window.__gtLoaded) {
+    syncGoogleLanguages();
+    return;
+  }
   window.__gtLoaded = true;
   window.googleTranslateElementInit = () => {
-    // includedLanguages rỗng = tất cả ngôn ngữ Google hỗ trợ.
     new window.google.translate.TranslateElement(
       { pageLanguage: 'vi', autoDisplay: false },
       'google_translate_element',
     );
+    syncGoogleLanguages();
   };
   const s = document.createElement('script');
   s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
@@ -60,15 +104,15 @@ function loadGoogleTranslate() {
 function setLang(code) {
   curLang.value = code;
   langOpen.value = false;
-  // Google Translate đọc cookie googtrans để chọn ngôn ngữ đích.
-  const val = code === 'vi' ? '/vi/vi' : `/vi/${code}`;
-  document.cookie = `googtrans=${val};path=/`;
-  document.cookie = `googtrans=${val};path=/;domain=.${location.hostname}`;
-  // Nếu về tiếng Việt gốc thì reload để bỏ bản dịch; ngược lại kích hoạt combo.
+
   if (code === 'vi') {
+    resetGoogleTranslate();
     location.reload();
     return;
   }
+
+  writeGoogleTranslateCookie(`/vi/${code}`, 60 * 60 * 12);
+
   const combo = document.querySelector('.goog-te-combo');
   if (combo) {
     combo.value = code;
@@ -81,9 +125,13 @@ function setLang(code) {
 onMounted(() => {
   tick();
   timer = setInterval(tick, 30000);
+  resetGoogleTranslate();
   loadGoogleTranslate();
 });
-onUnmounted(() => clearInterval(timer));
+onUnmounted(() => {
+  clearInterval(timer);
+  clearTimeout(googleLanguageSyncTimer);
+});
 
 // Menu lấy từ design (const NAV). href trỏ route Vue.
 // Menu đầy đủ theo design (const NAV). 9 mục, submenu 2 tầng.
@@ -154,18 +202,15 @@ const footerLinks = [
           <span>{{ now }}</span>
         </div>
         <div style="display:flex;align-items:center;gap:14px;font-size:12.5px;">
-          <!-- VI/EN nhanh -->
-          <button @click="setLang('vi')" :style="`background:none;border:0;cursor:pointer;font-size:12.5px;color:#fff;${curLang==='vi'?'font-weight:700;border-bottom:2px solid #fff;padding-bottom:1px;':'opacity:.75;'}`">Tiếng Việt</button>
-          <button @click="setLang('en')" :style="`background:none;border:0;cursor:pointer;font-size:12.5px;color:#fff;${curLang==='en'?'font-weight:700;border-bottom:2px solid #fff;padding-bottom:1px;':'opacity:.75;'}`">English</button>
           <!-- Dropdown mọi thứ tiếng (Google Translate) -->
           <div style="position:relative;">
-            <button @click="langOpen = !langOpen" style="background:none;border:0;cursor:pointer;color:#fff;display:flex;align-items:center;gap:4px;font-size:12.5px;">
+            <button data-testid="language-menu-toggle" @click="langOpen = !langOpen" style="background:none;border:0;cursor:pointer;color:#fff;display:flex;align-items:center;gap:4px;font-size:12.5px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
               Ngôn ngữ
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
             </button>
-            <div v-if="langOpen" style="position:absolute;top:100%;right:0;margin-top:6px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.2);z-index:70;min-width:150px;padding:6px 0;">
-              <button v-for="l in languages" :key="l.code" @click="setLang(l.code)"
+            <div v-if="langOpen" data-testid="language-menu" style="position:absolute;top:100%;right:0;margin-top:6px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.2);z-index:70;min-width:220px;max-height:420px;overflow-y:auto;padding:6px 0;">
+              <button v-for="l in languages" :key="l.code" data-testid="language-option" @click="setLang(l.code)"
                 :style="`display:block;width:100%;text-align:left;background:none;border:0;cursor:pointer;padding:8px 16px;font-size:13px;color:#212529;${curLang===l.code?'font-weight:700;background:#E8F0F7;':''}`">
                 {{ l.label }}
               </button>

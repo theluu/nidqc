@@ -26,20 +26,21 @@ export default defineEventHandler(async (event) => {
   const host = getRequestHost(event, { xForwardedHost: true }) || 'nidqc.gov.vn'
   const origin = `https://${host}`
 
-  // Lấy tin đã xuất bản để đưa vào sitemap (id + ngày sửa cho <lastmod>).
-  const news: Array<{ id: number; changed: string }> = []
+  // Lấy tin đã xuất bản để đưa vào sitemap (alias gốc + ngày sửa cho <lastmod>).
+  const news: Array<{ path: string; changed: string }> = []
   try {
     const res: any = await $fetch(`${drupal}/jsonapi/node/news`, {
       params: {
         'filter[status]': 1,
         sort: '-changed',
-        'fields[node--news]': 'drupal_internal__nid,changed',
+        'fields[node--news]': 'drupal_internal__nid,changed,path',
         'page[limit]': 200,
       },
       headers: { Accept: 'application/vnd.api+json' },
     })
     for (const n of res.data ?? []) {
-      news.push({ id: n.attributes.drupal_internal__nid, changed: n.attributes.changed })
+      const path = n.attributes.path?.alias || `/tin-tuc/${n.attributes.drupal_internal__nid}`
+      news.push({ path, changed: n.attributes.changed })
     }
   } catch {
     // Drupal không phản hồi -> vẫn trả sitemap các trang tĩnh, không để 500.
@@ -56,7 +57,7 @@ export default defineEventHandler(async (event) => {
   for (const n of news) {
     const lastmod = (n.changed || '').slice(0, 10) || today
     urls.push(
-      `  <url><loc>${xmlEscape(`${origin}/tin-tuc/${n.id}`)}</loc><changefreq>monthly</changefreq><priority>0.6</priority><lastmod>${lastmod}</lastmod></url>`,
+      `  <url><loc>${xmlEscape(origin + n.path)}</loc><changefreq>monthly</changefreq><priority>0.6</priority><lastmod>${lastmod}</lastmod></url>`,
     )
   }
 

@@ -51,6 +51,38 @@ export async function fetchPageByAlias(alias: string) {
   }
 }
 
+// Danh sách file đính kèm (field_attachments). Nhãn lấy từ meta.description
+// của quan hệ (VD "-Văn bản gốc"), URL lấy từ file included.
+export function attachments(node: any, included: any[]) {
+  const rels = node.relationships?.field_attachments?.data
+  if (!Array.isArray(rels)) return []
+  return rels
+    .map((r: any) => {
+      const url = findIncluded(included, r.type, r.id)?.attributes?.uri?.url
+      if (!url) return null
+      const label = (r.meta?.description || '').replace(/^[\s-]+/, '').trim()
+      const filename = findIncluded(included, r.type, r.id)?.attributes?.filename || 'Tải xuống'
+      return { url: url.startsWith('http') ? url : drupalBase() + url, label: label || filename }
+    })
+    .filter(Boolean)
+}
+
+// Resolve slug (path alias không có prefix /tin-tuc) -> drupal_internal__nid.
+// JSON:API không lọc được trên computed field 'path' nên phải phân trang & khớp JS.
+export async function fetchNewsNidByAlias(alias: string): Promise<number | null> {
+  // Alias tin tức nay ở cấp gốc: /<slug> (khớp trang gốc nidqc.gov.vn, bỏ prefix /tin-tuc).
+  const full = alias.startsWith('/') ? alias : `/${alias}`
+  for (let offset = 0; offset < 2000; offset += 50) {
+    const { data } = await fetchJsonApi('/node/news', {
+      'filter[status]': 1, sort: 'drupal_internal__nid', 'page[limit]': 50, 'page[offset]': offset,
+    })
+    const hit = data.find((x: any) => (x.attributes?.path?.alias || '') === full)
+    if (hit) return hit.attributes.drupal_internal__nid
+    if (data.length < 50) break
+  }
+  return null
+}
+
 export function termLabel(node: any, field: string, included: any[]) {
   const rel = node.relationships?.[field]?.data
   if (!rel) return ''
