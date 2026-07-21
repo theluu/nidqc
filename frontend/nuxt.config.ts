@@ -19,6 +19,8 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: 'vi' },
       title: 'Viện Kiểm nghiệm thuốc Trung ương',
       link: [
+        { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
         { rel: 'stylesheet', href: 'https://nidqc.ddev.site/themes/custom/nidqc/css/fonts.css' },
         { rel: 'stylesheet', href: 'https://nidqc.ddev.site/themes/custom/nidqc/css/tokens.css' },
       ],
