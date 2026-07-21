@@ -233,7 +233,7 @@ const footerLinks = [
               Ngôn ngữ
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
             </button>
-            <div v-if="langOpen" data-testid="language-menu" style="position:absolute;top:100%;right:0;margin-top:6px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.2);z-index:70;min-width:220px;max-height:420px;overflow-y:auto;padding:6px 0;">
+            <div v-if="langOpen" data-testid="language-menu" class="nidqc-lang-menu" style="position:absolute;top:100%;right:0;margin-top:6px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.2);z-index:70;min-width:220px;max-height:420px;overflow-y:auto;padding:6px 0;">
               <button v-for="l in languages" :key="l.code" data-testid="language-option" @click="setLang(l.code)"
                 :style="`display:block;width:100%;text-align:left;background:none;border:0;cursor:pointer;padding:8px 16px;font-size:13px;color:#212529;${curLang===l.code?'font-weight:700;background:#E8F0F7;':''}`">
                 {{ l.label }}

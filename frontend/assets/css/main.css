@@ -111,8 +111,20 @@
    ngoài vùng nhìn). Ẩn ngày/giờ (trang trí) + rút gọn nút đăng nhập cho vừa. */
 @media (max-width: 640px) {
   .nidqc-topbar { padding-left: 16px !important; padding-right: 16px !important; }
-  .nidqc-topbar-actions { gap: 12px !important; }
+  /* Ẩn ngày/giờ khiến actions là item flex duy nhất -> margin-left:auto để dồn về phải
+     (giữ đúng vị trí như desktop thay vì nhảy sang trái). */
+  .nidqc-topbar-actions { gap: 12px !important; margin-left: auto; }
   .nidqc-topbar-date { display: none !important; }
+  /* Dropdown ngôn ngữ: neo cố định theo mép phải viewport để KHÔNG tràn ra ngoài màn
+     (right:0 của nó neo vào nút "Ngôn ngữ" — nút không sát mép phải nên panel 220px
+     bị lọt ra ngoài bên trái). Đặt dưới top bar (cao 34px). */
+  .nidqc-lang-menu {
+    position: fixed !important;
+    top: 34px !important;
+    right: 8px !important;
+    left: auto !important;
+    max-width: calc(100vw - 16px);
+  }
 }
 @media (max-width: 380px) {
   .nidqc-login-text { display: none !important; }
