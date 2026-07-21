@@ -1,0 +1,27 @@
+uuid: 17c7bd1f-0b94-4da1-92bc-0c6a7571721c
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - node.type.news
+  module:
+    - text
+  enforced:
+    module:
+      - nidqc_content
+id: node.news.body
+field_name: body
+entity_type: node
+bundle: news
+label: 'Nội dung'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: true
+  required_summary: false
+  allowed_formats: {  }
+field_type: text_with_summary

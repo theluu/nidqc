@@ -1,0 +1,24 @@
+uuid: 1317c9c8-25f2-4c67-a1ed-228d8cc00589
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_contact_phone
+    - node.type.contact_submission
+  enforced:
+    module:
+      - nidqc_contact
+_core:
+  default_config_hash: GPmqMr9_pNYFOoBTFtWjYFjySAbAKw2gKyqfwctvWMo
+id: node.contact_submission.field_contact_phone
+field_name: field_contact_phone
+entity_type: node
+bundle: contact_submission
+label: 'Số điện thoại'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

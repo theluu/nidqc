@@ -1,0 +1,26 @@
+uuid: f506f72e-0598-4f0d-8785-3ce1f62eca84
+langcode: vi
+status: true
+dependencies:
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_contact
+_core:
+  default_config_hash: JZoZ4JqARB3rqO8Z4XqWcE-vDbt_FVGnqrCsWv4FAF0
+id: node.field_contact_name
+field_name: field_contact_name
+entity_type: node
+type: string
+settings:
+  max_length: 120
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: false
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

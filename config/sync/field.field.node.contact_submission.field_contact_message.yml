@@ -1,0 +1,27 @@
+uuid: db1072a2-6141-4201-908c-dbca12357035
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_contact_message
+    - node.type.contact_submission
+  module:
+    - text
+  enforced:
+    module:
+      - nidqc_contact
+_core:
+  default_config_hash: l--tz8wSn0SEETKxbVv-PttmO4p515ZvQ4xqblaFuMI
+id: node.contact_submission.field_contact_message
+field_name: field_contact_message
+entity_type: node
+bundle: contact_submission
+label: 'Nội dung'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

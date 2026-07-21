@@ -1,0 +1,17 @@
+nidqc_contact.csrf_token:
+  path: '/api/v1/contact/csrf-token'
+  defaults:
+    _controller: '\Drupal\nidqc_contact\Controller\ContactController::csrfToken'
+  methods: [GET]
+  requirements:
+    # Public endpoint only returns a session-bound CSRF token for contact POST.
+    _access: 'TRUE'
+
+nidqc_contact.submit:
+  path: '/api/v1/contact'
+  defaults:
+    _controller: '\Drupal\nidqc_contact\Controller\ContactController::submit'
+  methods: [POST]
+  requirements:
+    # Public contact endpoint. Controller enforces CSRF, reCAPTCHA and flood.
+    _access: 'TRUE'

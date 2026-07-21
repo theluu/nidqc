@@ -1,0 +1,9 @@
+name: 'NIDQC Contact'
+type: module
+description: 'Contact form endpoint, reCAPTCHA v3 verification, backend storage and email notifications.'
+package: NIDQC
+core_version_requirement: ^11
+dependencies:
+  - drupal:field
+  - drupal:node
+  - drupal:text

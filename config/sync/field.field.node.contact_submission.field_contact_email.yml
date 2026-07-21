@@ -1,0 +1,24 @@
+uuid: 62ed3167-e2b5-4674-9ec4-e924e2697e8f
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_contact_email
+    - node.type.contact_submission
+  enforced:
+    module:
+      - nidqc_contact
+_core:
+  default_config_hash: I7GR4VPbF1FObIQIJXqD-lMoQ9G0IhfXF1Clh3B8CO8
+id: node.contact_submission.field_contact_email
+field_name: field_contact_email
+entity_type: node
+bundle: contact_submission
+label: Email
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,16 @@
+uuid: fb3f2835-6ba2-4576-9a03-3868fe8445b7
+langcode: vi
+status: true
+dependencies:
+  enforced:
+    module:
+      - nidqc_contact
+_core:
+  default_config_hash: X5aTfBVSQz-n45L-MGTMP-Gho1AMMmHQA6Cj0yEffXI
+name: 'Liên hệ gửi từ website'
+type: contact_submission
+description: 'Lưu dữ liệu gửi từ form liên hệ trên trang /lien-he. Node do API tạo mặc định không publish.'
+help: ''
+new_revision: false
+preview_mode: 0
+display_submitted: false

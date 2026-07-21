@@ -1,0 +1,24 @@
+uuid: 7ca02d8a-0ce5-4d7b-9027-3d8a04f59806
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_contact_subject
+    - node.type.contact_submission
+  enforced:
+    module:
+      - nidqc_contact
+_core:
+  default_config_hash: 5G2QQUkGCma3L-mLK7iLSLsaHWh5sjqYLezVl06wZl8
+id: node.contact_submission.field_contact_subject
+field_name: field_contact_subject
+entity_type: node
+bundle: contact_submission
+label: 'Chủ đề'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

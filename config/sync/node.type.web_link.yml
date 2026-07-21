@@ -1,0 +1,11 @@
+uuid: 213517bf-b43d-4eb3-93ed-3bfddadda478
+langcode: vi
+status: true
+dependencies: {  }
+name: 'Liên kết web'
+type: web_link
+description: 'Liên kết ngoài hiển thị ở trang chủ (logo + mô tả + URL).'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

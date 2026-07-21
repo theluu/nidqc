@@ -14,7 +14,7 @@ _core:
 id: news
 label: 'Tin tức'
 type: 'canonical_entities:node'
-pattern: '/tin-tuc/[node:title]'
+pattern: '/[node:title]'
 selection_criteria:
   bundle_check:
     id: 'entity_bundle:node'

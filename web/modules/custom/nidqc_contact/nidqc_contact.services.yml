@@ -1,0 +1,17 @@
+services:
+  logger.channel.nidqc_contact:
+    parent: logger.channel_base
+    arguments: ['nidqc_contact']
+
+  nidqc_contact.recaptcha_verifier:
+    class: Drupal\nidqc_contact\Service\RecaptchaVerifier
+    arguments:
+      - '@http_client'
+      - '@logger.channel.nidqc_contact'
+
+  nidqc_contact.contact_mailer:
+    class: Drupal\nidqc_contact\Service\ContactMailer
+    arguments:
+      - '@config.factory'
+      - '@email.validator'
+      - '@logger.channel.nidqc_contact'

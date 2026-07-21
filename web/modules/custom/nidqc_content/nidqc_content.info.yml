@@ -10,4 +10,7 @@ dependencies:
   - drupal:text
   - drupal:image
   - drupal:datetime
+  - drupal:file
   - drupal:menu_link_content
+  - redirect:redirect
+  - simple_sitemap:simple_sitemap

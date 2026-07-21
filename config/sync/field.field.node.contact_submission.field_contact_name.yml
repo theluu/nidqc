@@ -1,0 +1,24 @@
+uuid: 8cae4139-77f0-4bbc-a2d7-682fb0c3f352
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_contact_name
+    - node.type.contact_submission
+  enforced:
+    module:
+      - nidqc_contact
+_core:
+  default_config_hash: pN2e-d0LPrzwuzZuHhEJgqQoqVmzDDWLYn3Lfx5v5Uc
+id: node.contact_submission.field_contact_name
+field_name: field_contact_name
+entity_type: node
+bundle: contact_submission
+label: 'Họ và tên'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

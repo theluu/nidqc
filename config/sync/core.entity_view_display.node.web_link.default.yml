@@ -1,0 +1,58 @@
+uuid: 900e35d0-5e6c-4a08-bbba-ef5d1d56f127
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.field.node.web_link.field_description
+    - field.field.node.web_link.field_image
+    - field.field.node.web_link.field_link
+    - field.field.node.web_link.field_weight
+    - node.type.web_link
+  module:
+    - image
+    - link
+    - text
+    - user
+id: node.web_link.default
+targetEntityType: node
+bundle: web_link
+mode: default
+content:
+  field_description:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_image:
+    type: image
+    label: hidden
+    settings:
+      image_link: ''
+      image_style: ''
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_link:
+    type: link
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_weight: true
+  langcode: true

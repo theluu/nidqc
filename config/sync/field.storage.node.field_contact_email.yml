@@ -1,0 +1,26 @@
+uuid: 9af4fdec-6a1c-41ab-bebf-afd732449793
+langcode: vi
+status: true
+dependencies:
+  module:
+    - node
+  enforced:
+    module:
+      - nidqc_contact
+_core:
+  default_config_hash: HS4zOK-wcL9pVf7LA_NkwRzzBpgOMAQnissQZAUOoko
+id: node.field_contact_email
+field_name: field_contact_email
+entity_type: node
+type: string
+settings:
+  max_length: 254
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: false
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

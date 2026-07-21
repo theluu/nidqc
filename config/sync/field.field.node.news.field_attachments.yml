@@ -1,0 +1,30 @@
+uuid: 9b4d8835-8c8a-40df-b70a-981a703e585a
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_attachments
+    - node.type.news
+  module:
+    - file
+  enforced:
+    module:
+      - nidqc_content
+id: node.news.field_attachments
+field_name: field_attachments
+entity_type: node
+bundle: news
+label: 'Tài liệu đính kèm'
+description: 'File đính kèm của bài viết (văn bản gốc, biểu mẫu…).'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: 'old-news/files/[date:custom:Y-m]'
+  file_extensions: 'pdf doc docx xls xlsx ppt pptx rar zip jpg jpeg png gif webp'
+  max_filesize: ''
+  description_field: true
+field_type: file

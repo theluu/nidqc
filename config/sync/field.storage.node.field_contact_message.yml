@@ -1,0 +1,24 @@
+uuid: 2b907188-7813-4f0a-b8cd-a6eecdd9eb67
+langcode: vi
+status: true
+dependencies:
+  module:
+    - node
+    - text
+  enforced:
+    module:
+      - nidqc_contact
+_core:
+  default_config_hash: bzS-5CTm_Nvl-_nVutBLxcGF_Vb-7dn61hGiWTM9gZM
+id: node.field_contact_message
+field_name: field_contact_message
+entity_type: node
+type: text_long
+settings: {  }
+module: text
+locked: false
+cardinality: 1
+translatable: false
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

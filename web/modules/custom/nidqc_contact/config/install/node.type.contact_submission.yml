@@ -1,0 +1,13 @@
+langcode: vi
+status: true
+dependencies:
+  enforced:
+    module:
+      - nidqc_contact
+name: 'Liên hệ gửi từ website'
+type: contact_submission
+description: 'Lưu dữ liệu gửi từ form liên hệ trên trang /lien-he. Node do API tạo mặc định không publish.'
+help: ''
+new_revision: false
+preview_mode: 0
+display_submitted: false

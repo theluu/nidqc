@@ -1,0 +1,38 @@
+uuid: 18ef824e-5baf-4f5f-8231-e8f7e44be140
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_image
+    - node.type.web_link
+  module:
+    - image
+id: node.web_link.field_image
+field_name: field_image
+entity_type: node
+bundle: web_link
+label: 'Logo / Ảnh'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: '[date:custom:Y]-[date:custom:m]'
+  file_extensions: 'png gif jpg jpeg webp'
+  max_filesize: ''
+  max_resolution: ''
+  min_resolution: ''
+  alt_field: true
+  alt_field_required: true
+  title_field: false
+  title_field_required: false
+  default_image:
+    uuid: null
+    alt: ''
+    title: ''
+    width: null
+    height: null
+field_type: image
