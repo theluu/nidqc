@@ -35,19 +35,43 @@ Dự án dùng **DDEV** cho local (`.ddev/config.yaml`: nginx-fpm, PHP 8.3, Mari
 
 Production **không** dùng DDEV (DDEV là công cụ dev). Hạ tầng production chốt riêng.
 
-## 3. Build frontend
+## 3. Build & chạy frontend (Nuxt SSR)
 
-**Production không chạy Node.** Vite build ra tĩnh:
+Frontend là **Nuxt SSR** (ADR-004) — **production CÓ chạy Node**: một tiến trình Node
+phục vụ render phía server, nginx reverse-proxy sang nó. (Không còn kiến trúc SPA/Vite
+build ra `dist/` tĩnh.)
+
+Build ra `.output/` — **không commit** (`.gitignore` chặn `/frontend/.output/`):
 
 ```bash
 cd frontend
 npm ci
-npm run build      # → web/themes/custom/nidqc/dist/
+npm run build      # → frontend/.output/  (server SSR + assets public/)
 ```
 
-Chốt một trong hai (**chưa quyết**):
-- **(a)** Commit `dist/` vào git — deploy đơn giản, nhưng diff bẩn và dễ xung đột.
-- **(b)** Build trong CI — sạch hơn, nhưng cần CI.
+Chạy server SSR, giữ sống bằng **systemd/pm2** (tự restart khi crash/reboot):
+
+```bash
+DRUPAL_INTERNAL=https://<drupal-host> \
+NUXT_HOST=0.0.0.0 NUXT_PORT=3000 \
+node .output/server/index.mjs
+```
+
+- `DRUPAL_INTERNAL` — URL Drupal để Nuxt gọi JSON:API phía server (SSR).
+- `NUXT_PORT` — cổng nội bộ (vd 3000) cho nginx trỏ vào.
+- Local dev chạy tiến trình này qua `web_extra_daemons: nuxt-ssr` trong `.ddev/config.yaml`.
+
+**nginx** (mẫu: `.ddev/nginx_full/nginx-site.conf`) — chia luồng:
+- `location /` → `proxy_pass http://127.0.0.1:3000` (Nuxt SSR)
+- `location ~ ^/(jsonapi|admin|user|node|...|sites|core|modules|themes)/` → Drupal PHP-FPM
+- `/robots.txt`, `/sitemap.xml` → Nuxt (do frontend sinh động)
+
+**Build ở đâu** — chọn 1 (chưa chốt hạ tầng):
+- **(a)** Build trên server khi deploy (`scripts/deploy.sh` đang làm vậy) — đơn giản, cần Node + toolchain trên prod.
+- **(b)** Build trong CI rồi đẩy `.output/` sang server — prod không cần toolchain build, chỉ cần Node runtime.
+
+> **Yêu cầu prod:** Node.js (bản khớp môi trường dev) + process manager (systemd/pm2).
+> `.output/` KHÔNG nằm trong git → phải build khi deploy hoặc trong CI, rồi restart tiến trình SSR.
 
 ## 4. Quy trình deploy
 
