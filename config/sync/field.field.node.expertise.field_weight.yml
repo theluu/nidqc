@@ -1,0 +1,23 @@
+uuid: 815ac832-6162-4d89-931d-ee784a1ca71e
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_weight
+    - node.type.expertise
+id: node.expertise.field_weight
+field_name: field_weight
+entity_type: node
+bundle: expertise
+label: 'Thứ tự'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

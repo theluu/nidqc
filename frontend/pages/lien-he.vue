@@ -1,8 +1,19 @@
 <script setup>
-const { data: body } = await useAsyncData('lien-he', async () => {
-  const page = await fetchPageByAlias('/lien-he')
-  return page?.body || ''
+const { data: page } = await useAsyncData('lien-he', async () => {
+  const [pg, off] = await Promise.all([
+    fetchPageByAlias('/lien-he'),
+    fetchJsonApi('/node/office', { 'filter[status]': 1, sort: 'field_weight', 'page[limit]': 10 }),
+  ])
+  return {
+    body: pg?.body || '',
+    offices: off.data.map((n) => ({
+      t: n.attributes.title, addr: n.attributes.field_address,
+      tel: n.attributes.field_phone, map: n.attributes.field_map,
+    })),
+  }
 })
+const body = computed(() => page.value?.body || '')
+const offices = computed(() => page.value?.offices || [])
 
 const contactSubjects = [
   'Dịch vụ kiểm nghiệm',
@@ -27,8 +38,6 @@ const lienHeLinks = [
   { label: 'Liên hệ', to: '/lien-he' },
   { label: 'Câu hỏi thường gặp', to: '/faq' },
 ]
-const mapSrc = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.185366346867!2d105.84769501476318!3d21.025267786000292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab949db87b29%3A0xeab602afd22b8090!2zNDggSGFpIELDoCBUcsawbmcsIFRyw6BuZyBUaeG7gW4sIEhvw6BuIEtp4bq_bSwgSMOgIE7hu5lpLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1577957514119!5m2!1svi!2s'
-const mapLink = 'https://www.google.com/maps/search/?api=1&query=48%20Hai%20B%C3%A0%20Tr%C6%B0ng%2C%20Tr%C3%A0ng%20Ti%E1%BB%81n%2C%20Ho%C3%A0n%20Ki%E1%BA%BFm%2C%20H%C3%A0%20N%E1%BB%99i'
 
 async function handleSubmit() {
   if (submitting.value) return
@@ -73,19 +82,20 @@ useSeoMeta({ title: 'Liên hệ & hỗ trợ — NIDQC', description: 'Thông ti
       <div class="contact-page__grid">
         <div class="contact-page__info">
           <div v-html="body" class="contact-page__body"></div>
-          <div class="contact-map" aria-labelledby="contact-map-title">
+          <div v-for="(o, i) in offices" :key="i" class="contact-map">
             <div class="contact-map__header">
-              <h2 id="contact-map-title">Cơ sở 1</h2>
-              <p>48 Hai Bà Trưng, Tràng Tiền, Hoàn Kiếm, Hà Nội</p>
+              <h2>{{ o.t }}</h2>
+              <p>{{ o.addr }}</p>
+              <p v-if="o.tel">ĐT: {{ o.tel }}</p>
             </div>
             <iframe
-              :src="mapSrc"
-              title="Bản đồ cơ sở 1: 48 Hai Bà Trưng, Tràng Tiền, Hoàn Kiếm, Hà Nội"
+              :src="o.map"
+              :title="`Bản đồ ${o.t}: ${o.addr}`"
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
               allowfullscreen
             ></iframe>
-            <a :href="mapLink" target="_blank" rel="noopener noreferrer" class="contact-map__link">
+            <a :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.addr)}`" target="_blank" rel="noopener noreferrer" class="contact-map__link">
               Mở bản đồ
             </a>
           </div>

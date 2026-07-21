@@ -1,0 +1,22 @@
+uuid: 0a3d0c3b-8a0b-4ea9-ac50-608bcb3da511
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - node.type.expertise
+  module:
+    - text
+id: node.expertise.field_description
+field_name: field_description
+entity_type: node
+bundle: expertise
+label: 'Mô tả'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

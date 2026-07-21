@@ -43,11 +43,36 @@ const { data: split } = await useAsyncData('home-news', async () => {
 const news = computed(() => split.value.events)
 const announcements = computed(() => split.value.announcements)
 
-const services = [
-  'Phân tích - Kiểm nghiệm', 'Đánh giá tương đương sinh học (TĐSH)',
-  'Đào tạo và tư vấn kỹ thuật', 'Hiệu chuẩn',
-  'Nghiên cứu - Chuyển giao', 'Thử nghiệm thành thạo',
-]
+// Khối trang chủ động (quản trị trong Drupal): Hoạt động chuyên môn, Dịch vụ,
+// Cơ sở/Liên hệ, và CTA + Video (node home_block).
+const { data: blocks } = await useAsyncData('home-blocks', async () => {
+  const [exp, svc, off, hb] = await Promise.all([
+    fetchJsonApi('/node/expertise', { 'filter[status]': 1, sort: 'field_weight', 'page[limit]': 30 }),
+    fetchJsonApi('/node/service', { 'filter[status]': 1, sort: 'field_weight', 'page[limit]': 30 }),
+    fetchJsonApi('/node/office', { 'filter[status]': 1, sort: 'field_weight', 'page[limit]': 10 }),
+    fetchJsonApi('/node/home_block', { 'filter[status]': 1, 'page[limit]': 1 }),
+  ])
+  const plain = (f) => (f?.processed || f?.value || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+  const ytEmbed = (v) => {
+    if (!v) return null
+    const m = String(v).match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/)
+    const id = m ? m[1] : (/^[\w-]{11}$/.test(String(v)) ? String(v) : null)
+    return id ? `https://www.youtube.com/embed/${id}` : null
+  }
+  const h = hb.data[0]?.attributes
+  return {
+    expertise: exp.data.map((n) => ({ t: n.attributes.title, d: plain(n.attributes.field_description) })),
+    services: svc.data.map((n) => ({ label: n.attributes.title, href: n.attributes.field_link?.uri || null })),
+    offices: off.data.map((n) => ({ t: n.attributes.title, addr: n.attributes.field_address, tel: n.attributes.field_phone, map: n.attributes.field_map })),
+    cta: h ? { heading: h.title, desc: plain(h.field_description), btnLabel: h.field_link?.title || 'Xem thêm', btnHref: h.field_link?.uri || '#' } : null,
+    videoUrl: ytEmbed(h?.field_video),
+  }
+})
+const expertise = computed(() => blocks.value?.expertise || [])
+const services = computed(() => blocks.value?.services || [])
+const offices = computed(() => blocks.value?.offices || [])
+const cta = computed(() => blocks.value?.cta || null)
+const videoUrl = computed(() => blocks.value?.videoUrl || null)
 
 // Liên kết web — quản trị trong Drupal (node type web_link): title + URL + logo + mô tả.
 const { data: webLinks } = await useAsyncData('home-weblinks', async () => {
@@ -62,21 +87,6 @@ const { data: webLinks } = await useAsyncData('home-weblinks', async () => {
       .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
   }))
 })
-
-// Video giới thiệu (design: click-to-play, YouTube embed)
-const videoStarted = ref(false)
-
-// 2 cơ sở + bản đồ Google Maps (design/NIDQC Trang chu.html -> iframe maps)
-const offices = [
-  {
-    t: 'Cơ sở 1', addr: '48 Hai Bà Trưng, Tràng Tiền, Hoàn Kiếm, Hà Nội', tel: '(024) 3825 5075',
-    map: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.185366346867!2d105.84769501476318!3d21.025267786000292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab949db87b29%3A0xeab602afd22b8090!2zNDggSGFpIELDoCBUcsawbmcsIFRyw6BuZyBUaeG7gW4sIEhvw6BuIEtp4bq_bSwgSMOgIE7hu5lpLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1577957514119!5m2!1svi!2s',
-  },
-  {
-    t: 'Cơ sở 2', addr: 'Ngõ 135 Núi Trúc, Ba Đình, Hà Nội', tel: '(024) 3736 4738',
-    map: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3725.941679701607!2d105.8298021147619!3d20.954857086038405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ada9a6796f99%3A0xebd36f00bc31e2f4!2zVmnhu4duIEtp4buDbSBuZ2hp4buHbSB0aHXhu5FjIFRydW5nIMawxqFuZyAoQ8ahIHPhu58gSUkp!5e0!3m2!1svi!2s!4v1577958314927!5m2!1svi!2s',
-  },
-]
 
 useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương', description: 'Tin tức, thông báo, dịch vụ kiểm nghiệm, tra cứu chất chuẩn và hoạt động chuyên môn của Viện Kiểm nghiệm thuốc Trung ương.', ogTitle: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương', ogDescription: 'Tin tức, thông báo, dịch vụ kiểm nghiệm, tra cứu chất chuẩn và hoạt động chuyên môn của Viện Kiểm nghiệm thuốc Trung ương.' })
 </script>
@@ -128,16 +138,10 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
       <div data-container style="max-width:1280px;margin:0 auto;padding:0 24px;">
         <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:22px;color:#0F3093;margin:0 0 24px;padding-left:12px;border-left:4px solid #0F3093;">Hoạt động chuyên môn</h2>
         <div class="nidqc-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
-          <a v-for="(a, i) in [
-            {t:'Chỉ đạo tuyến', d:'Hướng dẫn, giám sát chuyên môn hệ thống kiểm nghiệm địa phương.'},
-            {t:'Kiểm nghiệm và giám sát chất lượng thuốc', d:'Kiểm tra, giám sát chất lượng thuốc lưu hành trên toàn quốc.'},
-            {t:'Hợp tác quốc tế', d:'Hợp tác với các tổ chức kiểm nghiệm và y tế quốc tế.'},
-            {t:'Hoạt động NRA', d:'Cơ quan quản lý quốc gia về vắc xin theo chuẩn WHO.'},
-            {t:'Tạp chí Kiểm nghiệm Dược và Mỹ phẩm', d:'Ấn phẩm khoa học công bố nghiên cứu, kết quả kiểm nghiệm.'},
-          ]" :key="i" href="#hoat-dong-chuyen-mon" style="display:block;background:#fff;border:1px solid #CCCCCC;padding:22px 24px;text-decoration:none;">
+          <div v-for="(a, i) in expertise" :key="i" style="background:#fff;border:1px solid #CCCCCC;padding:22px 24px;">
             <h3 style="font-family:'Lexend',sans-serif;font-weight:600;font-size:16px;line-height:22px;color:#0F3093;margin:0 0 10px;">{{ a.t }}</h3>
             <p style="font-size:14px;line-height:21px;color:#495057;margin:0;">{{ a.d }}</p>
-          </a>
+          </div>
         </div>
       </div>
     </section>
@@ -173,21 +177,21 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
         <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:22px;color:#0F3093;margin:0 0 6px;">Dịch vụ &amp; tra cứu</h2>
         <p style="color:#495057;font-size:15px;margin:0 0 24px;">Các dịch vụ khoa học kỹ thuật và công cụ tra cứu của Viện.</p>
         <div class="nidqc-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
-          <a v-for="(s, i) in services" :key="i" href="#dich-vu" style="display:block;background:#F5F8FC;border:1px solid #CCCCCC;padding:20px 22px;text-decoration:none;">
-            <h3 style="font-family:'Lexend',sans-serif;font-weight:600;font-size:16px;color:#0F3093;margin:0;">{{ s }}</h3>
+          <a v-for="(s, i) in services" :key="i" :href="s.href || '#dich-vu'" :target="s.href ? '_blank' : undefined" :rel="s.href ? 'noopener' : undefined" style="display:block;background:#F5F8FC;border:1px solid #CCCCCC;padding:20px 22px;text-decoration:none;">
+            <h3 style="font-family:'Lexend',sans-serif;font-weight:600;font-size:16px;color:#0F3093;margin:0;">{{ s.label }}</h3>
           </a>
         </div>
       </div>
     </section>
 
     <!-- CTA CHẤT CHUẨN -->
-    <section style="background:#0F3093;padding:44px 0;" id="chat-chuan">
+    <section v-if="cta" style="background:#0F3093;padding:44px 0;" id="chat-chuan">
       <div style="max-width:1280px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:28px;flex-wrap:wrap;">
         <div>
-          <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:24px;color:#fff;margin:0 0 6px;">Chất chuẩn – chất đối chiếu</h2>
-          <p style="color:rgba(255,255,255,0.85);font-size:15px;margin:0;max-width:620px;">Tra cứu và đăng ký cung ứng chất chuẩn, chất đối chiếu phục vụ kiểm nghiệm.</p>
+          <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:24px;color:#fff;margin:0 0 6px;">{{ cta.heading }}</h2>
+          <p v-if="cta.desc" style="color:rgba(255,255,255,0.85);font-size:15px;margin:0;max-width:620px;">{{ cta.desc }}</p>
         </div>
-        <a href="https://nidqc.gov.vn/tim-kiem-chat-chuan" style="display:inline-block;background:#fff;color:#0F3093;font-weight:600;font-size:14px;padding:11px 22px;text-decoration:none;">Tra cứu chất chuẩn</a>
+        <a :href="cta.btnHref" target="_blank" rel="noopener" style="display:inline-block;background:#fff;color:#0F3093;font-weight:600;font-size:14px;padding:11px 22px;text-decoration:none;">{{ cta.btnLabel }}</a>
       </div>
     </section>
 
@@ -199,14 +203,10 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
             <span style="width:6px;height:26px;background:#0F3093;display:inline-block;"></span>
             <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:24px;letter-spacing:0.3px;text-transform:uppercase;color:#212529;margin:0;">Thư viện video</h2>
           </div>
-          <div style="position:relative;width:100%;padding-top:56.25%;background:#000;border:1px solid #CCCCCC;">
-            <iframe v-if="videoStarted" src="https://www.youtube.com/embed/7k9OhYB8Q5A?autoplay=1" title="NIDQC" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>
-            <button v-else @click="videoStarted = true" aria-label="Phát video giới thiệu"
-              style="position:absolute;inset:0;width:100%;height:100%;border:0;padding:0;cursor:pointer;background-image:url('/sites/default/files/design-images/video-poster.png');background-size:cover;background-position:center;">
-              <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:66px;height:66px;background:rgba(15,48,147,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
-              </span>
-            </button>
+          <div style="position:relative;width:100%;padding-top:56.25%;border:1px solid #CCCCCC;">
+            <iframe v-if="videoUrl" :src="videoUrl" title="Video giới thiệu NIDQC" allowfullscreen
+              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>
           </div>
         </div>
         <div v-if="webLinks && webLinks.length">

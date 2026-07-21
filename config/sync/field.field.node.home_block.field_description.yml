@@ -1,0 +1,22 @@
+uuid: 17989300-4184-40ec-9b32-a6f83709e88c
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - node.type.home_block
+  module:
+    - text
+id: node.home_block.field_description
+field_name: field_description
+entity_type: node
+bundle: home_block
+label: 'Mô tả'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

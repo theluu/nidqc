@@ -1,0 +1,23 @@
+uuid: ed1d1e3d-954a-4578-8b40-ea47715df091
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_weight
+    - node.type.service
+id: node.service.field_weight
+field_name: field_weight
+entity_type: node
+bundle: service
+label: 'Thứ tự'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

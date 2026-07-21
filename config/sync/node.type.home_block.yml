@@ -1,0 +1,11 @@
+uuid: 1abc5066-1685-4e57-8c2c-da6f7ebf9792
+langcode: vi
+status: true
+dependencies: {  }
+name: 'Khối trang chủ (CTA + Video)'
+type: home_block
+description: null
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

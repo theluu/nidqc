@@ -1,0 +1,23 @@
+uuid: 28885763-d8e3-4572-a525-1aea231f37b0
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_weight
+    - node.type.office
+id: node.office.field_weight
+field_name: field_weight
+entity_type: node
+bundle: office
+label: 'Thứ tự'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

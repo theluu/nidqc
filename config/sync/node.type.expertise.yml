@@ -1,0 +1,11 @@
+uuid: 8c343b48-7910-48e3-a31e-1789f9900950
+langcode: vi
+status: true
+dependencies: {  }
+name: 'Hoạt động chuyên môn'
+type: expertise
+description: null
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

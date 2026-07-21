@@ -1,0 +1,19 @@
+uuid: a0e0de3a-dc25-430b-bfc8-818733293a1d
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_map
+    - node.type.office
+id: node.office.field_map
+field_name: field_map
+entity_type: node
+bundle: office
+label: 'Bản đồ (URL nhúng Google Maps)'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long
