@@ -35,19 +35,28 @@ git log --oneline -5
 git checkout <commit-tốt-cuối-cùng>
 composer install --no-dev --optimize-autoloader
 
-# 4. Phục hồi DB (CHỈ khi deploy đã chạy updb/cim làm đổi DB)
+# 4. Build lại frontend Nuxt từ code CŨ + restart tiến trình SSR
+#    .output/ KHÔNG nằm trong git — nếu không build lại, tiến trình SSR vẫn
+#    chạy bản build MỚI dù code đã lùi.
+cd frontend && npm ci && npm run build && cd ..
+systemctl restart nidqc-nuxt        # hoặc: pm2 restart nidqc-nuxt
+
+# 5. Phục hồi DB (CHỈ khi deploy đã chạy updb/cim làm đổi DB)
+#    Cách A: DB/nội dung KHÔNG ở git → phục hồi từ backup phía server.
+#    Config lưu trong DB nên restore DB cũng revert cấu trúc (không cần cim lại).
 gunzip < /backup/nidqc-<trước-deploy>.sql.gz | drush sql:cli
 
-# 5. Phục hồi files (nếu cần)
+# 6. Phục hồi files (nếu cần)
 tar xzf /backup/files-<trước-deploy>.tar.gz -C /
 
-# 6. Xoá cache
+# 7. Xoá cache
 drush cr
 
-# 7. Kiểm tra
-curl -I https://nidqc.gov.vn/
+# 8. Kiểm tra (cả Drupal lẫn Nuxt SSR)
+curl -I https://nidqc.gov.vn/                    # trang do Nuxt render
+curl -I https://nidqc.gov.vn/jsonapi/node/news   # Drupal JSON:API
 
-# 8. Tắt bảo trì
+# 9. Tắt bảo trì
 drush state:set system.maintenance_mode 0
 ```
 
@@ -65,6 +74,20 @@ Vì vậy:
 - Backup **ngay sát trước** khi deploy, không phải "backup hàng đêm".
 - Deploy ngoài giờ làm việc → giảm lượng nội dung mất.
 - Deploy có đổi schema → cân nhắc kỹ hơn nhiều, báo trước cho biên tập viên.
+
+### Frontend (Nuxt SSR) cũng phải lùi
+
+`.output/` không nằm trong git. Lùi code mà **không build lại + restart tiến trình SSR**
+thì frontend vẫn phục vụ bản mới → luôn làm bước §3.4. Nuxt và Drupal là hai tiến trình
+riêng: rollback phải đồng bộ cả hai, nếu không frontend cũ gọi JSON:API cấu trúc mới
+(hoặc ngược lại) sẽ lệch.
+
+### Cách A: DB & nội dung không ở git
+
+Nội dung chỉ sống ở DB production → rollback DB **hoàn toàn** dựa vào backup phía server
+(cron `drush sql:dump`, đẩy lên object storage; ở dev là `ddev snapshot`). Git không lùi
+được nội dung. Vì config lưu trong DB, restore DB đưa luôn cấu trúc (node type/field/alias)
+về đúng mốc — không cần `drush cim` riêng.
 
 ## 5. Không có backup thì sao
 
