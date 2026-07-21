@@ -33,3 +33,10 @@ front:
   css:
     theme:
       css/front.css: {}
+
+# Trang tài khoản (đăng nhập / mật khẩu) — chỉ nạp ở route user (nidqc_preprocess_html).
+user:
+  version: 1.x
+  css:
+    theme:
+      css/user.css: {}

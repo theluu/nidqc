@@ -36,6 +36,30 @@ function nidqc_preprocess_menu__main(array &$variables): void {
 }
 
 /**
+ * Implements hook_preprocess_HOOK() for html.
+ *
+ * Route tài khoản (đăng nhập / khôi phục mật khẩu) -> gắn class body + nạp css/user.css.
+ * Chỉ nạp ở đây để trang khác không tải CSS thừa.
+ */
+function nidqc_preprocess_html(array &$variables): void {
+  $route = \Drupal::routeMatch()->getRouteName();
+  $auth_routes = [
+    'user.login',
+    'user.register',
+    'user.pass',
+    'user.reset',
+    'user.reset.login',
+    'user.reset.form',
+    'entity.user.canonical',
+    'entity.user.edit_form',
+  ];
+  if (in_array($route, $auth_routes, TRUE)) {
+    $variables['attributes']['class'][] = 'nidqc-user-auth';
+    $variables['#attached']['library'][] = 'nidqc/user';
+  }
+}
+
+/**
  * Implements hook_preprocess_HOOK() for page.
  *
  * Chuẩn bị dữ liệu ĐỘNG cho trang chủ: tin nổi bật + danh sách tin mới nhất,

@@ -1,0 +1,147 @@
+/**
+ * Trang tài khoản (đăng nhập / khôi phục mật khẩu) — /user, /user/login, /user/password.
+ * Chỉ nạp ở các route user (nidqc_preprocess_html gắn class .nidqc-user-auth + library).
+ * Dùng biến --nidqc-* của tokens.css, KHÔNG hard-code hex.
+ */
+
+.nidqc-user-auth .nidqc-main {
+  background: var(--nidqc-bg-subtle);
+  padding: 56px 0 84px;
+}
+
+/* Thu hẹp + căn giữa vùng nội dung thành 1 cột hẹp. */
+.nidqc-user-auth .nidqc-main > .nidqc-container {
+  max-width: 440px;
+}
+
+/* Tiêu đề trang ("Đăng nhập") */
+.nidqc-user-auth #block-nidqc-page-title h1 {
+  text-align: center;
+  font-family: 'Lexend', sans-serif;
+  font-weight: 700;
+  font-size: 27px;
+  color: var(--nidqc-text);
+  margin: 0 0 18px;
+}
+
+/* Tabs (Đăng nhập / Đặt lại mật khẩu) -> dạng pill, căn giữa. */
+.nidqc-user-auth #block-nidqc-primary-local-tasks nav,
+.nidqc-user-auth .tabs {
+  margin: 0 0 20px;
+}
+.nidqc-user-auth #block-nidqc-primary-local-tasks ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+.nidqc-user-auth #block-nidqc-primary-local-tasks a {
+  display: inline-block;
+  padding: 7px 16px;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--nidqc-text-muted);
+  text-decoration: none;
+  background: var(--nidqc-white);
+  border: 1px solid var(--nidqc-border);
+  border-radius: 999px;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.nidqc-user-auth #block-nidqc-primary-local-tasks a:hover {
+  color: var(--nidqc-primary);
+  border-color: var(--nidqc-primary-light);
+}
+.nidqc-user-auth #block-nidqc-primary-local-tasks .is-active a {
+  color: var(--nidqc-white);
+  background: var(--nidqc-primary);
+  border-color: var(--nidqc-primary);
+}
+
+/* Khối form = card trắng. */
+.nidqc-user-auth #block-nidqc-content form {
+  background: var(--nidqc-white);
+  border: 1px solid var(--nidqc-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 26px rgba(15, 48, 147, 0.08);
+  padding: 28px 28px 30px;
+}
+
+/* Field */
+.nidqc-user-auth .form-item {
+  margin: 0 0 18px;
+}
+.nidqc-user-auth .form-item > label {
+  display: block;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--nidqc-text-muted);
+  margin-bottom: 7px;
+}
+.nidqc-user-auth .form-required::after {
+  content: ' *';
+  color: var(--nidqc-danger);
+}
+.nidqc-user-auth input[type="text"],
+.nidqc-user-auth input[type="password"],
+.nidqc-user-auth input[type="email"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 14.5px;
+  color: var(--nidqc-text);
+  background: var(--nidqc-white);
+  border: 1px solid var(--nidqc-border-strong);
+  border-radius: 8px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.nidqc-user-auth input[type="text"]:focus,
+.nidqc-user-auth input[type="password"]:focus,
+.nidqc-user-auth input[type="email"]:focus {
+  outline: none;
+  border-color: var(--nidqc-primary);
+  box-shadow: 0 0 0 3px var(--nidqc-primary-pale);
+}
+
+/* Mô tả field (yêu cầu ký tự...) */
+.nidqc-user-auth .description,
+.nidqc-user-auth .form-item .description {
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--nidqc-text-light);
+  margin-top: 6px;
+}
+
+/* Nút submit = nút chính, full-width. */
+.nidqc-user-auth .form-actions {
+  margin-top: 4px;
+}
+.nidqc-user-auth .form-actions input.form-submit,
+.nidqc-user-auth .form-actions .button {
+  display: block;
+  width: 100%;
+  padding: 12px 18px;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--nidqc-white);
+  background: var(--nidqc-primary);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s, box-shadow .15s;
+}
+.nidqc-user-auth .form-actions input.form-submit:hover,
+.nidqc-user-auth .form-actions .button:hover {
+  background: var(--nidqc-primary-dark);
+}
+.nidqc-user-auth .form-actions input.form-submit:focus-visible,
+.nidqc-user-auth .form-actions .button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--nidqc-primary-pale);
+}
