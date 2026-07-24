@@ -82,6 +82,9 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 - `scripts/extract-fonts.py` — trích woff2 + sinh `@font-face` từ design bundle
 
 ### Fixed
+- **Banner đầu trang full-width và đúng tỷ lệ trên mobile** (TASK-011) — bỏ khoảng
+  trắng 8px mặc định ở hai bên trang và không còn ép/cắt ảnh banner thành 90px
+  trên màn hình nhỏ.
 - 🔴 **Pathauto cắt mất từ tiếng Việt trong URL** (TASK-007) — `ignore_words` mặc định là stopword
   **tiếng Anh**, trùng từ tiếng Việt thật: "Phòng **Tổ** chức" → `/phong-chuc-hanh-chinh`,
   "Viện **in ấn** tài liệu" → `/vien-tai-lieu`. URL mất nghĩa và **đụng alias** với trang khác.

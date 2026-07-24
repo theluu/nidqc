@@ -3,6 +3,9 @@
 
 * { box-sizing: border-box; }
 
+/* Loại bỏ margin mặc định của trình duyệt để các dải full-width chạm hai mép. */
+body { margin: 0; }
+
 /* Container: co padding trên mobile */
 @media (max-width: 768px) {
   [data-container] { padding-left: 16px !important; padding-right: 16px !important; }
@@ -39,10 +42,8 @@
   .nidqc-two-col { grid-template-columns: 1fr !important; }
 }
 
-/* ===== Banner: cao vừa trên mobile ===== */
-@media (max-width: 640px) {
-  .nidqc-banner img { min-height: 90px; object-fit: cover; }
-}
+/* ===== Banner: giữ đúng tỷ lệ ảnh ở mọi kích thước ===== */
+.nidqc-banner img { width: 100%; height: auto; }
 
 /* ===== Tiêu đề trang nhỏ lại trên mobile ===== */
 @media (max-width: 640px) {
