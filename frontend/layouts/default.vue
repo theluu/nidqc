@@ -13,6 +13,7 @@ const navBottom = ref(50);
 const headerEl = ref(null);
 const langOpen = ref(false);
 const curLang = ref('vi');
+const { onlineCount } = await useOnlineCounter();
 let timer;
 let googleLanguageSyncTimer;
 
@@ -325,7 +326,14 @@ const footerLinks = [
         </div>
       </div>
       <div style="border-top:1px solid rgba(255,255,255,0.14);">
-        <div style="max-width:1280px;margin:0 auto;padding:16px 24px;font-size:12.5px;color:rgba(255,255,255,0.6);text-align:center;">Bản quyền © 2026 thuộc về Viện Kiểm nghiệm thuốc Trung ương.</div>
+        <div class="nidqc-footer-bar" data-container style="max-width:1280px;margin:0 auto;padding:16px 24px;font-size:12.5px;color:rgba(255,255,255,0.6);">
+          <span>Bản quyền © 2026 thuộc về Viện Kiểm nghiệm thuốc Trung ương.</span>
+          <span class="nidqc-online-counter" aria-live="polite" aria-atomic="true">
+            <span class="nidqc-online-counter__dot" aria-hidden="true"></span>
+            Đang trực tuyến:
+            <strong>{{ onlineCount ?? '—' }}</strong>
+          </span>
+        </div>
       </div>
     </footer>
   </div>

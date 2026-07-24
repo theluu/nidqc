@@ -1,0 +1,5 @@
+name: 'NIDQC Online Counter'
+type: module
+description: 'Privacy-preserving aggregate online visitor counter for the site footer.'
+package: NIDQC
+core_version_requirement: ^11

@@ -1,0 +1,6 @@
+services:
+  nidqc_online.counter:
+    class: Drupal\nidqc_online\Service\OnlineCounter
+    arguments:
+      - '@database'
+      - '@datetime.time'

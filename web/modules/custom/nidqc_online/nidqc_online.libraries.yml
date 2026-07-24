@@ -1,0 +1,4 @@
+counter:
+  version: 1.x
+  js:
+    js/online-counter.js: { attributes: { defer: true } }

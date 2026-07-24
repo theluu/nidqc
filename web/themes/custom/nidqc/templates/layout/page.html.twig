@@ -85,7 +85,13 @@
       </div>
     </div>
     <div class="nidqc-footer__bar">
-      <div class="nidqc-container">Bản quyền © {{ 'now'|date('Y') }} thuộc về Viện Kiểm nghiệm thuốc Trung ương.</div>
+      <div class="nidqc-container">
+        <span>Bản quyền © {{ 'now'|date('Y') }} thuộc về Viện Kiểm nghiệm thuốc Trung ương.</span>
+        <span class="nidqc-online-counter" aria-live="polite" aria-atomic="true">
+          <span class="nidqc-online-counter__dot" aria-hidden="true"></span>
+          Đang trực tuyến: <strong data-online-count>{{ nidqc_online_count|default(0) }}</strong>
+        </span>
+      </div>
     </div>
   </footer>
 

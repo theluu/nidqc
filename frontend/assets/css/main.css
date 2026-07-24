@@ -33,8 +33,42 @@ body { margin: 0; }
 }
 
 /* ===== FOOTER: grid -> 1 cột ===== */
+.nidqc-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.nidqc-online-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.nidqc-online-counter__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--nidqc-success);
+  box-shadow: 0 0 0 3px rgba(30, 138, 76, 0.22);
+}
+
+.nidqc-online-counter strong {
+  color: var(--nidqc-white);
+  font-weight: 600;
+}
+
 @media (max-width: 768px) {
   .nidqc-footer-grid { grid-template-columns: 1fr !important; gap: 28px !important; }
+  .nidqc-footer-bar {
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+  }
 }
 
 /* ===== 2 cột chung (liên hệ, cơ cấu, năng lực) ===== */

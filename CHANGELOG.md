@@ -30,6 +30,10 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
   Rủi ro SEO (client-render) — cần prerender trước go-live, ghi trong ADR-003.
 
 ### Added
+- **Bộ đếm người đang trực tuyến** (TASK-012) — hiển thị kín đáo cạnh bản quyền
+  trong footer trên toàn site, có SSR và tự cập nhật mỗi 60 giây. Số liệu là tổng
+  session hoạt động trong 5 phút, không lưu hoặc công khai IP, fingerprint hay
+  danh tính; heartbeat được bảo vệ bằng CSRF.
 - **Form liên hệ thật tại `/lien-he`** (TASK-009) — submit qua Drupal API có CSRF,
   reCAPTCHA v3, flood control, validate dữ liệu và lưu thành node `contact_submission`
   unpublished. DDEV dùng SMTP Mailpit, gửi 1 email cho admin và 1 email xác nhận cho user.

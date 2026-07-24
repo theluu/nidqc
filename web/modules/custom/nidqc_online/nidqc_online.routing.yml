@@ -1,0 +1,26 @@
+nidqc_online.count:
+  path: '/api/v1/online'
+  defaults:
+    _controller: '\Drupal\nidqc_online\Controller\OnlineController::count'
+  methods: [GET]
+  requirements:
+    # Public by design: this returns only an aggregate count.
+    _access: 'TRUE'
+
+nidqc_online.csrf_token:
+  path: '/api/v1/online/csrf-token'
+  defaults:
+    _controller: '\Drupal\nidqc_online\Controller\OnlineController::csrfToken'
+  methods: [GET]
+  requirements:
+    # Public token remains bound to its anonymous session cookie.
+    _access: 'TRUE'
+
+nidqc_online.heartbeat:
+  path: '/api/v1/online/heartbeat'
+  defaults:
+    _controller: '\Drupal\nidqc_online\Controller\OnlineController::heartbeat'
+  methods: [POST]
+  requirements:
+    # Public heartbeat; the controller enforces Drupal's CSRF token.
+    _access: 'TRUE'

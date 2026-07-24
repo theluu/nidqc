@@ -40,6 +40,9 @@ thì chưa được gọi, chưa được viết.
 
 | Endpoint | Island | Trạng thái |
 |---|---|---|
+| `GET /api/v1/online` | online counter toàn site | 🟢 Chốt trong TASK-012 |
+| `GET /api/v1/online/csrf-token` | online counter toàn site | 🟢 Chốt trong TASK-012 |
+| `POST /api/v1/online/heartbeat` | online counter toàn site | 🟢 Chốt trong TASK-012 |
 | `GET /api/v1/contact/csrf-token` | contact form `/lien-he` | 🟢 Chốt trong TASK-009 |
 | `POST /api/v1/contact` | contact form `/lien-he` | 🟢 Chốt trong TASK-009 |
 | `GET /api/v1/documents` | `doc-filter` | 🔴 Chưa đặc tả |
@@ -49,6 +52,76 @@ thì chưa được gọi, chưa được viết.
 `mega-menu`, `faq-accordion`, `tabs` **không cần API** — dữ liệu render sẵn từ Twig.
 
 ## 4. Endpoint đã chốt
+
+### Online counter
+
+**Định nghĩa “đang trực tuyến”:** số session Drupal khác nhau có hoạt động trong
+300 giây gần nhất. Không lưu hoặc trả IP, user-agent, fingerprint, URL đang xem
+hay danh tính người dùng.
+
+#### `GET /api/v1/online`
+
+**Mục đích:** trả số người đang trực tuyến để SSR và client đọc. GET chỉ đọc,
+không tạo session và không thay đổi trạng thái.
+
+**Query params:** không có. Param lạ trả `400 INVALID_PARAMETER`.
+
+**Response 200**
+
+```json
+{
+  "data": {
+    "count": 128,
+    "window_seconds": 300
+  }
+}
+```
+
+**Lỗi:** `400 INVALID_PARAMETER` · `500 INTERNAL_ERROR`
+
+**Cache:** không cache; `Cache-Control: no-store`.
+
+**Quyền:** public có chủ đích; chỉ trả số tổng hợp, không trả dữ liệu session.
+
+**Progressive enhancement:** Twig/Nuxt SSR gọi endpoint để render giá trị ban
+đầu. Không JavaScript thì số tại thời điểm render vẫn đọc được.
+
+#### `GET /api/v1/online/csrf-token`
+
+**Mục đích:** tạo anonymous session và trả CSRF token core, dùng riêng cho
+heartbeat.
+
+**Response 200:** plain text UTF-8, token gắn với session cookie.
+
+**Lỗi:** `500 INTERNAL_ERROR`
+
+**Cache:** không cache; `Cache-Control: no-store`.
+
+**Quyền:** public có chủ đích; token không dùng được nếu thiếu cookie session đi kèm.
+
+#### `POST /api/v1/online/heartbeat`
+
+**Mục đích:** đánh dấu session hiện tại vừa hoạt động và trả số tổng hợp mới nhất.
+
+**Headers**
+
+| Tên | Bắt buộc | Ràng buộc |
+|---|---|---|
+| `X-CSRF-Token` | có | token từ `GET /api/v1/online/csrf-token`, cùng session cookie |
+
+**Body và query params:** không có. Body/query khác rỗng trả
+`400 INVALID_PARAMETER`.
+
+**Response 200:** cùng schema với `GET /api/v1/online`.
+
+**Lỗi:** `400 INVALID_PARAMETER` · `403 CSRF_TOKEN_INVALID` ·
+`500 INTERNAL_ERROR`
+
+**Cache:** không cache; `Cache-Control: no-store`.
+
+**Bảo mật và tải:** client gửi tối đa một heartbeat mỗi 60 giây khi tab đang
+hiển thị. Server chỉ cập nhật session hiện tại; nhiều heartbeat cùng session
+không làm tăng số đếm.
 
 ### `POST /api/v1/contact`
 

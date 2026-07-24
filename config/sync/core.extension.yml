@@ -37,6 +37,7 @@ module:
   navigation: 0
   nidqc_contact: 0
   nidqc_content: 0
+  nidqc_online: 0
   node: 0
   options: 0
   page_cache: 0

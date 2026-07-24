@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Hooks for the NIDQC online counter.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_preprocess_HOOK() for page.
+ */
+function nidqc_online_preprocess_page(array &$variables): void {
+  $variables['nidqc_online_count'] = \Drupal::service('nidqc_online.counter')->count();
+  $variables['#attached']['library'][] = 'nidqc_online/counter';
+}
