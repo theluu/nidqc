@@ -33,11 +33,17 @@ const sent = ref(false)
 const submitting = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
-const { executeRecaptcha } = useRecaptchaV3()
+const { executeRecaptcha, initializeRecaptcha } = useRecaptchaV3()
 const lienHeLinks = [
   { label: 'Liên hệ', to: '/lien-he' },
   { label: 'Câu hỏi thường gặp', to: '/faq' },
 ]
+
+onMounted(() => {
+  initializeRecaptcha().catch(() => {
+    errorMessage.value = 'Không tải được reCAPTCHA. Vui lòng kiểm tra kết nối và tải lại trang.'
+  })
+})
 
 async function handleSubmit() {
   if (submitting.value) return

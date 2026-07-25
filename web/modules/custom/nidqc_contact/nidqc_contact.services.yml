@@ -8,6 +8,8 @@ services:
     arguments:
       - '@http_client'
       - '@logger.channel.nidqc_contact'
+      - '@config.factory'
+      - '@state'
 
   nidqc_contact.contact_mailer:
     class: Drupal\nidqc_contact\Service\ContactMailer
@@ -15,3 +17,4 @@ services:
       - '@config.factory'
       - '@email.validator'
       - '@logger.channel.nidqc_contact'
+      - '@state'

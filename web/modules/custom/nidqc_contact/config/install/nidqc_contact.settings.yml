@@ -1,0 +1,8 @@
+smtp:
+  scheme: smtp
+  host: smtp.nidqc.gov.vn
+  port: 25
+  admin_email: noreply@nidqc.gov.vn
+recaptcha:
+  site_key: ''
+  minimum_score: 0.5

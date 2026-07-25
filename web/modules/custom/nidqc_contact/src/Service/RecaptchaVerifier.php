@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\nidqc_contact\Service;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\State\StateInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
@@ -19,6 +21,8 @@ final class RecaptchaVerifier {
   public function __construct(
     private readonly ClientInterface $httpClient,
     private readonly LoggerInterface $logger,
+    private readonly ConfigFactoryInterface $configFactory,
+    private readonly StateInterface $state,
   ) {
   }
 
@@ -39,6 +43,9 @@ final class RecaptchaVerifier {
 
     $secret = getenv('NIDQC_RECAPTCHA_SECRET');
     if (!is_string($secret) || trim($secret) === '') {
+      $secret = (string) $this->state->get('nidqc_contact.recaptcha_secret', '');
+    }
+    if (trim($secret) === '') {
       $this->logger->error('reCAPTCHA secret is not configured.');
       return ['ok' => FALSE, 'reason' => 'not_configured', 'score' => NULL];
     }
@@ -84,7 +91,8 @@ final class RecaptchaVerifier {
   private function minimumScore(): float {
     $configured = getenv('NIDQC_RECAPTCHA_MIN_SCORE');
     if (!is_string($configured) || trim($configured) === '') {
-      return self::DEFAULT_MIN_SCORE;
+      $stored = $this->configFactory->get('nidqc_contact.settings')->get('recaptcha.minimum_score');
+      return is_numeric($stored) ? (float) $stored : self::DEFAULT_MIN_SCORE;
     }
 
     $score = (float) $configured;

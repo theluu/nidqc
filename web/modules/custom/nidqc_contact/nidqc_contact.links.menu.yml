@@ -1,0 +1,6 @@
+nidqc_contact.settings:
+  title: 'Cấu hình NIDQC'
+  description: 'SMTP, reCAPTCHA v3 và thông tin website.'
+  route_name: nidqc_contact.settings
+  parent: system.admin_config_system
+  weight: 20

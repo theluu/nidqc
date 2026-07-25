@@ -40,6 +40,7 @@ thì chưa được gọi, chưa được viết.
 
 | Endpoint | Island | Trạng thái |
 |---|---|---|
+| `GET /api/v1/contact/config` | contact form `/lien-he` | 🟢 Chốt trong TASK-013 |
 | `GET /api/v1/online` | online counter toàn site | 🟢 Chốt trong TASK-012 |
 | `GET /api/v1/online/csrf-token` | online counter toàn site | 🟢 Chốt trong TASK-012 |
 | `POST /api/v1/online/heartbeat` | online counter toàn site | 🟢 Chốt trong TASK-012 |
@@ -52,6 +53,39 @@ thì chưa được gọi, chưa được viết.
 `mega-menu`, `faq-accordion`, `tabs` **không cần API** — dữ liệu render sẵn từ Twig.
 
 ## 4. Endpoint đã chốt
+
+### `GET /api/v1/contact/config`
+
+**Mục đích:** trả cấu hình công khai cần thiết để frontend khởi tạo reCAPTCHA v3
+mà không cần build lại Nuxt khi quản trị viên đổi site key.
+
+**Query params:** không có. Param lạ trả `400 INVALID_PARAMETER`.
+
+**Response 200**
+
+```json
+{
+  "data": {
+    "recaptcha": {
+      "enabled": true,
+      "site_key": "6Lc_public_site_key"
+    }
+  }
+}
+```
+
+`enabled = false` ở DDEV khi `NIDQC_RECAPTCHA_BYPASS=1`. Response không bao giờ
+chứa reCAPTCHA secret, SMTP password, SMTP username hoặc DSN.
+
+**Lỗi:** `400 INVALID_PARAMETER` · `500 INTERNAL_ERROR`
+
+**Cache:** không cache; `Cache-Control: no-store`.
+
+**Quyền:** public có chủ đích; chỉ trả reCAPTCHA site key vốn phải xuất hiện trên
+trình duyệt và cờ enabled.
+
+**Progressive enhancement:** không JavaScript thì trang vẫn hiển thị email, số
+điện thoại và địa chỉ liên hệ server-side.
 
 ### Online counter
 

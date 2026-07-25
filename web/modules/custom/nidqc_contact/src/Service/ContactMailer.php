@@ -6,6 +6,7 @@ namespace Drupal\nidqc_contact\Service;
 
 use Drupal\Component\Utility\EmailValidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\State\StateInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
@@ -21,7 +22,32 @@ final class ContactMailer {
     private readonly ConfigFactoryInterface $configFactory,
     private readonly EmailValidatorInterface $emailValidator,
     private readonly LoggerInterface $logger,
+    private readonly StateInterface $state,
   ) {
+  }
+
+  /**
+   * Sends a configuration test email.
+   */
+  public function sendTest(string $recipient): bool {
+    if (!$this->emailValidator->isValid($recipient) || !$this->emailValidator->isValid($this->siteEmail())) {
+      return FALSE;
+    }
+
+    try {
+      $from = new Address($this->siteEmail(), $this->siteName());
+      $message = (new Email())
+        ->from($from)
+        ->to($recipient)
+        ->subject('[' . $this->siteName() . '] Kiểm tra cấu hình SMTP')
+        ->text('Email kiểm tra SMTP từ trang cấu hình website NIDQC.');
+      (new Mailer(Transport::fromDsn($this->mailerDsn())))->send($message);
+      return TRUE;
+    }
+    catch (\Throwable) {
+      $this->logger->error('SMTP configuration test failed.');
+      return FALSE;
+    }
   }
 
   /**
@@ -132,7 +158,10 @@ final class ContactMailer {
       return trim($configured);
     }
 
-    return (string) $this->configFactory->get('system.site')->get('mail');
+    $stored = (string) $this->configFactory->get('nidqc_contact.settings')->get('smtp.admin_email');
+    return $stored !== ''
+      ? $stored
+      : (string) $this->configFactory->get('system.site')->get('mail');
   }
 
   /**
@@ -163,17 +192,22 @@ final class ContactMailer {
    * Converts Drupal's Symfony mailer config into a DSN string.
    */
   private function mailerDsn(): string {
-    $dsn = $this->configFactory->get('system.mail')->get('mailer_dsn');
-    if (!is_array($dsn)) {
-      return 'smtp://localhost:25';
-    }
+    $settings = $this->configFactory->get('nidqc_contact.settings');
+    $legacy = $this->configFactory->get('system.mail')->get('mailer_dsn');
+    $legacy = is_array($legacy) ? $legacy : [];
 
-    $scheme = (string) ($dsn['scheme'] ?? 'smtp');
-    $host = (string) ($dsn['host'] ?? 'localhost');
-    $port = $dsn['port'] ?? NULL;
-    $user = $dsn['user'] ?? NULL;
-    $password = $dsn['password'] ?? NULL;
-    $options = $dsn['options'] ?? [];
+    $scheme = (string) ($settings->get('smtp.scheme') ?: ($legacy['scheme'] ?? 'smtp'));
+    $host = (string) ($settings->get('smtp.host') ?: ($legacy['host'] ?? 'localhost'));
+    $port = $settings->get('smtp.port') ?: ($legacy['port'] ?? NULL);
+    $user = getenv('NIDQC_SMTP_USERNAME');
+    if (!is_string($user) || $user === '') {
+      $user = (string) $this->state->get('nidqc_contact.smtp_username', '');
+    }
+    $password = getenv('NIDQC_SMTP_PASSWORD');
+    if (!is_string($password) || $password === '') {
+      $password = (string) $this->state->get('nidqc_contact.smtp_password', '');
+    }
+    $options = $legacy['options'] ?? [];
 
     $auth = '';
     if (is_string($user) && $user !== '') {

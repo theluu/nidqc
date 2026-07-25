@@ -4,8 +4,8 @@ interface:
   default: symfony_mailer
 mailer_dsn:
   scheme: smtp
-  host: 127.0.0.1
+  host: smtp.nidqc.gov.vn
   user: null
   password: null
-  port: 1025
+  port: 25
   options: {  }

@@ -12,7 +12,7 @@ database:
 use_dns_when_possible: true
 composer_version: "2"
 web_environment:
-    - NIDQC_RECAPTCHA_BYPASS=1
+    - NIDQC_RECAPTCHA_BYPASS=0
     - NIDQC_RECAPTCHA_MIN_SCORE=0.5
     - NIDQC_CONTACT_ADMIN_EMAIL=noreply@nidqc.gov.vn
 corepack_enable: true

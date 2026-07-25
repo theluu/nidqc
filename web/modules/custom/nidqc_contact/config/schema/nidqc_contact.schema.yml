@@ -1,0 +1,30 @@
+nidqc_contact.settings:
+  type: config_object
+  label: 'NIDQC contact settings'
+  mapping:
+    smtp:
+      type: mapping
+      label: 'SMTP'
+      mapping:
+        scheme:
+          type: string
+          label: 'Scheme'
+        host:
+          type: string
+          label: 'Host'
+        port:
+          type: integer
+          label: 'Port'
+        admin_email:
+          type: email
+          label: 'Administrative recipient'
+    recaptcha:
+      type: mapping
+      label: 'reCAPTCHA v3'
+      mapping:
+        site_key:
+          type: string
+          label: 'Site key'
+        minimum_score:
+          type: float
+          label: 'Minimum score'

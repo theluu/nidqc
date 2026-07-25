@@ -1,3 +1,20 @@
+nidqc_contact.settings:
+  path: '/admin/config/nidqc/settings'
+  defaults:
+    _form: '\Drupal\nidqc_contact\Form\NidqcSettingsForm'
+    _title: 'Cấu hình website NIDQC'
+  requirements:
+    _permission: 'administer site configuration'
+
+nidqc_contact.public_config:
+  path: '/api/v1/contact/config'
+  defaults:
+    _controller: '\Drupal\nidqc_contact\Controller\ContactController::publicConfig'
+  methods: [GET]
+  requirements:
+    # Public by design: only exposes the browser-visible reCAPTCHA site key.
+    _access: 'TRUE'
+
 nidqc_contact.csrf_token:
   path: '/api/v1/contact/csrf-token'
   defaults:

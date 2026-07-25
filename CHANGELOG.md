@@ -30,6 +30,10 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
   Rủi ro SEO (client-render) — cần prerender trước go-live, ghi trong ADR-003.
 
 ### Added
+- **Trang cấu hình tích hợp NIDQC** (TASK-013) — quản trị SMTP, reCAPTCHA v3 và
+  thông tin website tại `/admin/config/nidqc/settings`, có nút gửi email thử.
+  SMTP username/password và reCAPTCHA secret lưu ngoài config export; frontend
+  lấy site key công khai qua API nên đổi key không cần build lại Nuxt.
 - **Bộ đếm người đang trực tuyến** (TASK-012) — hiển thị kín đáo cạnh bản quyền
   trong footer trên toàn site, có SSR và tự cập nhật mỗi 60 giây. Số liệu là tổng
   session hoạt động trong 5 phút, không lưu hoặc công khai IP, fingerprint hay

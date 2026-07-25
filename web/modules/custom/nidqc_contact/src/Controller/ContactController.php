@@ -11,6 +11,7 @@ use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Flood\FloodInterface;
+use Drupal\Core\State\StateInterface;
 use Drupal\nidqc_contact\Service\ContactMailer;
 use Drupal\nidqc_contact\Service\RecaptchaVerifier;
 use Psr\Log\LoggerInterface;
@@ -54,6 +55,7 @@ final class ContactController extends ControllerBase {
     private readonly RecaptchaVerifier $recaptchaVerifier,
     private readonly ContactMailer $contactMailer,
     private readonly LoggerInterface $logger,
+    private readonly StateInterface $state,
   ) {
   }
 
@@ -71,7 +73,40 @@ final class ContactController extends ControllerBase {
       $container->get('nidqc_contact.recaptcha_verifier'),
       $container->get('nidqc_contact.contact_mailer'),
       $container->get('logger.channel.nidqc_contact'),
+      $container->get('state'),
     );
+  }
+
+  /**
+   * Returns the browser-visible contact form configuration.
+   */
+  public function publicConfig(Request $request): JsonResponse {
+    if ($request->query->count() !== 0) {
+      return $this->errorResponse(
+        'INVALID_PARAMETER',
+        'Yêu cầu có tham số không hợp lệ.',
+        400,
+      );
+    }
+
+    $environmentSiteKey = getenv('NIDQC_RECAPTCHA_SITE_KEY');
+    $siteKey = is_string($environmentSiteKey) && trim($environmentSiteKey) !== ''
+      ? trim($environmentSiteKey)
+      : (string) $this->config('nidqc_contact.settings')->get('recaptcha.site_key');
+    $environmentSecret = getenv('NIDQC_RECAPTCHA_SECRET');
+    $secretConfigured = is_string($environmentSecret) && trim($environmentSecret) !== ''
+      ? TRUE
+      : (string) $this->state->get('nidqc_contact.recaptcha_secret', '') !== '';
+    $bypass = getenv('NIDQC_RECAPTCHA_BYPASS') === '1';
+
+    return $this->jsonResponse([
+      'data' => [
+        'recaptcha' => [
+          'enabled' => !$bypass && $siteKey !== '' && $secretConfigured,
+          'site_key' => $siteKey,
+        ],
+      ],
+    ]);
   }
 
   /**

@@ -11,6 +11,34 @@ declare global {
 
 const RECAPTCHA_SCRIPT_ID = 'nidqc-recaptcha-v3'
 let recaptchaScriptPromise: Promise<void> | null = null
+let publicConfigPromise: Promise<{ enabled: boolean; siteKey: string }> | null = null
+
+function drupalBase(): string {
+  return (import.meta.env.VITE_DRUPAL_BASE as string) || window.location.origin
+}
+
+async function readPublicConfig(): Promise<{ enabled: boolean; siteKey: string }> {
+  if (publicConfigPromise) {
+    return publicConfigPromise
+  }
+
+  publicConfigPromise = fetch(`${drupalBase()}/api/v1/contact/config`, {
+    credentials: 'include',
+    headers: { Accept: 'application/json' },
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error('Không tải được cấu hình reCAPTCHA.')
+      }
+      const body = await response.json()
+      return {
+        enabled: body?.data?.recaptcha?.enabled === true,
+        siteKey: String(body?.data?.recaptcha?.site_key || ''),
+      }
+    })
+
+  return publicConfigPromise
+}
 
 function loadRecaptchaScript(siteKey: string): Promise<void> {
   if (window.grecaptcha) {
@@ -44,18 +72,33 @@ function loadRecaptchaScript(siteKey: string): Promise<void> {
 
 export function useRecaptchaV3() {
   const config = useRuntimeConfig()
-  const siteKey = String(config.public.recaptchaSiteKey || '')
+  const environmentSiteKey = String(config.public.recaptchaSiteKey || '')
+
+  async function initializeRecaptcha(): Promise<string | null> {
+    if (import.meta.server) {
+      return null
+    }
+
+    const publicConfig = environmentSiteKey
+      ? { enabled: true, siteKey: environmentSiteKey }
+      : await readPublicConfig()
+    if (!publicConfig.enabled) {
+      return null
+    }
+    if (!publicConfig.siteKey) {
+      throw new Error('reCAPTCHA chưa được cấu hình.')
+    }
+
+    const siteKey = publicConfig.siteKey
+    await loadRecaptchaScript(siteKey)
+    return siteKey
+  }
 
   async function executeRecaptcha(action: string): Promise<string> {
+    const siteKey = await initializeRecaptcha()
     if (!siteKey) {
       return 'ddev-bypass'
     }
-
-    if (import.meta.server) {
-      throw new Error('reCAPTCHA chỉ chạy trên trình duyệt.')
-    }
-
-    await loadRecaptchaScript(siteKey)
 
     if (!window.grecaptcha) {
       throw new Error('Không tải được reCAPTCHA.')
@@ -71,5 +114,5 @@ export function useRecaptchaV3() {
     })
   }
 
-  return { executeRecaptcha }
+  return { executeRecaptcha, initializeRecaptcha }
 }
