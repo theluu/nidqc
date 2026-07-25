@@ -40,7 +40,7 @@ final class ContactMailer {
         ->from($from)
         ->to($recipient)
         ->subject('[' . $this->siteName() . '] Kiểm tra cấu hình SMTP')
-        ->text('Email kiểm tra SMTP từ trang cấu hình website NIDQC.');
+        ->text('Email kiểm tra SMTP từ trang cấu hình website NIDQC.', $this->charset());
       (new Mailer(Transport::fromDsn($this->mailerDsn())))->send($message);
       return TRUE;
     }
@@ -120,7 +120,7 @@ final class ContactMailer {
         '',
         'Nội dung:',
         $submission['message'],
-      ]));
+      ]), $this->charset());
   }
 
   /**
@@ -146,18 +146,13 @@ final class ContactMailer {
         '',
         'Trân trọng,',
         $this->siteName(),
-      ]));
+      ]), $this->charset());
   }
 
   /**
    * Returns the configured admin recipient with site mail as fallback.
    */
   private function adminEmail(): string {
-    $configured = getenv('NIDQC_CONTACT_ADMIN_EMAIL');
-    if (is_string($configured) && trim($configured) !== '') {
-      return trim($configured);
-    }
-
     $stored = (string) $this->configFactory->get('nidqc_contact.settings')->get('smtp.admin_email');
     return $stored !== ''
       ? $stored
@@ -189,25 +184,20 @@ final class ContactMailer {
   }
 
   /**
-   * Converts Drupal's Symfony mailer config into a DSN string.
+   * Builds the sole SMTP DSN from the NIDQC contact settings.
    */
   private function mailerDsn(): string {
     $settings = $this->configFactory->get('nidqc_contact.settings');
-    $legacy = $this->configFactory->get('system.mail')->get('mailer_dsn');
-    $legacy = is_array($legacy) ? $legacy : [];
-
-    $scheme = (string) ($settings->get('smtp.scheme') ?: ($legacy['scheme'] ?? 'smtp'));
-    $host = (string) ($settings->get('smtp.host') ?: ($legacy['host'] ?? 'localhost'));
-    $port = $settings->get('smtp.port') ?: ($legacy['port'] ?? NULL);
-    $user = getenv('NIDQC_SMTP_USERNAME');
-    if (!is_string($user) || $user === '') {
-      $user = (string) $this->state->get('nidqc_contact.smtp_username', '');
-    }
-    $password = getenv('NIDQC_SMTP_PASSWORD');
-    if (!is_string($password) || $password === '') {
-      $password = (string) $this->state->get('nidqc_contact.smtp_password', '');
-    }
-    $options = $legacy['options'] ?? [];
+    $host = (string) ($settings->get('smtp.host') ?: 'smtp.nidqc.gov.vn');
+    $port = (int) ($settings->get('smtp.port') ?: 25);
+    $authEnabled = (bool) $settings->get('smtp.auth');
+    $security = strtoupper((string) ($settings->get('smtp.security') ?: 'IMAP'));
+    $scheme = $security === 'SSL' ? 'smtps' : 'smtp';
+    $user = $authEnabled ? (string) $this->state->get('nidqc_contact.smtp_username', '') : '';
+    $password = $authEnabled ? (string) $this->state->get('nidqc_contact.smtp_password', '') : '';
+    $options = in_array($security, ['IMAP', 'NONE'], TRUE)
+      ? ['auto_tls' => 'false']
+      : [];
 
     $auth = '';
     if (is_string($user) && $user !== '') {
@@ -219,9 +209,7 @@ final class ContactMailer {
     }
 
     $portPart = '';
-    if (is_int($port) || (is_string($port) && $port !== '')) {
-      $portPart = ':' . (string) $port;
-    }
+    $portPart = ':' . (string) $port;
 
     $query = '';
     if (is_array($options) && $options !== []) {
@@ -229,6 +217,13 @@ final class ContactMailer {
     }
 
     return $scheme . '://' . $auth . $host . $portPart . $query;
+  }
+
+  /**
+   * Returns the UTF-8 character set required by the website.
+   */
+  private function charset(): string {
+    return 'UTF-8';
   }
 
 }

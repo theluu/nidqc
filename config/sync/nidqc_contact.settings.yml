@@ -1,7 +1,9 @@
 smtp:
-  scheme: smtp
+  charset: UTF-8
   host: smtp.nidqc.gov.vn
+  auth: true
   port: 25
+  security: IMAP
   admin_email: noreply@nidqc.gov.vn
 recaptcha:
   site_key: 6Ld18OomAAAAAMNT7_8xeBEHdq5TyGYQgn0Y_GG-

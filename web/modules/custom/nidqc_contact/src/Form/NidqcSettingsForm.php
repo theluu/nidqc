@@ -67,7 +67,7 @@ final class NidqcSettingsForm extends ConfigFormBase {
 
     $form['intro'] = [
       '#type' => 'item',
-      '#markup' => $this->t('Cấu hình tích hợp của website. Biến môi trường luôn có ưu tiên cao hơn giá trị nhập tại đây. Mật khẩu và secret được lưu trong database State API, không đi vào config export.'),
+      '#markup' => $this->t('Toàn bộ chức năng gửi email liên hệ sử dụng duy nhất cấu hình SMTP tại đây. Mật khẩu SMTP và reCAPTCHA secret được lưu trong database State API, không đi vào config export.'),
     ];
 
     $form['smtp'] = [
@@ -75,28 +75,29 @@ final class NidqcSettingsForm extends ConfigFormBase {
       '#title' => $this->t('SMTP'),
       '#open' => TRUE,
     ];
-    $form['smtp']['smtp_scheme'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Giao thức'),
-      '#options' => [
-        'smtp' => 'SMTP / STARTTLS',
-        'smtps' => 'SMTPS',
-      ],
-      '#default_value' => $settings->get('smtp.scheme') ?: 'smtp',
+    $form['smtp']['smtp_charset'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('CharSet'),
+      '#default_value' => $settings->get('smtp.charset') ?: 'UTF-8',
       '#required' => TRUE,
+      '#description' => $this->t('Website bắt buộc sử dụng UTF-8.'),
     ];
     $form['smtp']['smtp_host'] = [
       '#type' => 'textfield',
       '#title' => $this->t('SMTP host'),
-      '#default_value' => $settings->get('smtp.host') ?: '127.0.0.1',
+      '#default_value' => $settings->get('smtp.host') ?: 'smtp.nidqc.gov.vn',
       '#maxlength' => 255,
       '#required' => TRUE,
-      '#description' => $this->t('DDEV hiện tại dùng 127.0.0.1. Production dùng hostname do nhà cung cấp email cấp.'),
+    ];
+    $form['smtp']['smtp_auth'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('SMTPAuth'),
+      '#default_value' => $settings->get('smtp.auth') ?? TRUE,
     ];
     $form['smtp']['smtp_port'] = [
       '#type' => 'number',
       '#title' => $this->t('Cổng'),
-      '#default_value' => $settings->get('smtp.port') ?: 1025,
+      '#default_value' => $settings->get('smtp.port') ?: 25,
       '#min' => 1,
       '#max' => 65535,
       '#required' => TRUE,
@@ -104,12 +105,14 @@ final class NidqcSettingsForm extends ConfigFormBase {
     $form['smtp']['smtp_username'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Tên đăng nhập'),
-      '#default_value' => '',
+      '#default_value' => (string) $this->state->get('nidqc_contact.smtp_username', ''),
       '#maxlength' => 255,
-      '#description' => $this->secretDescription(
-        'NIDQC_SMTP_USERNAME',
-        $this->state->get('nidqc_contact.smtp_username', '') !== '',
-      ),
+      '#description' => $this->storedSecretDescription($this->state->get('nidqc_contact.smtp_username', '') !== ''),
+      '#attributes' => [
+        'autocomplete' => 'off',
+        'data-lpignore' => 'true',
+        'data-1p-ignore' => 'true',
+      ],
     ];
     $form['smtp']['smtp_username_clear'] = [
       '#type' => 'checkbox',
@@ -119,21 +122,35 @@ final class NidqcSettingsForm extends ConfigFormBase {
       '#type' => 'password',
       '#title' => $this->t('Mật khẩu'),
       '#maxlength' => 512,
-      '#description' => $this->secretDescription(
-        'NIDQC_SMTP_PASSWORD',
-        $this->state->get('nidqc_contact.smtp_password', '') !== '',
-      ),
+      '#description' => $this->storedSecretDescription($this->state->get('nidqc_contact.smtp_password', '') !== ''),
+      '#attributes' => [
+        'autocomplete' => 'new-password',
+        'data-lpignore' => 'true',
+        'data-1p-ignore' => 'true',
+      ],
     ];
     $form['smtp']['smtp_password_clear'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Xoá mật khẩu SMTP đang lưu trong database'),
+    ];
+    $form['smtp']['smtp_security'] = [
+      '#type' => 'select',
+      '#title' => $this->t('SMTPSecure'),
+      '#options' => [
+        'IMAP' => 'IMAP',
+        'TLS' => 'TLS / STARTTLS',
+        'SSL' => 'SSL / SMTPS',
+        'NONE' => $this->t('Không mã hoá'),
+      ],
+      '#default_value' => strtoupper((string) ($settings->get('smtp.security') ?: 'IMAP')),
+      '#required' => TRUE,
+      '#description' => $this->t('IMAP được xử lý thành SMTP không STARTTLS vì IMAP không phải chế độ mã hoá SMTP.'),
     ];
     $form['smtp']['smtp_admin_email'] = [
       '#type' => 'email',
       '#title' => $this->t('Email nhận thông báo liên hệ'),
       '#default_value' => $settings->get('smtp.admin_email') ?: $site->get('mail'),
       '#required' => TRUE,
-      '#description' => $this->environmentDescription('NIDQC_CONTACT_ADMIN_EMAIL'),
     ];
 
     $form['recaptcha'] = [
@@ -227,6 +244,25 @@ final class NidqcSettingsForm extends ConfigFormBase {
       $form_state->setErrorByName('smtp_host', $this->t('SMTP host chỉ được chứa chữ cái, chữ số, dấu chấm và dấu gạch ngang.'));
     }
 
+    if (strtoupper(trim((string) $form_state->getValue('smtp_charset'))) !== 'UTF-8') {
+      $form_state->setErrorByName('smtp_charset', $this->t('CharSet phải là UTF-8.'));
+    }
+
+    if ((bool) $form_state->getValue('smtp_auth')) {
+      $hasUsername = trim((string) $form_state->getValue('smtp_username')) !== ''
+        || ((string) $this->state->get('nidqc_contact.smtp_username', '') !== ''
+          && !(bool) $form_state->getValue('smtp_username_clear'));
+      $hasPassword = (string) $form_state->getValue('smtp_password') !== ''
+        || ((string) $this->state->get('nidqc_contact.smtp_password', '') !== ''
+          && !(bool) $form_state->getValue('smtp_password_clear'));
+      if (!$hasUsername) {
+        $form_state->setErrorByName('smtp_username', $this->t('Tên đăng nhập là bắt buộc khi SMTPAuth được bật.'));
+      }
+      if (!$hasPassword) {
+        $form_state->setErrorByName('smtp_password', $this->t('Mật khẩu là bắt buộc khi SMTPAuth được bật.'));
+      }
+    }
+
     foreach (['smtp_admin_email', 'site_email'] as $field) {
       if (!$this->emailValidator->isValid((string) $form_state->getValue($field))) {
         $form_state->setErrorByName($field, $this->t('Địa chỉ email không hợp lệ.'));
@@ -252,9 +288,11 @@ final class NidqcSettingsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->configFactory->getEditable('nidqc_contact.settings')
-      ->set('smtp.scheme', $form_state->getValue('smtp_scheme'))
+      ->set('smtp.charset', 'UTF-8')
       ->set('smtp.host', trim((string) $form_state->getValue('smtp_host')))
+      ->set('smtp.auth', (bool) $form_state->getValue('smtp_auth'))
       ->set('smtp.port', (int) $form_state->getValue('smtp_port'))
+      ->set('smtp.security', strtoupper((string) $form_state->getValue('smtp_security')))
       ->set('smtp.admin_email', trim((string) $form_state->getValue('smtp_admin_email')))
       ->set('recaptcha.site_key', trim((string) $form_state->getValue('recaptcha_site_key')))
       ->set('recaptcha.minimum_score', (float) $form_state->getValue('recaptcha_minimum_score'))
@@ -328,6 +366,15 @@ final class NidqcSettingsForm extends ConfigFormBase {
       return (string) $this->t('Đang lấy từ biến môi trường @name. Giá trị nhập tại đây sẽ không có hiệu lực khi biến này còn tồn tại.', ['@name' => $environmentName]);
     }
 
+    return $stored
+      ? (string) $this->t('Database đang có giá trị. Để trống để giữ nguyên; secret không được export.')
+      : (string) $this->t('Chưa có giá trị. Secret được lưu trong database và không được export.');
+  }
+
+  /**
+   * Describes a State API secret used without environment fallbacks.
+   */
+  private function storedSecretDescription(bool $stored): string {
     return $stored
       ? (string) $this->t('Database đang có giá trị. Để trống để giữ nguyên; secret không được export.')
       : (string) $this->t('Chưa có giá trị. Secret được lưu trong database và không được export.');

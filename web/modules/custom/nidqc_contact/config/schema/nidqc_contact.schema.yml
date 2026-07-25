@@ -6,15 +6,21 @@ nidqc_contact.settings:
       type: mapping
       label: 'SMTP'
       mapping:
-        scheme:
+        charset:
           type: string
-          label: 'Scheme'
+          label: 'Message character set'
         host:
           type: string
           label: 'Host'
+        auth:
+          type: boolean
+          label: 'Authentication enabled'
         port:
           type: integer
           label: 'Port'
+        security:
+          type: string
+          label: 'Security mode'
         admin_email:
           type: email
           label: 'Administrative recipient'
