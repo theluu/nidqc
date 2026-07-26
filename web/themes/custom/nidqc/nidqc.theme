@@ -68,6 +68,20 @@ function nidqc_preprocess_html(array &$variables): void {
  * Chỉ chạy ở trang chủ để không tốn query ở trang khác.
  */
 function nidqc_preprocess_page(array &$variables): void {
+  $auth_routes = [
+    'user.login',
+    'user.register',
+    'user.pass',
+    'user.reset',
+    'user.reset.login',
+    'user.reset.form',
+    'entity.user.canonical',
+    'entity.user.edit_form',
+  ];
+  if (in_array(\Drupal::routeMatch()->getRouteName(), $auth_routes, TRUE)) {
+    $variables['page']['breadcrumb'] = [];
+  }
+
   if (empty($variables['is_front'])) {
     return;
   }
@@ -89,11 +103,7 @@ function nidqc_preprocess_page(array &$variables): void {
 
   $items = [];
   foreach ($storage->loadMultiple($ids) as $node) {
-    $date = '';
-    if ($node->hasField('field_date') && !$node->get('field_date')->isEmpty()) {
-      $ts = strtotime($node->get('field_date')->value);
-      $date = $ts ? $date_formatter->format($ts, 'custom', 'd/m/Y') : '';
-    }
+    $date = $date_formatter->format($node->getCreatedTime(), 'custom', 'd/m/Y');
     $items[] = [
       'title' => $node->label(),
       'url' => $alias->getAliasByPath('/node/' . $node->id()),

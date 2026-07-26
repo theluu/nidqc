@@ -7,13 +7,20 @@ const PAGE_SIZE = 12
 const route = useRoute()
 const listTop = ref(null)
 
-const cat = computed(() => String(route.query.cat || 'all'))
+const categorySlug = (value) => String(value || '')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/đ/g, 'd')
+  .replace(/Đ/g, 'D')
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-|-$/g, '')
 const page = computed(() => Math.max(1, parseInt(String(route.query.trang || '1'), 10) || 1))
 
 const mapItem = (n, included) => ({
   id: n.attributes.drupal_internal__nid,
   title: n.attributes.title,
-  date: formatDate(n.attributes.field_date || n.attributes.created),
+  date: formatDate(n.attributes.created),
   tag: n.attributes.field_tag || termLabel(n, 'field_category', included),
   image: imageUrl(n, included),
   alias: n.attributes.path?.alias || `/tin-tuc/${n.attributes.drupal_internal__nid}`,
@@ -23,6 +30,11 @@ const mapItem = (n, included) => ({
 const { data: categories } = await useCachedData('news-categories', async () => {
   const { data } = await fetchJsonApi('/taxonomy_term/news_category', { sort: 'weight' })
   return data.map((t) => ({ id: t.id, label: t.attributes.name }))
+})
+const cat = computed(() => {
+  const requested = String(route.query.cat || 'all')
+  if (requested === 'all') return 'all'
+  return categories.value?.find((item) => item.id === requested || categorySlug(item.label) === requested)?.id || 'all'
 })
 
 // Tổng số tin theo chuyên mục -> số trang. Key chỉ phụ thuộc cat (đổi trang không đếm lại).
@@ -38,7 +50,7 @@ const { data: news, pending } = await useCachedData(
   () => `news-list-${cat.value}-p${page.value}`,
   async () => {
     const params = {
-      'filter[status]': 1, sort: '-field_date,-created', include: 'field_image,field_category',
+      'filter[status]': 1, sort: '-created', include: 'field_image,field_category',
       'page[limit]': PAGE_SIZE, 'page[offset]': (page.value - 1) * PAGE_SIZE,
     }
     if (cat.value !== 'all') params['filter[field_category.id]'] = cat.value
@@ -51,7 +63,7 @@ const selectCat = (id) => {
   const q = { ...route.query }
   delete q.trang // đổi chuyên mục -> về trang 1
   if (id === 'all') delete q.cat
-  else q.cat = id
+  else q.cat = categorySlug(categories.value?.find((item) => item.id === id)?.label || id)
   navigateTo({ query: q })
 }
 

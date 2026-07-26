@@ -11,7 +11,7 @@ const NOTICE_CATS = ['Thông báo', 'Mua sắm - đấu thầu', 'Tuyển dụng
 const mapItem = (n, included) => ({
   id: n.attributes.drupal_internal__nid,
   title: n.attributes.title,
-  date: formatDate(n.attributes.field_date || n.attributes.created),
+  date: formatDate(n.attributes.created),
   tag: n.attributes.field_tag || termLabel(n, 'field_category', included),
   category: termLabel(n, 'field_category', included),
   image: imageUrl(n, included),
@@ -21,7 +21,7 @@ const mapItem = (n, included) => ({
 // Lọc theo tên chuyên mục (field_category.name IN [...]) — JSON:API condition group.
 const byCategory = (cats, limit) => {
   const params = {
-    'filter[status]': 1, sort: '-field_date', 'page[limit]': limit,
+    'filter[status]': 1, sort: '-created', 'page[limit]': limit,
     include: 'field_image,field_category',
     'filter[cat][condition][path]': 'field_category.name',
     'filter[cat][condition][operator]': 'IN',

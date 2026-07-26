@@ -67,7 +67,7 @@ Các vòng lặp `sc-for` trích từ design (xem `scripts/extract-design.py`):
 |---|---|---|---|---|
 | `title` | base field | có | Site cũ / design | Tiêu đề tin |
 | `body` | text_with_summary | không | Site cũ | TASK-010 — nội dung chi tiết bài viết import từ site cũ |
-| `field_date` | datetime date | có | Site cũ / design | Ngày đăng |
+| `created` (core) | timestamp | có | Drupal core / site cũ | Ngày đăng; không tạo field riêng |
 | `field_category` | ER → `news_category` | có | Site cũ / design | Mapping category cũ sang taxonomy mới |
 | `field_tag` | string | không | Design | Nhãn hiển thị ngắn nếu có |
 | `field_image` | image | không | Site cũ / design | Ảnh đại diện, whitelist extension theo field config |

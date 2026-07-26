@@ -43,12 +43,12 @@ $term = function (string $vid, string $name) use ($term_storage) {
   return $found ? reset($found)->id() : NULL;
 };
 
-/** design lưu ngày dd/mm/yyyy; field_date là datetime -> cần Y-m-d. */
-$date = function (string $vn): ?string {
+/** Chuyển ngày design dd/mm/yyyy thành timestamp của trường created core. */
+$date = function (string $vn): ?int {
   if (!preg_match('#^(\d{2})/(\d{2})/(\d{4})$#', $vn, $m)) {
     return NULL;
   }
-  return "$m[3]-$m[2]-$m[1]";
+  return mktime(12, 0, 0, (int) $m[2], (int) $m[1], (int) $m[3]);
 };
 
 $created = 0;
@@ -69,7 +69,7 @@ $make = function (string $type, string $title, array $values) use ($node_storage
 foreach ($data['news'] ?? [] as $row) {
   $values = [];
   if ($d = $date($row['date'] ?? '')) {
-    $values['field_date'] = $d;
+    $values['created'] = $d;
   }
   if (!empty($row['tag'])) {
     $values['field_tag'] = $row['tag'];

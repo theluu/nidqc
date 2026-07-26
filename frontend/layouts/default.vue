@@ -189,12 +189,12 @@ const nav = [
     { label: 'Cung ứng chất chuẩn', to: '/#chat-chuan' },
   ] },
   { label: 'Tin tức & Thông báo', to: '/tin-tuc', children: [
-    { label: 'Thông báo', to: '/tin-tuc' },
-    { label: 'Tin hoạt động', to: '/tin-tuc' },
-    { label: 'Mua sắm, đấu thầu & công khai minh bạch', to: '/tin-tuc' },
-    { label: 'Đào tạo', to: '/tin-tuc' },
-    { label: 'Hội nghị - Hội thảo', to: '/tin-tuc' },
-    { label: 'Tuyển dụng', to: '/tin-tuc' },
+    { label: 'Thông báo', to: '/tin-tuc?cat=thong-bao' },
+    { label: 'Tin hoạt động', to: '/tin-tuc?cat=tin-hoat-dong' },
+    { label: 'Mua sắm, đấu thầu & công khai minh bạch', to: '/tin-tuc?cat=mua-sam-dau-thau' },
+    { label: 'Đào tạo', to: '/tin-tuc?cat=dao-tao' },
+    { label: 'Hội nghị - Hội thảo', to: '/tin-tuc?cat=hoi-nghi-hoi-thao' },
+    { label: 'Tuyển dụng', to: '/tin-tuc?cat=tuyen-dung' },
   ] },
   { label: 'Văn bản - Tài liệu', to: '/van-ban-tai-lieu', children: [
     { label: 'Văn bản pháp quy', to: '/van-ban-tai-lieu' },

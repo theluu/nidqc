@@ -20,7 +20,7 @@ const { data } = await useCachedData(`news-slug-${route.params.slug}`, async () 
   const node = {
     nid,
     title: n.attributes.title,
-    date: formatDate(n.attributes.field_date || n.attributes.created),
+    date: formatDate(n.attributes.created),
     tag: n.attributes.field_tag || categoryName,
     category: categoryName,
     image: imageUrl(n, res.included),
@@ -31,13 +31,13 @@ const { data } = await useCachedData(`news-slug-${route.params.slug}`, async () 
   const mapItem = (x, inc) => ({
     id: x.attributes.drupal_internal__nid,
     title: x.attributes.title,
-    date: formatDate(x.attributes.field_date || x.attributes.created),
+    date: formatDate(x.attributes.created),
     category: termLabel(x, 'field_category', inc),
     image: imageUrl(x, inc),
     alias: x.attributes.path?.alias || `/tin-tuc/${x.attributes.drupal_internal__nid}`,
   })
   const listParams = (extra) => ({
-    'filter[status]': 1, sort: '-field_date', 'page[limit]': 8,
+    'filter[status]': 1, sort: '-created', 'page[limit]': 8,
     include: 'field_image,field_category', ...extra,
   })
   const catFilter = categoryName ? {
@@ -56,6 +56,14 @@ const { data } = await useCachedData(`news-slug-${route.params.slug}`, async () 
   if (!related.length) related = latest
   return { node, related: related.slice(0, 3), latest: latest.slice(0, 5) }
 })
+
+if (!data.value?.node) {
+  throw createError({
+    statusCode: 404,
+    statusMessage: 'Không tìm thấy trang',
+    fatal: true,
+  })
+}
 
 const node = computed(() => data.value?.node || null)
 const related = computed(() => data.value?.related || [])

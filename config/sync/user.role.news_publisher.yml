@@ -1,0 +1,33 @@
+uuid: 538de2f2-3eb2-42e3-b062-209cf6c60b92
+langcode: vi
+status: true
+dependencies:
+  config:
+    - workflows.workflow.editorial
+  module:
+    - content_moderation
+    - contextual
+    - navigation
+    - node
+    - system
+id: news_publisher
+label: 'Admin / Lãnh đạo'
+weight: 6
+is_admin: false
+permissions:
+  - 'access administration pages'
+  - 'access content overview'
+  - 'access contextual links'
+  - 'access navigation'
+  - 'create news content'
+  - 'edit any news content'
+  - 'edit own news content'
+  - 'use editorial transition create_new_draft'
+  - 'use editorial transition keep_in_review'
+  - 'use editorial transition publish'
+  - 'use editorial transition return_to_draft'
+  - 'use editorial transition submit_for_review'
+  - 'view any unpublished content'
+  - 'view latest version'
+  - 'view news revisions'
+  - 'view the administration theme'

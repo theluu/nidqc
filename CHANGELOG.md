@@ -9,6 +9,9 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 ## [Unreleased]
 
 ### Changed
+- **Tin tức và trang tài khoản** (TASK-015) — dùng ngày tạo mặc định thay field
+  ngày đăng trùng lặp; submenu Tin tức mở đúng chuyên mục; trang đăng nhập bỏ
+  breadcrumb Home và giữ navigation thống nhất với trang chủ.
 - **Google Translate trên top bar** — mặc định tiếng Việt trên mỗi lần tải trang/F5,
   xoá trạng thái dịch cũ trước khi nạp Google Translate, và dropdown lấy toàn bộ
   ngôn ngữ từ select thật của Google thay vì danh sách rút gọn hard-code; bỏ hai
@@ -30,6 +33,12 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
   Rủi ro SEO (client-render) — cần prerender trước go-live, ghi trong ADR-003.
 
 ### Added
+- **Trang 404 NIDQC** (TASK-016) — URL không tồn tại trả đúng HTTP 404, có giao
+  diện nhận diện thương hiệu, lối về Trang chủ và các khu vực tra cứu hữu ích.
+- **Quy trình duyệt Tin tức ba cấp** (TASK-014) — Người viết chỉ tạo nháp và
+  gửi duyệt; Kiểm duyệt viên được biên tập/trả bài; chỉ Admin/Lãnh đạo được
+  chuyển bài từ Chờ kiểm duyệt sang Đã xuất bản. Nội dung chưa duyệt không
+  hiển thị công khai.
 - **Trang cấu hình tích hợp NIDQC** (TASK-013) — quản trị SMTP, reCAPTCHA v3 và
   thông tin website tại `/admin/config/nidqc/settings`, có nút gửi email thử.
   SMTP username/password và reCAPTCHA secret lưu ngoài config export; frontend

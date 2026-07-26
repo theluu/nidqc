@@ -91,7 +91,7 @@ $nodeStorage = $entityTypeManager->getStorage('node');
 $termStorage = $entityTypeManager->getStorage('taxonomy_term');
 $fields = \Drupal::service('entity_field.manager')->getFieldDefinitions('node', 'news');
 
-foreach (['field_date', 'field_category'] as $requiredField) {
+foreach (['field_category'] as $requiredField) {
   if (!isset($fields[$requiredField])) {
     throw new RuntimeException("Missing required news field: $requiredField");
   }
@@ -493,7 +493,6 @@ function nidqc_old_news_apply_node(NodeInterface $node, array $item, ?FileInterf
   $node->setPublished(TRUE);
   $node->setCreatedTime($timestamp);
   $node->setChangedTime($timestamp);
-  $node->set('field_date', $item['date']);
   $node->set('field_category', ['target_id' => $item['target_tid']]);
   $node->set('body', [
     'value' => $item['body'],

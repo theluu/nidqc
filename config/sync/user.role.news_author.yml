@@ -1,0 +1,27 @@
+uuid: 873d6739-6cac-42f1-9031-fb5a44f4b588
+langcode: vi
+status: true
+dependencies:
+  config:
+    - workflows.workflow.editorial
+  module:
+    - content_moderation
+    - contextual
+    - navigation
+    - node
+    - system
+id: news_author
+label: 'Người viết bài'
+weight: 4
+is_admin: false
+permissions:
+  - 'access administration pages'
+  - 'access content overview'
+  - 'access contextual links'
+  - 'access navigation'
+  - 'create news content'
+  - 'edit own news content'
+  - 'use editorial transition create_new_draft'
+  - 'use editorial transition submit_for_review'
+  - 'view own unpublished content'
+  - 'view the administration theme'

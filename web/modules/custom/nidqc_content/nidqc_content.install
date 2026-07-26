@@ -140,20 +140,20 @@ function _nidqc_content_create_menu(): void {
       'weight' => $weight,
       'expanded' => TRUE,
     ]);
-    if (!$existing) {
-      $parent->save();
-    }
+    $parent->set('link', ['uri' => $uri]);
+    $parent->set('weight', $weight);
+    $parent->set('expanded', TRUE);
+    $parent->save();
     foreach ($children as $cw => [$ctitle, $curi]) {
-      if ($storage->loadByProperties(['menu_name' => 'main', 'title' => $ctitle])) {
-        continue;
-      }
-      MenuLinkContent::create([
+      $childExisting = $storage->loadByProperties(['menu_name' => 'main', 'title' => $ctitle]);
+      $child = $childExisting ? reset($childExisting) : MenuLinkContent::create([
         'title' => $ctitle,
-        'link' => ['uri' => $curi],
         'menu_name' => 'main',
-        'parent' => 'menu_link_content:' . $parent->uuid(),
-        'weight' => $cw,
-      ])->save();
+      ]);
+      $child->set('link', ['uri' => $curi]);
+      $child->set('parent', 'menu_link_content:' . $parent->uuid());
+      $child->set('weight', $cw);
+      $child->save();
     }
   }
 }
@@ -204,4 +204,30 @@ function nidqc_content_uninstall(): void {
   if ($links) {
     \Drupal::entityTypeManager()->getStorage('menu_link_content')->delete($links);
   }
+}
+
+/**
+ * Copies the legacy news date into core created and refreshes menu destinations.
+ */
+function nidqc_content_update_11001(): void {
+  $database = \Drupal::database();
+  if ($database->schema()->tableExists('node__field_date')) {
+    $rows = $database->select('node__field_date', 'd')
+      ->fields('d', ['entity_id', 'langcode', 'field_date_value'])
+      ->condition('deleted', 0)
+      ->execute();
+    foreach ($rows as $row) {
+      $timestamp = strtotime($row->field_date_value . ' 12:00:00');
+      if ($timestamp === FALSE) {
+        continue;
+      }
+      $database->update('node_field_data')
+        ->fields(['created' => $timestamp])
+        ->condition('nid', $row->entity_id)
+        ->condition('langcode', $row->langcode)
+        ->execute();
+    }
+  }
+
+  _nidqc_content_create_menu();
 }
