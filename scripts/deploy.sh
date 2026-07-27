@@ -21,7 +21,26 @@ echo "==> 1. Cập nhật code từ git"
 git pull --ff-only
 
 echo "==> 2. Cài PHP deps"
+# Chạy composer bằng root trong phiên non-interactive thì Composer TỰ TẮT MỌI PLUGIN
+# ("Composer plugins have been disabled for safety"). Mất composer/installers nghĩa là
+# drupal/core rơi vào vendor/drupal/core thay vì web/core: site vẫn chạy bằng web/core
+# cũ, nhưng vendor/composer/installed.php ghi sai đường dẫn nên Drush 13 (tìm root qua
+# InstalledVersions::getInstallPath('drupal/core')) không bootstrap được và cả `drush
+# --version` cũng chết. Đặt biến này để plugin chạy bình thường.
+export COMPOSER_ALLOW_SUPERUSER=1
 composer install --no-dev --optimize-autoloader --no-interaction
+
+# Chốt lại: core phải nằm ở web/core. Nếu lệch thì dừng ngay thay vì để deploy chạy
+# tiếp rồi chết ở bước drush với thông báo khó hiểu.
+CORE_PATH="$(php -r '$d = require "vendor/composer/installed.php"; echo $d["versions"]["drupal/core"]["install_path"] ?? "";')"
+case "$CORE_PATH" in
+  */web/core) : ;;
+  *)
+    echo "LỖI: drupal/core đang ở '$CORE_PATH', đáng lẽ phải ở web/core." >&2
+    echo "     Chạy: COMPOSER_ALLOW_SUPERUSER=1 composer reinstall drupal/core" >&2
+    exit 1
+    ;;
+esac
 
 echo "==> 3. Drupal: updatedb + import config + cache rebuild"
 # drush deploy = updatedb -> config:import -> cache:rebuild -> deploy:hook
