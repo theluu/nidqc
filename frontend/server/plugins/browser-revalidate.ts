@@ -17,6 +17,16 @@ import { getResponseHeader, setResponseHeader } from 'h3'
 
 export default defineNitroPlugin((nitroApp) => {
   nitroApp.hooks.hook('beforeResponse', (event) => {
+    // Response lỗi TUYỆT ĐỐI không được cache ở đâu cả. Đã có sự cố thật: một lần
+    // render hỏng trả về trang lỗi, trình duyệt cache lại, rồi những lần sau
+    // revalidate vẫn nhận 304 (khớp theo Last-Modified) nên cứ hiện trang lỗi mãi
+    // dù server đã lành — access log không hề ghi nhận lỗi nào.
+    const status = event.node.res.statusCode
+    if (status >= 400) {
+      setResponseHeader(event, 'cache-control', 'no-store, must-revalidate')
+      return
+    }
+
     const current = String(getResponseHeader(event, 'cache-control') || '')
     // Chỉ đụng vào response do route cache SWR sinh ra. Asset trong /_nuxt/ dùng
     // `max-age=31536000, immutable` và PHẢI giữ nguyên — tên file có hash rồi.

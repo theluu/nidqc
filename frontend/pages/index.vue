@@ -30,8 +30,12 @@ const { data: split } = await useCachedData('home-news', async () => {
     announcements: an.data.map(mapItem),
   }
 })
-const news = computed(() => split.value.events)
-const announcements = computed(() => split.value.announcements)
+// PHẢI guard null: useAsyncData trả data = null khi handler lỗi (Drupal chậm/khởi
+// động lại). Thiếu `?.` thì computed ném "Cannot read properties of null" ngay trong
+// lúc render -> Nuxt bỏ cả trang chủ để hiện trang lỗi 500, chỉ vì mất khối tin tức.
+// Các computed khác trong file này đã guard sẵn; hai dòng này trước đây bị sót.
+const news = computed(() => split.value?.events || [])
+const announcements = computed(() => split.value?.announcements || [])
 
 // Khối trang chủ động (quản trị trong Drupal): Hoạt động chuyên môn, Dịch vụ,
 // Cơ sở/Liên hệ, và CTA + Video (node home_block).
