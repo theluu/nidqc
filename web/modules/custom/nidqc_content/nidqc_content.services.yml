@@ -1,0 +1,8 @@
+services:
+  nidqc_content.news_presenter:
+    class: Drupal\nidqc_content\NewsPresenter
+    arguments:
+      - '@entity_type.manager'
+      - '@file_url_generator'
+      - '@stream_wrapper_manager'
+      - '@image.factory'

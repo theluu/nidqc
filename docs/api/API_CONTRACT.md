@@ -48,11 +48,160 @@ thì chưa được gọi, chưa được viết.
 | `POST /api/v1/contact` | contact form `/lien-he` | 🟢 Chốt trong TASK-009 |
 | `GET /api/v1/documents` | `doc-filter` | 🔴 Chưa đặc tả |
 | `GET /api/v1/news` | `news-filter` | 🔴 Chưa đặc tả |
+| `GET /api/v1/news/search` | popup tìm kiếm + `/tim-kiem` | 🟢 Chốt trong TASK-017 |
+| `GET /api/v1/news/list` | `/tin-tuc`, trang chủ, `sitemap.xml` | 🟢 Chốt trong TASK-018 |
+| `GET /api/v1/news/detail` | trang chi tiết tin `/<slug>` | 🟢 Chốt trong TASK-018 |
 | `GET /api/v1/standards/search` | `standard-search` | 🔴 Chưa đặc tả — **phạm vi chưa rõ**, xem `PROJECT_CONTEXT.md` §5 |
 
 `mega-menu`, `faq-accordion`, `tabs` **không cần API** — dữ liệu render sẵn từ Twig.
 
 ## 4. Endpoint đã chốt
+
+### `GET /api/v1/news/list`
+
+**Mục đích:** danh sách tin có phân trang **kèm tổng số** và (tuỳ chọn) danh mục,
+phục vụ `/tin-tuc`, khối tin trang chủ và `sitemap.xml`.
+
+**Vì sao không dùng JSON:API:** JSON:API không trả tổng số bản ghi (chỉ có link
+`next`/`prev`) và chặn cứng `page[limit]` ở 50. Frontend phải liệt kê hết rồi cộng
+— 18 request chỉ để đếm 705 tin, đo được 5.5s cho một lần mở `/tin-tuc` khi cache
+nguội. Ở đây tổng số là một câu `COUNT`.
+
+**Query params**
+
+| Tên | Kiểu | Bắt buộc | Mặc định | Ràng buộc |
+|---|---|---|---|---|
+| `cat` | string | không | — | UUID term hoặc **tên** chuyên mục, nhiều giá trị phân tách bằng `,`; `all` = không lọc |
+| `page` | int | không | `0` | số nguyên, 0–10000 |
+| `limit` | int | không | `12` | số nguyên, 1–50 |
+| `categories` | string | không | — | `1` để trả kèm danh sách chuyên mục |
+
+Param ngoài contract bị từ chối bằng `400 INVALID_PARAMETER`. `cat` không khớp
+chuyên mục nào trả `200` với `data: []` (không phải lỗi).
+
+**Response 200**
+
+```json
+{
+  "data": [
+    {
+      "id": 123,
+      "title": "Thông báo mẫu",
+      "created": "2026-07-26T08:30:00+00:00",
+      "changed": "2026-07-26T09:00:00+00:00",
+      "tag": "Thông báo",
+      "category": "Thông báo",
+      "image": "/sites/default/files/styles/max_650x650/public/news/example.jpg.avif?itok=…",
+      "alias": "/thong-bao-mau"
+    }
+  ],
+  "meta": { "total": 705, "page": 0, "limit": 12 },
+  "categories": [{ "id": "<uuid>", "label": "Thông báo" }]
+}
+```
+
+`categories` chỉ xuất hiện khi truyền `categories=1`.
+
+**Cache:** cache tag `node_list:news`, `taxonomy_term_list:news_category`; cache
+context `url.query_args:cat|page|limit|categories`.
+
+### `GET /api/v1/news/detail`
+
+**Mục đích:** trọn gói dữ liệu một trang chi tiết tin — node + tin liên quan + tin
+mới nhất — trong **một** request.
+
+**Vì sao không dùng JSON:API:** JSON:API không lọc được trên computed field `path`
+(trả 500 `'path' not found`), nên frontend phải dựng map `alias -> nid` bằng 16
+request quét toàn bộ node: đo được **13.8s** khi cache Drupal nguội, 1.07s khi ấm.
+Ở đây alias tra thẳng bảng `path_alias` (1 query có index).
+
+**Query params**
+
+| Tên | Kiểu | Bắt buộc | Mặc định | Ràng buộc |
+|---|---|---|---|---|
+| `alias` | string | có | — | đường dẫn bài, tối đa 512 ký tự; tự thêm `/` đầu |
+
+**Response 200**
+
+```json
+{
+  "data": {
+    "node": {
+      "nid": 106,
+      "title": "Tiêu đề bài",
+      "created": "2026-05-28T05:00:00+00:00",
+      "tag": "Tin hoạt động",
+      "category": "Tin hoạt động",
+      "image": "/sites/default/files/styles/max_1300x1300/public/…?itok=…",
+      "body": "<p>…</p>",
+      "attachments": [{ "url": "/sites/default/files/…pdf", "label": "Văn bản gốc" }]
+    },
+    "related": [{ "id": 1, "title": "…", "created": "…", "changed": "…", "tag": "…", "category": "…", "image": "…", "alias": "/…" }],
+    "latest": []
+  }
+}
+```
+
+`related` tối đa 3 (cùng chuyên mục, thiếu thì lấp bằng `latest`), `latest` tối đa 5.
+Ảnh trong `body` được đổi sang image style `max_1300x1300`, thêm
+`loading="lazy" decoding="async"` và `width`/`height` đúng tỉ lệ derivative (đo từ
+file gốc) để lazy-load không gây layout shift.
+
+**Lỗi:** `400 MISSING_PARAMETER` · `400 INVALID_PARAMETER` · `404 NOT_FOUND`
+(alias không tồn tại, không phải bài `news`, hoặc chưa xuất bản) · `500 INTERNAL_ERROR`.
+
+**Cache:** cache tag `node_list:news` + cache tag của node; cache context
+`url.query_args:alias`. Response 404 cũng cacheable theo `node_list:news` để bài
+mới xuất bản tự làm mới.
+
+### `GET /api/v1/news/search`
+
+**Mục đích:** tìm theo tiêu đề và nội dung trong content type `news`, phục vụ
+popup tìm kiếm toàn site và trang kết quả SSR `/tim-kiem`.
+
+**Query params**
+
+| Tên | Kiểu | Bắt buộc | Mặc định | Ràng buộc |
+|---|---|---|---|---|
+| `q` | string | có | — | trim, 2–200 ký tự |
+| `page` | int | không | `0` | số nguyên, 0–10000 |
+| `limit` | int | không | `12` | số nguyên, 1–100 |
+
+Param ngoài contract bị từ chối bằng `400 INVALID_PARAMETER`.
+
+**Response 200**
+
+```json
+{
+  "data": [
+    {
+      "id": 123,
+      "title": "Thông báo mẫu",
+      "created": "2026-07-26T08:30:00+07:00",
+      "tag": "Thông báo",
+      "image": "/sites/default/files/news/example.jpg",
+      "url": "/tin-tuc/thong-bao-mau"
+    }
+  ],
+  "meta": { "total": 1, "page": 0, "limit": 12 }
+}
+```
+
+**Lỗi:** `400 MISSING_PARAMETER` · `400 INVALID_PARAMETER` ·
+`500 INTERNAL_ERROR`.
+
+**Cache:** cache tag `node_list:news`; cache context `url.query_args:q`,
+`url.query_args:page`, `url.query_args:limit`.
+
+**Quyền:** route yêu cầu `access content`. Entity Query luôn
+`->accessCheck(TRUE)`, giới hạn `type = news` và `status = 1`.
+
+**Bảo mật:** không nối chuỗi SQL; từ khóa đi qua Entity Query; không trả body;
+giới hạn độ dài từ khóa, trang và số kết quả.
+
+**Progressive enhancement:** icon là link tới `/tim-kiem`; popup chứa form GET
+tới `/tim-kiem?q=...`. Trang kết quả được Nuxt SSR render nên kết quả có trong
+HTML thô; không JavaScript vẫn mở trang và gửi form được.
 
 ### `GET /api/v1/contact/config`
 

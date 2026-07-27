@@ -122,7 +122,6 @@ function nidqc_content_default_menu(): array {
       ['Liên hệ', 'internal:/lien-he'],
       ['Câu hỏi thường gặp', 'internal:/faq'],
     ]],
-    ['Tra cứu', 'internal:/#chat-chuan', []],
   ];
 }
 
@@ -230,4 +229,18 @@ function nidqc_content_update_11001(): void {
   }
 
   _nidqc_content_create_menu();
+}
+
+/**
+ * Removes the retired Tra cứu menu link.
+ */
+function nidqc_content_update_11002(): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
+  $links = $storage->loadByProperties([
+    'menu_name' => 'main',
+    'title' => 'Tra cứu',
+  ]);
+  if ($links) {
+    $storage->delete($links);
+  }
 }

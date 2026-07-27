@@ -7,54 +7,34 @@ const reqUrl = useRequestURL()
 const slug = computed(() => String(route.params.slug))
 
 const { data } = await useCachedData(`news-slug-${route.params.slug}`, async () => {
-  // Phân giải alias -> nid qua endpoint cache (/__resolve-news) thay vì lặp JSON:API
-  // (trước đây mở node lần đầu tốn ~16 request, cold ~15s). Xem server/utils/newsAlias.ts.
-  const { nid } = await $fetch('/__resolve-news', { params: { alias: `/${slug.value}` } })
-  if (!nid) return null
-  const res = await fetchJsonApi('/node/news', {
-    'filter[drupal_internal__nid]': nid, include: 'field_image,field_category,field_attachments',
+  // MỘT request duy nhất: controller nidqc_content.news_detail tra alias qua bảng
+  // path_alias rồi trả luôn node + tin liên quan + tin mới nhất. Xem useNewsDetail.ts
+  // để biết vì sao bỏ đường cũ (map alias->nid dựng bằng 16 request JSON:API).
+  const payload = await fetchNewsDetail(`/${slug.value}`)
+  if (!payload) return null
+
+  const mapItem = (x) => ({
+    id: x.id,
+    title: x.title,
+    date: formatDate(x.created),
+    category: x.category,
+    image: newsImageUrl(x.image),
+    alias: x.alias,
   })
-  if (!res.data.length) return null
-  const n = res.data[0]
-  const categoryName = termLabel(n, 'field_category', res.included)
-  const node = {
-    nid,
-    title: n.attributes.title,
-    date: formatDate(n.attributes.created),
-    tag: n.attributes.field_tag || categoryName,
-    category: categoryName,
-    image: imageUrl(n, res.included),
-    body: n.attributes.body?.processed || '',
-    attachments: attachments(n, res.included),
+
+  return {
+    node: {
+      ...payload.node,
+      date: formatDate(payload.node.created),
+      image: newsImageUrl(payload.node.image),
+      attachments: payload.node.attachments.map((f) => ({
+        ...f,
+        url: newsImageUrl(f.url),
+      })),
+    },
+    related: payload.related.map(mapItem),
+    latest: payload.latest.map(mapItem),
   }
-
-  const mapItem = (x, inc) => ({
-    id: x.attributes.drupal_internal__nid,
-    title: x.attributes.title,
-    date: formatDate(x.attributes.created),
-    category: termLabel(x, 'field_category', inc),
-    image: imageUrl(x, inc),
-    alias: x.attributes.path?.alias || `/tin-tuc/${x.attributes.drupal_internal__nid}`,
-  })
-  const listParams = (extra) => ({
-    'filter[status]': 1, sort: '-created', 'page[limit]': 8,
-    include: 'field_image,field_category', ...extra,
-  })
-  const catFilter = categoryName ? {
-    'filter[cat][condition][path]': 'field_category.name',
-    'filter[cat][condition][operator]': 'IN',
-    'filter[cat][condition][value][0]': categoryName,
-  } : {}
-
-  const [relRes, latestRes] = await Promise.all([
-    categoryName ? fetchJsonApi('/node/news', listParams(catFilter)) : Promise.resolve({ data: [], included: [] }),
-    fetchJsonApi('/node/news', listParams({})),
-  ])
-
-  const latest = latestRes.data.map((x) => mapItem(x, latestRes.included)).filter((i) => i.id !== nid)
-  let related = relRes.data.map((x) => mapItem(x, relRes.included)).filter((i) => i.id !== nid)
-  if (!related.length) related = latest
-  return { node, related: related.slice(0, 3), latest: latest.slice(0, 5) }
 })
 
 if (!data.value?.node) {
@@ -192,7 +172,7 @@ useHead({
                 <NuxtLink v-for="item in latest" :key="item.id" :to="item.alias" class="nidqc-aside-item"
                   style="display:flex;gap:12px;padding:13px 16px;border-bottom:1px solid #ECECEC;text-decoration:none;align-items:flex-start;">
                   <div style="width:72px;height:56px;flex:0 0 72px;background:#E8F0F7;overflow:hidden;">
-                    <img v-if="item.image" :src="item.image" alt="" style="width:100%;height:100%;object-fit:cover;">
+                    <img loading="lazy" v-if="item.image" :src="item.image" alt="" style="width:100%;height:100%;object-fit:cover;">
                   </div>
                   <span style="flex:1;min-width:0;">
                     <span class="nidqc-aside-title nidqc-clamp-2" style="display:block;font-size:13.5px;line-height:19px;color:#212529;font-weight:500;">{{ item.title }}</span>
@@ -218,7 +198,7 @@ useHead({
           <NuxtLink v-for="item in related" :key="item.id" :to="item.alias" class="nidqc-related-card"
             style="display:block;background:#fff;border:1px solid #E4E9F0;text-decoration:none;">
             <div class="nidqc-related-thumb" style="position:relative;width:100%;padding-top:56.25%;background:#0D2870;">
-              <img v-if="item.image" :src="item.image" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+              <img loading="lazy" v-if="item.image" :src="item.image" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
               <span v-if="item.category" style="position:absolute;top:12px;left:12px;background:rgba(15,48,147,0.92);color:#fff;font-family:'Lexend',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;padding:4px 10px;">{{ item.category }}</span>
             </div>
             <div style="padding:16px 18px 20px;">

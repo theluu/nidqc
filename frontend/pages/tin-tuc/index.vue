@@ -1,8 +1,8 @@
 <script setup>
 // Danh sách Tin tức — PHÂN TRANG PHÍA SERVER (12 tin/trang).
 // Trạng thái nằm trong URL: ?cat=<uuid>&trang=N -> SSR đúng, chia sẻ link được, F5 giữ nguyên.
-// Không tải toàn bộ rồi lọc phía JS (có >700 tin): mỗi trang chỉ nạp 12 tin, lọc chuyên
-// mục bằng filter[field_category.id]; tổng số trang tính từ countNews (đếm id-only).
+// Không tải toàn bộ rồi lọc phía JS (có >700 tin): mỗi trang chỉ nạp 12 tin qua
+// endpoint /api/v1/news/list, trả kèm meta.total nên số trang có ngay trong 1 request.
 const PAGE_SIZE = 12
 const route = useRoute()
 const listTop = ref(null)
@@ -17,19 +17,19 @@ const categorySlug = (value) => String(value || '')
   .replace(/^-|-$/g, '')
 const page = computed(() => Math.max(1, parseInt(String(route.query.trang || '1'), 10) || 1))
 
-const mapItem = (n, included) => ({
-  id: n.attributes.drupal_internal__nid,
-  title: n.attributes.title,
-  date: formatDate(n.attributes.created),
-  tag: n.attributes.field_tag || termLabel(n, 'field_category', included),
-  image: imageUrl(n, included),
-  alias: n.attributes.path?.alias || `/tin-tuc/${n.attributes.drupal_internal__nid}`,
+const mapItem = (n) => ({
+  id: n.id,
+  title: n.title,
+  date: formatDate(n.created),
+  tag: n.tag,
+  image: newsImageUrl(n.image),
+  alias: n.alias,
 })
 
-// Chuyên mục — ít đổi, cache dùng chung.
+// Chuyên mục — ít đổi, cache dùng chung. Lấy kèm request danh sách đầu tiên.
 const { data: categories } = await useCachedData('news-categories', async () => {
-  const { data } = await fetchJsonApi('/taxonomy_term/news_category', { sort: 'weight' })
-  return data.map((t) => ({ id: t.id, label: t.attributes.name }))
+  const { categories } = await fetchNewsList({ limit: 1, categories: true })
+  return categories ?? []
 })
 const cat = computed(() => {
   const requested = String(route.query.cat || 'all')
@@ -37,27 +37,23 @@ const cat = computed(() => {
   return categories.value?.find((item) => item.id === requested || categorySlug(item.label) === requested)?.id || 'all'
 })
 
-// Tổng số tin theo chuyên mục -> số trang. Key chỉ phụ thuộc cat (đổi trang không đếm lại).
-const { data: total } = await useCachedData(
-  () => `news-count-${cat.value}`,
-  () => countNews(cat.value),
-)
-const totalPages = computed(() => Math.max(1, Math.ceil((total.value || 0) / PAGE_SIZE)))
-
-// 12 tin của trang hiện tại. Key theo (cat, trang) -> đổi trang tự refetch, mỗi trang
-// cache riêng nên quay lại tức thì mà vẫn đúng dữ liệu.
-const { data: news, pending } = await useCachedData(
+// 12 tin của trang hiện tại + TỔNG SỐ trong cùng một request (endpoint trả meta.total
+// bằng một câu COUNT). Trước đây tổng số phải đếm bằng cách liệt kê hết 705 tin —
+// 18 request JSON:API, 5.5s khi cache nguội. Key theo (cat, trang) nên đổi trang tự
+// refetch, mỗi trang cache riêng, quay lại tức thì mà vẫn đúng dữ liệu.
+const { data: result, pending } = await useCachedData(
   () => `news-list-${cat.value}-p${page.value}`,
   async () => {
-    const params = {
-      'filter[status]': 1, sort: '-created', include: 'field_image,field_category',
-      'page[limit]': PAGE_SIZE, 'page[offset]': (page.value - 1) * PAGE_SIZE,
-    }
-    if (cat.value !== 'all') params['filter[field_category.id]'] = cat.value
-    const { data, included } = await fetchJsonApi('/node/news', params)
-    return data.map((n) => mapItem(n, included))
+    const res = await fetchNewsList({
+      cat: cat.value,
+      page: page.value - 1,
+      limit: PAGE_SIZE,
+    })
+    return { items: res.data.map(mapItem), total: res.meta.total }
   },
 )
+const news = computed(() => result.value?.items || [])
+const totalPages = computed(() => Math.max(1, Math.ceil((result.value?.total || 0) / PAGE_SIZE)))
 
 const selectCat = (id) => {
   const q = { ...route.query }
@@ -100,21 +96,7 @@ useSeoMeta({
 
         <p v-if="!news || !news.length" class="empty">Không có tin nào trong chuyên mục này.</p>
 
-        <div v-else class="grid" :class="{ 'is-loading': pending }">
-          <NuxtLink v-for="item in news" :key="item.id" :to="item.alias" class="card">
-            <div class="card__thumb">
-              <img v-if="item.image" :src="item.image" :alt="item.title" loading="lazy">
-            </div>
-            <div class="card__body">
-              <span v-if="item.tag" class="card__tag">{{ item.tag }}</span>
-              <h3 class="card__title">{{ item.title }}</h3>
-              <div class="card__date">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
-                {{ item.date }}
-              </div>
-            </div>
-          </NuxtLink>
-        </div>
+        <NewsGrid v-else :items="news" :loading="pending" />
 
         <Pagination :current="page" :total="totalPages" @change="changePage" />
       </div>
@@ -167,90 +149,4 @@ useSeoMeta({
   padding: 24px 0;
 }
 
-/* Lưới thẻ tin */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  transition: opacity .2s;
-}
-.grid.is-loading {
-  opacity: .5;
-}
-@media (max-width: 1024px) {
-  .grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 768px) {
-  .grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 480px) {
-  .grid { grid-template-columns: 1fr; }
-}
-
-.card {
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  border: 1px solid #ECECEC;
-  border-radius: 8px;
-  overflow: hidden;
-  text-decoration: none;
-  transition: transform .18s, box-shadow .18s, border-color .18s;
-}
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(15, 48, 147, 0.12);
-  border-color: #D8DEE6;
-}
-.card__thumb {
-  aspect-ratio: 16 / 10;
-  background: #E8F0F7;
-  overflow: hidden;
-}
-.card__thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform .3s;
-}
-.card:hover .card__thumb img {
-  transform: scale(1.05);
-}
-.card__body {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: 16px 18px 18px;
-}
-.card__tag {
-  align-self: flex-start;
-  background: #E8F0F7;
-  color: #0F3093;
-  font-size: 10.5px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  padding: 3px 9px;
-  border-radius: 4px;
-  margin-bottom: 10px;
-}
-.card__title {
-  font-size: 14px;
-  line-height: 20px;
-  color: #212529;
-  font-weight: 500;
-  margin: 0 0 12px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.card__date {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: auto;
-  color: #777;
-  font-size: 12px;
-}
 </style>

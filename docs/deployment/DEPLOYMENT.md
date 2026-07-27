@@ -53,13 +53,34 @@ Chạy server SSR, giữ sống bằng **systemd/pm2** (tự restart khi crash/r
 
 ```bash
 DRUPAL_INTERNAL=https://<drupal-host> \
+NUXT_PURGE_TOKEN=<chuỗi bí mật> \
 NUXT_HOST=0.0.0.0 NUXT_PORT=3000 \
 node .output/server/index.mjs
 ```
 
-- `DRUPAL_INTERNAL` — URL Drupal để Nuxt gọi JSON:API phía server (SSR).
+- `DRUPAL_INTERNAL` — URL Drupal để Nuxt gọi API phía server (SSR).
 - `NUXT_PORT` — cổng nội bộ (vd 3000) cho nginx trỏ vào.
+- `NUXT_PURGE_TOKEN` — token cho `POST /__purge`. Thiếu biến này thì endpoint trả
+  `503` và cache HTML chỉ hết theo TTL (10 phút) thay vì cập nhật ngay khi sửa bài.
 - Local dev chạy tiến trình này qua `web_extra_daemons: nuxt-ssr` trong `.ddev/config.yaml`.
+
+### Cache HTML và purge
+
+Nuxt cache HTML đã render (`routeRules: { '/**': { swr: 600 } }`) xuống đĩa
+(`/tmp/nidqc-nitro-cache`, đổi bằng `NUXT_CACHE_DIR` **lúc build**). Trang ấm trả
+trong ~20ms mà không chạm Drupal.
+
+Để biên tập viên thấy thay đổi ngay, Drupal gọi sang Nuxt sau mỗi lần lưu nội dung
+(`hook_node_insert/update/delete`, `hook_taxonomy_term_update/delete` trong
+`nidqc_content.module`). Cấu hình phía Drupal — `settings.php` hoặc biến môi trường:
+
+```php
+$settings['nidqc_frontend_purge_url'] = 'http://127.0.0.1:3000/__purge';
+$settings['nidqc_frontend_purge_token'] = '<khớp NUXT_PURGE_TOKEN>';
+```
+
+Không cấu hình thì hook bỏ qua im lặng. Purge chạy trong shutdown function nên
+không làm chậm thao tác lưu bài; lỗi mạng chỉ ghi log warning.
 
 **nginx** (mẫu: `.ddev/nginx_full/nginx-site.conf`) — chia luồng:
 - `location /` → `proxy_pass http://127.0.0.1:3000` (Nuxt SSR)

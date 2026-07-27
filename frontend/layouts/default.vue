@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { nextTick, ref, onMounted, onUnmounted } from 'vue';
 
 /**
  * Layout dùng chung mọi trang — tái tạo từ design đã duyệt.
@@ -12,6 +12,9 @@ const mobileOpen = ref(false);
 const navBottom = ref(50);
 const headerEl = ref(null);
 const langOpen = ref(false);
+const searchOpen = ref(false);
+const searchInput = ref(null);
+const searchTrigger = ref(null);
 const curLang = ref('vi');
 const { onlineCount } = await useOnlineCounter();
 let timer;
@@ -145,17 +148,39 @@ function setMobile(open) {
   }
 }
 
+async function openSearch(event) {
+  event?.preventDefault();
+  setMobile(false);
+  searchOpen.value = true;
+  await nextTick();
+  searchInput.value?.focus();
+}
+
+async function closeSearch() {
+  searchOpen.value = false;
+  await nextTick();
+  searchTrigger.value?.focus();
+}
+
+function handleEscape(event) {
+  if (event.key === 'Escape' && searchOpen.value) {
+    closeSearch();
+  }
+}
+
 onMounted(() => {
   tick();
   timer = setInterval(tick, 30000);
   resetGoogleTranslate();
   loadGoogleTranslate();
+  document.addEventListener('keydown', handleEscape);
 });
 onUnmounted(() => {
   clearInterval(timer);
   clearTimeout(googleLanguageSyncTimer);
   window.removeEventListener('scroll', syncNavBottom);
   window.removeEventListener('resize', syncNavBottom);
+  document.removeEventListener('keydown', handleEscape);
 });
 
 // Menu lấy từ design (const NAV). href trỏ route Vue.
@@ -204,7 +229,6 @@ const nav = [
     { label: 'Liên hệ', to: '/lien-he' },
     { label: 'Câu hỏi thường gặp', to: '/faq' },
   ] },
-  { label: 'Tra cứu', to: '/#chat-chuan', children: [] },
 ];
 
 const footerLinks = [
@@ -295,12 +319,36 @@ const footerLinks = [
             </div>
           </div>
         </nav>
-        <a href="https://nidqc.gov.vn/tim-kiem-chat-chuan" title="Tra cứu" class="nidqc-nav-search"
+        <!-- Thẻ <a> THƯỜNG, không phải NuxtLink: NuxtLink tự điều hướng qua Vue Router
+             nên preventDefault() không chặn được -> bấm icon vừa mở popup vừa nhảy sang
+             /tim-kiem. Với <a> thường, có JS thì @click.prevent mở popup và ở lại trang;
+             không JS thì href đưa thẳng tới trang tìm kiếm (progressive enhancement).
+             ref trên phần tử thường cũng trả về DOM node nên .focus() chạy đúng. -->
+        <a ref="searchTrigger" href="/tim-kiem" title="Tìm kiếm Tin tức" class="nidqc-nav-search"
+           aria-haspopup="dialog" :aria-expanded="searchOpen ? 'true' : 'false'" @click.prevent="openSearch"
            style="align-self:center;display:flex;align-items:center;justify-content:center;width:42px;height:34px;background:#1D6AC5;border-radius:18px;margin-left:10px;flex:0 0 auto;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <span class="nidqc-visually-hidden">Tìm kiếm Tin tức</span>
         </a>
       </div>
     </header>
+
+    <div v-if="searchOpen" class="nidqc-search-overlay" role="presentation" @mousedown.self="closeSearch">
+      <section class="nidqc-search-dialog" role="dialog" aria-modal="true" aria-labelledby="nidqc-search-title">
+        <button type="button" class="nidqc-search-close" aria-label="Đóng tìm kiếm" @click="closeSearch">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+        <h2 id="nidqc-search-title">Tìm kiếm Tin tức</h2>
+        <p>Nhập từ khóa để tìm trong tiêu đề và nội dung Tin tức.</p>
+        <form class="nidqc-search-form" action="/tim-kiem" method="get">
+          <label for="nidqc-search-input">Từ khóa</label>
+          <div class="nidqc-search-form__row">
+            <input id="nidqc-search-input" ref="searchInput" name="q" type="search" minlength="2" maxlength="200" required autocomplete="off" placeholder="Nhập từ khóa tìm kiếm…">
+            <button type="submit">Tìm kiếm</button>
+          </div>
+        </form>
+      </section>
+    </div>
 
     <!-- ===== NỘI DUNG TRANG ===== -->
     <main>

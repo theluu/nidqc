@@ -1,0 +1,26 @@
+nidqc_content.news_search:
+  path: '/api/v1/news/search'
+  defaults:
+    _controller: '\Drupal\nidqc_content\Controller\NewsSearchController::search'
+    _format: 'json'
+  requirements:
+    _permission: 'access content'
+  methods: [GET]
+
+nidqc_content.news_list:
+  path: '/api/v1/news/list'
+  defaults:
+    _controller: '\Drupal\nidqc_content\Controller\NewsListController::list'
+    _format: 'json'
+  requirements:
+    _permission: 'access content'
+  methods: [GET]
+
+nidqc_content.news_detail:
+  path: '/api/v1/news/detail'
+  defaults:
+    _controller: '\Drupal\nidqc_content\Controller\NewsDetailController::detail'
+    _format: 'json'
+  requirements:
+    _permission: 'access content'
+  methods: [GET]

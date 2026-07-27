@@ -15,6 +15,10 @@ web_environment:
     - NIDQC_RECAPTCHA_BYPASS=0
     - NIDQC_RECAPTCHA_MIN_SCORE=0.5
     - NIDQC_CONTACT_ADMIN_EMAIL=noreply@nidqc.gov.vn
+    # Drupal gọi vào đây để xoá cache HTML của Nuxt sau khi sửa nội dung
+    # (hook trong nidqc_content.module). Token dev; production đặt giá trị riêng.
+    - NIDQC_PURGE_URL=http://127.0.0.1:3000/__purge
+    - NIDQC_PURGE_TOKEN=nidqc-dev-purge-token
 corepack_enable: true
 
 # Key features of DDEV's config.yaml:
@@ -299,5 +303,5 @@ corepack_enable: true
 
 web_extra_daemons:
   - name: nuxt-ssr
-    command: "cd /var/www/html/frontend && NODE_TLS_REJECT_UNAUTHORIZED=0 DRUPAL_INTERNAL=https://nidqc.ddev.site NUXT_HOST=0.0.0.0 NUXT_PORT=3000 node .output/server/index.mjs"
+    command: "cd /var/www/html/frontend && NODE_TLS_REJECT_UNAUTHORIZED=0 DRUPAL_INTERNAL=https://nidqc.ddev.site NUXT_PURGE_TOKEN=nidqc-dev-purge-token NUXT_HOST=0.0.0.0 NUXT_PORT=3000 node .output/server/index.mjs"
     directory: /var/www/html/frontend

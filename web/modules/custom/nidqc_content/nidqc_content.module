@@ -1,0 +1,89 @@
+<?php
+
+/**
+ * @file
+ * Hook của module NIDQC Content.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Site\Settings;
+
+/**
+ * Xoá cache trang của frontend Nuxt sau khi nội dung thay đổi.
+ *
+ * Nuxt cache HTML đã render (SWR) nên nếu không báo, biên tập viên sửa bài xong
+ * vẫn thấy bản cũ tới khi hết TTL. Drupal tự invalidate cache tag của chính nó,
+ * còn tầng Nitro thì phải gọi sang. Chạy trong shutdown function để người sửa bài
+ * không phải chờ request mạng.
+ */
+function _nidqc_content_purge_frontend(): void {
+  $url = (string) (Settings::get('nidqc_frontend_purge_url') ?: getenv('NIDQC_PURGE_URL'));
+  $token = (string) (Settings::get('nidqc_frontend_purge_token') ?: getenv('NIDQC_PURGE_TOKEN'));
+  if ($url === '' || $token === '') {
+    // Chưa cấu hình purge (ví dụ môi trường chỉ chạy Drupal) — bỏ qua im lặng.
+    return;
+  }
+
+  static $scheduled = FALSE;
+  if ($scheduled) {
+    // Lưu nhiều node trong một request (import, bulk action) chỉ purge một lần.
+    return;
+  }
+  $scheduled = TRUE;
+
+  drupal_register_shutdown_function(static function () use ($url, $token): void {
+    try {
+      \Drupal::httpClient()->post($url, [
+        'headers' => ['X-Purge-Token' => $token],
+        'timeout' => 5,
+        'connect_timeout' => 2,
+        // DDEV dùng cert tự ký; production đặt NIDQC_PURGE_URL qua http nội bộ.
+        'verify' => (bool) Settings::get('nidqc_frontend_purge_verify', TRUE),
+      ]);
+    }
+    catch (\Throwable $exception) {
+      // Purge hỏng không được làm hỏng thao tác lưu bài; cache tự hết hạn theo TTL.
+      \Drupal::logger('nidqc_content')->warning('Không purge được cache frontend: @message', [
+        '@message' => $exception->getMessage(),
+      ]);
+    }
+  });
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for node entities.
+ */
+function nidqc_content_node_insert(EntityInterface $entity): void {
+  _nidqc_content_purge_frontend();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for node entities.
+ */
+function nidqc_content_node_update(EntityInterface $entity): void {
+  _nidqc_content_purge_frontend();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for node entities.
+ */
+function nidqc_content_node_delete(EntityInterface $entity): void {
+  _nidqc_content_purge_frontend();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for taxonomy_term entities.
+ */
+function nidqc_content_taxonomy_term_update(EntityInterface $entity): void {
+  // Đổi tên chuyên mục làm thay đổi nhãn hiển thị trên mọi trang tin.
+  _nidqc_content_purge_frontend();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for taxonomy_term entities.
+ */
+function nidqc_content_taxonomy_term_delete(EntityInterface $entity): void {
+  _nidqc_content_purge_frontend();
+}

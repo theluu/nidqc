@@ -27,20 +27,30 @@ export default defineEventHandler(async (event) => {
   const origin = `https://${host}`
 
   // Lấy tin đã xuất bản để đưa vào sitemap (alias gốc + ngày sửa cho <lastmod>).
+  // Liệt kê TẤT CẢ tin qua /api/v1/news/list. Trước đây dùng JSON:API với
+  // page[limit]=200, nhưng JSON:API chặn cứng ở 50 nên sitemap chỉ có 50/705 bài —
+  // crawler không thấy phần còn lại. Endpoint mới trả meta.total nên biết chính xác
+  // cần bao nhiêu trang; kết quả lại được cache SWR nên vòng lặp này hiếm khi chạy.
+  const PER_PAGE = 50
+  const MAX_PAGES = 60 // chặn trên an toàn: 3000 tin
   const news: Array<{ path: string; changed: string }> = []
+  const fetchPage = (page: number): Promise<any> => $fetch(`${drupal}/api/v1/news/list`, {
+    params: { page, limit: PER_PAGE },
+    headers: { Accept: 'application/json' },
+  })
   try {
-    const res: any = await $fetch(`${drupal}/jsonapi/node/news`, {
-      params: {
-        'filter[status]': 1,
-        sort: '-changed',
-        'fields[node--news]': 'drupal_internal__nid,changed,path',
-        'page[limit]': 200,
-      },
-      headers: { Accept: 'application/vnd.api+json' },
-    })
-    for (const n of res.data ?? []) {
-      const path = n.attributes.path?.alias || `/tin-tuc/${n.attributes.drupal_internal__nid}`
-      news.push({ path, changed: n.attributes.changed })
+    // Trang đầu cho biết meta.total -> các trang còn lại gọi SONG SONG thay vì
+    // tuần tự (15 request nối đuôi nhau mất ~8.5s khi cache Drupal nguội).
+    const first = await fetchPage(0)
+    const total = first.meta?.total ?? 0
+    const pages = Math.min(Math.ceil(total / PER_PAGE), MAX_PAGES)
+    const rest = await Promise.all(
+      Array.from({ length: Math.max(0, pages - 1) }, (_, i) => fetchPage(i + 1)),
+    )
+    for (const res of [first, ...rest]) {
+      for (const n of res.data ?? []) {
+        news.push({ path: n.alias, changed: n.changed })
+      }
     }
   } catch {
     // Drupal không phản hồi -> vẫn trả sitemap các trang tĩnh, không để 500.

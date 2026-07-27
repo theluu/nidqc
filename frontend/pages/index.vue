@@ -1,5 +1,6 @@
 <script setup>
-// Trang chủ — SSR fetch tin tức từ Drupal JSON:API (ADR-004).
+// Trang chủ — SSR fetch từ Drupal (ADR-004). Tin tức đi qua /api/v1/news/list của
+// module nidqc_content (ảnh đã qua image style); các khối còn lại vẫn dùng JSON:API.
 //
 // Design tách 2 khối: hero = tin SỰ KIỆN, section "Thông báo" = thông báo hành chính.
 // KHÔNG lấy chung 50 tin mới rồi lọc phía JS: tin "Mua sắm - đấu thầu" áp đảo (>500)
@@ -8,36 +9,25 @@
 const EVENT_CATS = ['Tin hoạt động', 'Hội nghị - Hội thảo']
 const NOTICE_CATS = ['Thông báo', 'Mua sắm - đấu thầu', 'Tuyển dụng', 'Đào tạo']
 
-const mapItem = (n, included) => ({
-  id: n.attributes.drupal_internal__nid,
-  title: n.attributes.title,
-  date: formatDate(n.attributes.created),
-  tag: n.attributes.field_tag || termLabel(n, 'field_category', included),
-  category: termLabel(n, 'field_category', included),
-  image: imageUrl(n, included),
-  alias: n.attributes.path?.alias || `/tin-tuc/${n.attributes.drupal_internal__nid}`,
+const mapItem = (n) => ({
+  id: n.id,
+  title: n.title,
+  date: formatDate(n.created),
+  tag: n.tag,
+  category: n.category,
+  // Ảnh đã qua image style ở phía Drupal (trước đây trả file gốc, ~170KB/ảnh).
+  image: newsImageUrl(n.image),
+  alias: n.alias,
 })
-
-// Lọc theo tên chuyên mục (field_category.name IN [...]) — JSON:API condition group.
-const byCategory = (cats, limit) => {
-  const params = {
-    'filter[status]': 1, sort: '-created', 'page[limit]': limit,
-    include: 'field_image,field_category',
-    'filter[cat][condition][path]': 'field_category.name',
-    'filter[cat][condition][operator]': 'IN',
-  }
-  cats.forEach((c, i) => { params[`filter[cat][condition][value][${i}]`] = c })
-  return params
-}
 
 const { data: split } = await useCachedData('home-news', async () => {
   const [ev, an] = await Promise.all([
-    fetchJsonApi('/node/news', byCategory(EVENT_CATS, 6)),
-    fetchJsonApi('/node/news', byCategory(NOTICE_CATS, 4)),
+    fetchNewsList({ cat: EVENT_CATS.join(','), limit: 6 }),
+    fetchNewsList({ cat: NOTICE_CATS.join(','), limit: 4 }),
   ])
   return {
-    events: ev.data.map((n) => mapItem(n, ev.included)),
-    announcements: an.data.map((n) => mapItem(n, an.included)),
+    events: ev.data.map(mapItem),
+    announcements: an.data.map(mapItem),
   }
 })
 const news = computed(() => split.value.events)
@@ -120,7 +110,7 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
             <div style="flex:1;display:flex;flex-direction:column;">
               <NuxtLink v-for="item in news.slice(1, 6)" :key="item.id" :to="item.alias" style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #ECECEC;align-items:center;flex:1;text-decoration:none;">
                 <div style="width:66px;height:52px;flex:0 0 auto;background:#E8F0F7;overflow:hidden;">
-                  <img v-if="item.image" :src="item.image" alt="" style="width:100%;height:100%;object-fit:cover;">
+                  <img loading="lazy" v-if="item.image" :src="item.image" alt="" style="width:100%;height:100%;object-fit:cover;">
                 </div>
                 <span style="flex:1;min-width:0;">
                   <span style="display:block;font-size:13.5px;line-height:19px;color:#212529;font-weight:500;">{{ item.title }}</span>
@@ -156,7 +146,7 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
         <div class="nidqc-grid-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
           <NuxtLink v-for="item in announcements.slice(0, 4)" :key="item.id" :to="item.alias" style="display:block;background:#fff;border:1px solid #ECECEC;text-decoration:none;">
             <div style="width:100%;height:150px;background:#E8F0F7;overflow:hidden;">
-              <img v-if="item.image" :src="item.image" alt="" style="width:100%;height:100%;object-fit:cover;">
+              <img loading="lazy" v-if="item.image" :src="item.image" alt="" style="width:100%;height:100%;object-fit:cover;">
             </div>
             <div style="padding:16px 18px 20px;">
               <span v-if="item.tag" style="display:inline-block;background:#E8F0F7;color:#0F3093;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;padding:3px 9px;margin-bottom:10px;">{{ item.tag }}</span>
@@ -220,7 +210,7 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
               class="nidqc-weblink"
               style="display:flex;align-items:center;gap:12px;background:#F5F8FC;border:1px solid #ECECEC;padding:12px 14px;color:#212529;text-decoration:none;">
               <span style="width:44px;height:44px;flex:0 0 44px;background:#fff;border:1px solid #ECECEC;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                <img v-if="l.image" :src="l.image" :alt="l.label" style="width:100%;height:100%;object-fit:contain;">
+                <img loading="lazy" v-if="l.image" :src="l.image" :alt="l.label" style="width:100%;height:100%;object-fit:contain;">
                 <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D6AC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
               </span>
               <span style="flex:1;min-width:0;">

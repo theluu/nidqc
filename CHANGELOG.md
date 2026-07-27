@@ -8,7 +8,32 @@ Mỗi PR thêm một dòng vào `[Unreleased]`. Xem `docs/DEFINITION_OF_DONE.md`
 
 ## [Unreleased]
 
+### Added
+- **Tìm kiếm Tin tức** (TASK-017) — bỏ menu “Tra cứu”; icon search mở popup ngay tại
+  trang đang xem; trang kết quả `/tim-kiem` SSR, dùng chung `NewsCard`/`NewsGrid` với
+  `/tin-tuc`. Không JavaScript vẫn dùng được (icon là link tới `/tim-kiem`, form GET).
+- **Purge cache frontend từ Drupal** — `POST /__purge` (có token) cho Nitro; hook trong
+  `nidqc_content` gọi sang sau khi lưu node/term nên biên tập viên thấy thay đổi ngay
+  thay vì chờ hết TTL. Cần `NUXT_PURGE_TOKEN` (Nuxt) và `nidqc_frontend_purge_url` +
+  `nidqc_frontend_purge_token` (Drupal `settings.php`); thiếu thì hook bỏ qua im lặng.
+
+### Fixed
+- 🔴 **Trang chi tiết tin load 13.8s** — JSON:API không lọc được computed field `path`
+  nên frontend phải dựng map `alias -> nid` bằng 16 request quét toàn bộ 705 tin. Thêm
+  `GET /api/v1/news/detail` tra thẳng bảng `path_alias` và trả luôn node + tin liên quan
+  + tin mới nhất trong **một** request (4 → 1). Trang ấm: 3.3s → 0.018s.
+- 🔴 **`/tin-tuc` load 5.5s** — JSON:API không trả tổng số và chặn `page[limit]` ở 50 nên
+  phải liệt kê hết để đếm (18 request). Thêm `GET /api/v1/news/list` trả `meta.total`
+  bằng một câu `COUNT`.
+- **Sitemap thiếu 655/705 bài** — `page[limit]=200` bị JSON:API chặn ở 50 nên sitemap chỉ
+  có 50 tin. Nay phân trang qua `/api/v1/news/list`: 60 → 715 URL.
+- **Ảnh dùng file gốc** — tin tức trả thẳng file upload (trung bình 172KB, cá biệt 5.9MB).
+  Nay qua image style; ảnh trong thân bài thêm `loading="lazy"` kèm `width`/`height` đúng
+  tỉ lệ derivative để không gây layout shift.
+
 ### Changed
+- **Cache HTML ở Nitro (SWR 600s)** — trang ấm trả ~20ms không chạm Drupal. Cache xuống
+  đĩa để query tìm kiếm không làm phình RAM và giữ được qua lần restart.
 - **Tin tức và trang tài khoản** (TASK-015) — dùng ngày tạo mặc định thay field
   ngày đăng trùng lặp; submenu Tin tức mở đúng chuyên mục; trang đăng nhập bỏ
   breadcrumb Home và giữ navigation thống nhất với trang chủ.
