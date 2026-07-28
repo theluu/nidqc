@@ -368,6 +368,15 @@ body { top: 0 !important; position: static !important; }
 .nidqc-weblink { transition: border-color .15s ease, background .15s ease; }
 a.nidqc-weblink:hover { border-color: #0F3093; background: #EEF4FB; }
 
+/* ===== Badge reCAPTCHA v3 =====
+   Script Google chèn thẳng <div class="grecaptcha-badge"> vào <body>, nằm ngoài cây
+   component của Vue. Nuxt điều hướng kiểu SPA nên document không unload -> badge bám
+   lại ở mọi trang sau khi rời /lien-he (chỉ F5 mới mất). Ẩn mặc định, chỉ hiện ở
+   trang thật sự dùng reCAPTCHA: pages/lien-he.vue gắn class vào <body> bằng useHead
+   bodyAttrs và unhead tự gỡ khi rời trang. */
+.grecaptcha-badge { visibility: hidden; }
+body.nidqc-recaptcha .grecaptcha-badge { visibility: visible; }
+
 @media (prefers-reduced-motion: reduce) {
   .nidqc-related-card, .nidqc-related-card .nidqc-related-thumb img,
   .nidqc-aside-item, .nidqc-share-btn, .nidqc-weblink { transition: none; }
