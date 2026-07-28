@@ -210,6 +210,18 @@ final class NewsDetailController implements ContainerInjectionInterface {
     if ($categoryId !== NULL) {
       $query->condition('field_category.target_id', $categoryId);
     }
+    else {
+      // "Tin mới nhất" ở sidebar là tin đọc được, không phải bài Thư viện media.
+      // Tin liên quan đi theo $categoryId nên tự khớp đúng danh mục, không cần lọc.
+      $mediaIds = $this->presenter->mediaCategoryTermIds();
+      if ($mediaIds !== []) {
+        $query->condition(
+          $query->orConditionGroup()
+            ->condition('field_category.target_id', array_values($mediaIds), 'NOT IN')
+            ->notExists('field_category')
+        );
+      }
+    }
 
     $ids = $query->execute();
     if ($ids === []) {

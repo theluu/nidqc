@@ -17,6 +17,14 @@ const searchInput = ref(null);
 const searchTrigger = ref(null);
 const curLang = ref('vi');
 const { onlineCount } = await useOnlineCounter();
+
+// Thanh tin chạy dưới main menu — dùng chung cho MỌI trang nên fetch ở layout.
+// useCachedData khoá theo key nên điều hướng client-side không gọi lại Drupal; lỗi
+// fetch trả data = null và component tự ẩn, không được phép làm hỏng cả layout.
+const { data: tickerNews } = await useCachedData('layout-ticker', async () => {
+  const res = await fetchNewsList({ limit: 5 });
+  return res.data.map((n) => ({ id: n.id, title: n.title, alias: n.alias }));
+});
 let timer;
 let googleLanguageSyncTimer;
 
@@ -37,6 +45,25 @@ function tick() {
  */
 const defaultLanguage = { code: 'vi', label: 'Tiếng Việt' };
 const languages = ref([defaultLanguage]);
+
+// Hai ngôn ngữ bấm nhanh trên top bar. Phần còn lại (~100 thứ tiếng của Google
+// Translate) vẫn nằm trong dropdown bên cạnh.
+const quickLanguages = [
+  { code: 'vi', short: 'VI', label: 'Tiếng Việt' },
+  { code: 'en', short: 'EN', label: 'English' },
+];
+
+// Link mạng xã hội quản trị trong Drupal: /admin/config/nidqc/settings (mục "Mạng xã
+// hội"). Chỉ kênh nào điền URL mới được trả về, nên không cần lọc thêm ở đây.
+const SOCIAL_LABELS = { facebook: 'Facebook', youtube: 'YouTube', zalo: 'Zalo' };
+const { data: socialLinks } = await useCachedData('layout-social', async () => {
+  const res = await fetchPublicConfig();
+  return (res.social || []).map((s) => ({
+    key: s.key,
+    url: s.url,
+    label: SOCIAL_LABELS[s.key] || s.key,
+  }));
+});
 
 function googleTranslateCookieDomains() {
   const hostname = location.hostname;
@@ -183,53 +210,8 @@ onUnmounted(() => {
   document.removeEventListener('keydown', handleEscape);
 });
 
-// Menu lấy từ design (const NAV). href trỏ route Vue.
-// Menu đầy đủ theo design (const NAV). 9 mục, submenu 2 tầng.
-const nav = [
-  { label: 'Trang chủ', to: '/', children: [] },
-  { label: 'Giới thiệu', to: '/gioi-thieu-chung', children: [
-    { label: 'Giới thiệu chung', to: '/gioi-thieu-chung' },
-    { label: 'Chính sách chất lượng', to: '/chinh-sach-chat-luong' },
-    { label: 'Năng lực', to: '/nang-luc' },
-    { label: 'Cơ cấu tổ chức', to: '/co-cau-to-chuc' },
-  ] },
-  { label: 'Hoạt động chuyên môn', to: '/#hoat-dong-chuyen-mon', children: [
-    { label: 'Chỉ đạo tuyến', to: '/#hoat-dong-chuyen-mon' },
-    { label: 'Kiểm nghiệm và giám sát chất lượng thuốc', to: '/#hoat-dong-chuyen-mon' },
-    { label: 'Hợp tác quốc tế', to: '/#hoat-dong-chuyen-mon' },
-    { label: 'Hoạt động NRA', to: '/#hoat-dong-chuyen-mon' },
-    { label: 'Tạp chí Kiểm nghiệm Dược và Mỹ phẩm', to: '/#hoat-dong-chuyen-mon' },
-  ] },
-  { label: 'Đào tạo & NCKH', to: '/dao-tao-nckh', children: [
-    { label: 'Đào tạo tiến sỹ', to: '/dao-tao-nckh' },
-    { label: 'Nghiên cứu khoa học', to: '/dao-tao-nckh' },
-  ] },
-  { label: 'Dịch vụ', to: '/#dich-vu', children: [
-    { label: 'Phân tích - Kiểm nghiệm', to: '/#dich-vu' },
-    { label: 'Đánh giá tương đương sinh học (TĐSH)', to: '/#dich-vu' },
-    { label: 'Đào tạo và tư vấn kỹ thuật', to: '/#dich-vu' },
-    { label: 'Hiệu chuẩn', to: '/#dich-vu' },
-    { label: 'Nghiên cứu - Chuyển giao', to: '/#dich-vu' },
-    { label: 'Thử nghiệm thành thạo', to: '/#dich-vu' },
-    { label: 'Cung ứng chất chuẩn', to: '/#chat-chuan' },
-  ] },
-  { label: 'Tin tức & Thông báo', to: '/tin-tuc', children: [
-    { label: 'Thông báo', to: '/tin-tuc?cat=thong-bao' },
-    { label: 'Tin hoạt động', to: '/tin-tuc?cat=tin-hoat-dong' },
-    { label: 'Mua sắm, đấu thầu & công khai minh bạch', to: '/tin-tuc?cat=mua-sam-dau-thau' },
-    { label: 'Đào tạo', to: '/tin-tuc?cat=dao-tao' },
-    { label: 'Hội nghị - Hội thảo', to: '/tin-tuc?cat=hoi-nghi-hoi-thao' },
-    { label: 'Tuyển dụng', to: '/tin-tuc?cat=tuyen-dung' },
-  ] },
-  { label: 'Văn bản - Tài liệu', to: '/van-ban-tai-lieu', children: [
-    { label: 'Văn bản pháp quy', to: '/van-ban-tai-lieu' },
-    { label: 'Tài liệu chuyên môn', to: '/van-ban-tai-lieu' },
-  ] },
-  { label: 'Liên hệ & hỗ trợ', to: '/lien-he', children: [
-    { label: 'Liên hệ', to: '/lien-he' },
-    { label: 'Câu hỏi thường gặp', to: '/faq' },
-  ] },
-];
+// Menu chính dùng chung với trang chủ — xem composables/useMainNav.ts.
+const nav = mainNav;
 
 const footerLinks = [
   { label: 'Giới thiệu chung', to: '/gioi-thieu-chung' },
@@ -250,13 +232,23 @@ const footerLinks = [
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
           <span>{{ now }}</span>
         </div>
-        <div class="nidqc-topbar-actions" style="display:flex;align-items:center;gap:14px;font-size:12.5px;">
+        <div class="nidqc-topbar-actions" style="display:flex;align-items:center;gap:12px;font-size:12.5px;">
+          <!-- Bấm nhanh VI / EN — hai ngôn ngữ dùng nhiều nhất, khỏi phải mở dropdown. -->
+          <div class="nidqc-lang-quick">
+            <button v-for="l in quickLanguages" :key="l.code" type="button"
+              class="nidqc-lang-btn" :class="{ 'is-active': curLang === l.code }"
+              :aria-pressed="curLang === l.code ? 'true' : 'false'"
+              :title="l.label" @click="setLang(l.code)">
+              {{ l.short }}
+            </button>
+          </div>
           <!-- Dropdown mọi thứ tiếng (Google Translate) -->
           <div style="position:relative;">
-            <button data-testid="language-menu-toggle" @click="langOpen = !langOpen" style="background:none;border:0;cursor:pointer;color:#fff;display:flex;align-items:center;gap:4px;font-size:12.5px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
-              Ngôn ngữ
+            <button data-testid="language-menu-toggle" @click="langOpen = !langOpen"
+              class="nidqc-icon-btn" title="Ngôn ngữ khác" aria-haspopup="true" :aria-expanded="langOpen ? 'true' : 'false'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+              <span class="nidqc-visually-hidden">Ngôn ngữ khác</span>
             </button>
             <div v-if="langOpen" data-testid="language-menu" class="nidqc-lang-menu" style="position:absolute;top:100%;right:0;margin-top:6px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.2);z-index:70;min-width:220px;max-height:420px;overflow-y:auto;padding:6px 0;">
               <button v-for="l in languages" :key="l.code" data-testid="language-option" @click="setLang(l.code)"
@@ -265,10 +257,25 @@ const footerLinks = [
               </button>
             </div>
           </div>
-          <span style="width:1px;height:14px;background:rgba(255,255,255,0.25);"></span>
-          <a href="/user/login" class="nidqc-login" style="color:#fff;display:flex;align-items:center;gap:5px;text-decoration:none;white-space:nowrap;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
-            <span class="nidqc-login-text">Đăng nhập hệ thống</span>
+          <span v-if="socialLinks && socialLinks.length" class="nidqc-topbar-sep"></span>
+
+          <!-- Mạng xã hội (cấu hình trong Drupal) -->
+          <div v-if="socialLinks && socialLinks.length" class="nidqc-social-group">
+            <a v-for="s in socialLinks" :key="s.key" :href="s.url" target="_blank" rel="noopener"
+              class="nidqc-social" :class="`is-${s.key}`" :title="s.label">
+              <svg v-if="s.key === 'facebook'" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8.5V7a1.5 1.5 0 0 1 1.5-1.5H17V2.6A15 15 0 0 0 14.9 2.5C12.3 2.5 10.5 4.1 10.5 7v1.5H8v3.2h2.5V21h3.5v-9.3h2.6l.4-3.2H14z"/></svg>
+              <svg v-else-if="s.key === 'youtube'" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15.2V8.8l5.2 3.2z"/></svg>
+              <!-- Zalo: bong bóng chat + chữ Z (không dùng logo gốc để khỏi vẽ sai nhận diện). -->
+              <svg v-else width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7A8.4 8.4 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.5 8.5 0 0 1 21 11.5z"/><path d="M9.8 9h5l-5 5.5h5"/></svg>
+              <span class="nidqc-visually-hidden">{{ s.label }}</span>
+            </a>
+          </div>
+
+          <span class="nidqc-topbar-sep"></span>
+
+          <a href="/user/login" class="nidqc-icon-btn nidqc-login" title="Đăng nhập hệ thống">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+            <span class="nidqc-visually-hidden">Đăng nhập hệ thống</span>
           </a>
           <!-- Element ẩn cho Google Translate -->
           <div id="google_translate_element" style="display:none;"></div>
@@ -332,6 +339,8 @@ const footerLinks = [
         </a>
       </div>
     </header>
+
+    <NewsTicker v-if="tickerNews && tickerNews.length" :items="tickerNews" />
 
     <div v-if="searchOpen" class="nidqc-search-overlay" role="presentation" @mousedown.self="closeSearch">
       <section class="nidqc-search-dialog" role="dialog" aria-modal="true" aria-labelledby="nidqc-search-title">

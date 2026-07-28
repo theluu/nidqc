@@ -1,0 +1,25 @@
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_featured
+    - node.type.news
+  enforced:
+    module:
+      - nidqc_content
+id: node.news.field_featured
+field_name: field_featured
+entity_type: node
+bundle: news
+label: 'Tin nổi bật'
+description: 'Tích chọn để đưa tin này lên khối "Tin tức & sự kiện" ở trang chủ.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: Có
+  off_label: Không
+field_type: boolean

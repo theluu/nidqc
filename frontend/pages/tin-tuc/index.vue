@@ -7,14 +7,7 @@ const PAGE_SIZE = 12
 const route = useRoute()
 const listTop = ref(null)
 
-const categorySlug = (value) => String(value || '')
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')
-  .replace(/đ/g, 'd')
-  .replace(/Đ/g, 'D')
-  .toLowerCase()
-  .replace(/[^a-z0-9]+/g, '-')
-  .replace(/^-|-$/g, '')
+// categorySlug dùng chung với trang chủ — xem composables/useNewsDetail.ts.
 const page = computed(() => Math.max(1, parseInt(String(route.query.trang || '1'), 10) || 1))
 
 const mapItem = (n) => ({

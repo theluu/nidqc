@@ -1,0 +1,25 @@
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_youtube_urls
+    - node.type.news
+  module:
+    - link
+  enforced:
+    module:
+      - nidqc_content
+id: node.news.field_youtube_urls
+field_name: field_youtube_urls
+entity_type: node
+bundle: news
+label: 'Link YouTube'
+description: 'Dán link YouTube. Hỗ trợ dạng watch?v=…, youtu.be/… và shorts/…. Thêm nhiều link bằng nút "Add another item"; thứ tự hiển thị đúng như thứ tự ở đây.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 0
+  link_type: 16
+field_type: link

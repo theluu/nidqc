@@ -4,11 +4,13 @@ status: true
 dependencies:
   config:
     - field.field.node.office.field_address
+    - field.field.node.office.field_email
     - field.field.node.office.field_map
     - field.field.node.office.field_phone
     - field.field.node.office.field_weight
     - node.type.office
   module:
+    - content_moderation
     - path
 id: node.office.default
 targetEntityType: node
@@ -28,6 +30,14 @@ content:
     settings:
       rows: 5
       placeholder: ''
+    third_party_settings: {  }
+  field_email:
+    type: email_default
+    weight: 3
+    region: content
+    settings:
+      placeholder: ''
+      size: 60
     third_party_settings: {  }
   field_map:
     type: string_textarea
@@ -58,6 +68,12 @@ content:
     region: content
     settings:
       include_locked: true
+    third_party_settings: {  }
+  moderation_state:
+    type: moderation_state_default
+    weight: 100
+    region: content
+    settings: {  }
     third_party_settings: {  }
   path:
     type: path

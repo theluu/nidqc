@@ -195,6 +195,22 @@ final class NidqcSettingsForm extends ConfigFormBase {
       ];
     }
 
+    $form['social'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Mạng xã hội'),
+      '#open' => TRUE,
+      '#description' => $this->t('Hiện thành các icon trên thanh trên cùng của website. Để trống ô nào thì icon đó không hiện.'),
+    ];
+    foreach ($this->socialChannels() as $key => $label) {
+      $form['social']['social_' . $key] = [
+        '#type' => 'url',
+        '#title' => $label,
+        '#default_value' => $settings->get('social.' . $key) ?: '',
+        '#maxlength' => 255,
+        '#placeholder' => 'https://',
+      ];
+    }
+
     $form['site'] = [
       '#type' => 'details',
       '#title' => $this->t('Thông tin website'),
@@ -269,6 +285,19 @@ final class NidqcSettingsForm extends ConfigFormBase {
       }
     }
 
+    // #type url đã chặn URL sai cú pháp; ở đây chỉ chặn scheme lạ (javascript:,
+    // data:…) vì các URL này được đổ thẳng vào href trên mọi trang.
+    foreach (array_keys($this->socialChannels()) as $key) {
+      $url = trim((string) $form_state->getValue('social_' . $key));
+      if ($url === '') {
+        continue;
+      }
+      $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+      if (!in_array($scheme, ['http', 'https'], TRUE)) {
+        $form_state->setErrorByName('social_' . $key, $this->t('Địa chỉ phải bắt đầu bằng http:// hoặc https://.'));
+      }
+    }
+
     $siteKey = trim((string) $form_state->getValue('recaptcha_site_key'));
     $newSecret = trim((string) $form_state->getValue('recaptcha_secret'));
     $storedSecret = (string) $this->state->get('nidqc_contact.recaptcha_secret', '');
@@ -287,7 +316,7 @@ final class NidqcSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
-    $this->configFactory->getEditable('nidqc_contact.settings')
+    $settings = $this->configFactory->getEditable('nidqc_contact.settings')
       ->set('smtp.charset', 'UTF-8')
       ->set('smtp.host', trim((string) $form_state->getValue('smtp_host')))
       ->set('smtp.auth', (bool) $form_state->getValue('smtp_auth'))
@@ -295,8 +324,11 @@ final class NidqcSettingsForm extends ConfigFormBase {
       ->set('smtp.security', strtoupper((string) $form_state->getValue('smtp_security')))
       ->set('smtp.admin_email', trim((string) $form_state->getValue('smtp_admin_email')))
       ->set('recaptcha.site_key', trim((string) $form_state->getValue('recaptcha_site_key')))
-      ->set('recaptcha.minimum_score', (float) $form_state->getValue('recaptcha_minimum_score'))
-      ->save();
+      ->set('recaptcha.minimum_score', (float) $form_state->getValue('recaptcha_minimum_score'));
+    foreach (array_keys($this->socialChannels()) as $key) {
+      $settings->set('social.' . $key, trim((string) $form_state->getValue('social_' . $key)));
+    }
+    $settings->save();
 
     $this->configFactory->getEditable('system.site')
       ->set('name', trim((string) $form_state->getValue('site_name')))
@@ -334,6 +366,19 @@ final class NidqcSettingsForm extends ConfigFormBase {
     }
 
     $this->messenger()->addError($this->t('Không gửi được email thử. Kiểm tra SMTP và nhật ký hệ thống.'));
+  }
+
+  /**
+   * Kênh mạng xã hội hiển thị trên top bar: khoá config => nhãn trên form.
+   *
+   * Khoá phải khớp với `key` trong danh sách icon ở frontend (layouts/default.vue).
+   */
+  private function socialChannels(): array {
+    return [
+      'facebook' => $this->t('Facebook'),
+      'youtube' => $this->t('YouTube'),
+      'zalo' => $this->t('Zalo'),
+    ];
   }
 
   /**

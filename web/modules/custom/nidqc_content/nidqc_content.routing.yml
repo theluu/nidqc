@@ -16,6 +16,15 @@ nidqc_content.news_list:
     _permission: 'access content'
   methods: [GET]
 
+nidqc_content.news_media:
+  path: '/api/v1/news/media'
+  defaults:
+    _controller: '\Drupal\nidqc_content\Controller\NewsMediaController::list'
+    _format: 'json'
+  requirements:
+    _permission: 'access content'
+  methods: [GET]
+
 nidqc_content.news_detail:
   path: '/api/v1/news/detail'
   defaults:

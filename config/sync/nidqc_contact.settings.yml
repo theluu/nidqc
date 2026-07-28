@@ -8,3 +8,7 @@ smtp:
 recaptcha:
   site_key: 6Ld18OomAAAAAMNT7_8xeBEHdq5TyGYQgn0Y_GG-
   minimum_score: 0.5
+social:
+  facebook: 'https://www.facebook.com/nidqc.gov.vn'
+  youtube: 'https://www.youtube.com/@nidqc'
+  zalo: 'https://zalo.me/nidqc'

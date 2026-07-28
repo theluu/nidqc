@@ -8,7 +8,9 @@
 declare(strict_types=1);
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\nidqc_content\NewsPresenter;
 
 /**
  * Xoá cache trang của frontend Nuxt sau khi nội dung thay đổi.
@@ -86,4 +88,74 @@ function nidqc_content_taxonomy_term_update(EntityInterface $entity): void {
  */
 function nidqc_content_taxonomy_term_delete(EntityInterface $entity): void {
   _nidqc_content_purge_frontend();
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for node_form.
+ *
+ * Ẩn/hiện field Thư viện media theo chuyên mục đang chọn, và validate link YouTube.
+ *
+ * #states chỉ là tiện ích cho biên tập viên — nó chạy bằng JavaScript nên KHÔNG
+ * được coi là bảo vệ dữ liệu. Việc kiểm tra thật nằm ở hàm validate bên dưới, chạy
+ * phía server bất kể trình duyệt có JS hay không (yêu cầu mục 8).
+ */
+function nidqc_content_form_node_form_alter(array &$form, FormStateInterface $form_state): void {
+  $node = $form_state->getFormObject()->getEntity();
+  if ($node->bundle() !== 'news') {
+    return;
+  }
+
+  /** @var \Drupal\nidqc_content\NewsPresenter $presenter */
+  $presenter = \Drupal::service('nidqc_content.news_presenter');
+  $mediaIds = $presenter->mediaCategoryTermIds();
+  $videoId = $mediaIds[NewsPresenter::CATEGORY_VIDEO] ?? NULL;
+  $imageId = $mediaIds[NewsPresenter::CATEGORY_IMAGE] ?? NULL;
+
+  // Term id tra theo tên lúc dựng form, không chôn số vào code.
+  $selector = ':input[name="field_category"]';
+  if ($videoId !== NULL) {
+    foreach (['field_youtube_urls', 'field_videos'] as $field) {
+      if (isset($form[$field])) {
+        $form[$field]['#states']['visible'][$selector] = ['value' => (string) $videoId];
+      }
+    }
+  }
+  if ($imageId !== NULL && isset($form['field_gallery_images'])) {
+    $form['field_gallery_images']['#states']['visible'][$selector] = ['value' => (string) $imageId];
+  }
+
+  $form['#validate'][] = '_nidqc_content_validate_media_fields';
+}
+
+/**
+ * Kiểm tra link YouTube phía server.
+ *
+ * Field dùng kiểu link nên Drupal đã chặn URL sai cú pháp; ở đây chỉ xác nhận đó
+ * đúng là link YouTube rút được video id (watch?v=…, youtu.be/…, shorts/…). Link
+ * hợp lệ nhưng không phải YouTube mà lọt qua thì frontend sẽ bỏ qua im lặng, biên
+ * tập viên không hiểu vì sao video không hiện.
+ */
+function _nidqc_content_validate_media_fields(array &$form, FormStateInterface $form_state): void {
+  $values = $form_state->getValue('field_youtube_urls');
+  if (!is_array($values)) {
+    return;
+  }
+
+  /** @var \Drupal\nidqc_content\NewsPresenter $presenter */
+  $presenter = \Drupal::service('nidqc_content.news_presenter');
+  foreach ($values as $delta => $value) {
+    if (!is_int($delta) || !is_array($value)) {
+      continue;
+    }
+    $uri = trim((string) ($value['uri'] ?? ''));
+    if ($uri === '') {
+      continue;
+    }
+    if ($presenter->youtubeId($uri) === NULL) {
+      $form_state->setErrorByName(
+        "field_youtube_urls][$delta][uri",
+        t('“@url” không phải link YouTube hợp lệ. Dùng dạng https://www.youtube.com/watch?v=…, https://youtu.be/… hoặc https://www.youtube.com/shorts/….', ['@url' => $uri]),
+      );
+    }
+  }
 }

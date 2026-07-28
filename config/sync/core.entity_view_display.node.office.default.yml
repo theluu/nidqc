@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.node.office.field_address
+    - field.field.node.office.field_email
     - field.field.node.office.field_map
     - field.field.node.office.field_phone
     - field.field.node.office.field_weight
@@ -53,4 +54,5 @@ content:
     weight: 100
     region: content
 hidden:
+  field_email: true
   langcode: true

@@ -34,3 +34,16 @@ nidqc_contact.settings:
         minimum_score:
           type: float
           label: 'Minimum score'
+    social:
+      type: mapping
+      label: 'Social networks'
+      mapping:
+        facebook:
+          type: string
+          label: 'Facebook page URL'
+        youtube:
+          type: string
+          label: 'YouTube channel URL'
+        zalo:
+          type: string
+          label: 'Zalo official account URL'

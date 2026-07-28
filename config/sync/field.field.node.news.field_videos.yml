@@ -1,0 +1,27 @@
+uuid: 721fd493-4e2d-46ae-849b-42eebdb3eaf7
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_videos
+    - node.type.news
+  module:
+    - file
+id: node.news.field_videos
+field_name: field_videos
+entity_type: node
+bundle: news
+label: 'Video tải lên'
+description: 'Định dạng cho phép: mp4, webm. Phát trực tiếp trên web bằng trình phát HTML5.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: 'videos/[date:custom:Y]-[date:custom:m]'
+  file_extensions: 'mp4 webm'
+  max_filesize: ''
+  description_field: true
+field_type: file

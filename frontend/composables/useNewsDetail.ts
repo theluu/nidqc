@@ -11,6 +11,8 @@ type NewsListItem = {
   category: string
   image: string | null
   alias: string
+  // Tin cũ (tạo trước khi có field_featured) không có khoá này -> optional.
+  featured?: boolean
 }
 
 type NewsDetailNode = {
@@ -51,7 +53,20 @@ export function newsImageUrl(path: string | null): string | null {
 type NewsListResponse = {
   data: NewsListItem[]
   meta: { total: number, page: number, limit: number }
-  categories?: { id: string, label: string }[]
+  categories?: { id: string, label: string, count: number }[]
+}
+
+// Nhãn chuyên mục -> slug dùng trên URL (?cat=thong-bao). Dùng chung cho trang
+// /tin-tuc và khối chuyên mục ở trang chủ để hai nơi không sinh ra slug lệch nhau.
+export function categorySlug(value: string): string {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
 }
 
 // Danh sách tin có phân trang + TỔNG SỐ trong một request.
@@ -65,6 +80,7 @@ export async function fetchNewsList(options: {
   page?: number
   limit?: number
   categories?: boolean
+  featured?: boolean
 } = {}): Promise<NewsListResponse> {
   const query: Record<string, string | number> = {
     page: options.page ?? 0,
@@ -72,6 +88,8 @@ export async function fetchNewsList(options: {
   }
   if (options.cat && options.cat !== 'all') query.cat = options.cat
   if (options.categories) query.categories = '1'
+  // Chỉ gửi khi bật: featured=0 và không gửi là cùng nghĩa, bớt một cache context.
+  if (options.featured) query.featured = '1'
 
   return await $fetch<NewsListResponse>(`${drupalBase()}/api/v1/news/list`, {
     query,

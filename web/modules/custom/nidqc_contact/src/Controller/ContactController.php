@@ -99,12 +99,23 @@ final class ContactController extends ControllerBase {
       : (string) $this->state->get('nidqc_contact.recaptcha_secret', '') !== '';
     $bypass = getenv('NIDQC_RECAPTCHA_BYPASS') === '1';
 
+    // Mạng xã hội: chỉ trả kênh đã cấu hình, frontend cứ thế render — không phải
+    // biết trước site có những kênh nào.
+    $social = [];
+    foreach (['facebook', 'youtube', 'zalo'] as $channel) {
+      $url = trim((string) $this->config('nidqc_contact.settings')->get('social.' . $channel));
+      if ($url !== '') {
+        $social[] = ['key' => $channel, 'url' => $url];
+      }
+    }
+
     return $this->jsonResponse([
       'data' => [
         'recaptcha' => [
           'enabled' => !$bypass && $siteKey !== '' && $secretConfigured,
           'site_key' => $siteKey,
         ],
+        'social' => $social,
       ],
     ]);
   }

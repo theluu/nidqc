@@ -37,6 +37,28 @@ function drupalBase(): string {
   return (import.meta.env.VITE_DRUPAL_BASE as string) || window.location.origin
 }
 
+export type PublicConfig = {
+  recaptcha: { enabled: boolean, site_key: string }
+  social: { key: string, url: string }[]
+}
+
+/**
+ * Cấu hình công khai của site (quản trị tại /admin/config/nidqc/settings).
+ *
+ * Khác readPublicConfig() trong useRecaptchaV3.ts: hàm đó chạy phía client (dùng
+ * window.location.origin) cho form liên hệ; hàm này gọi được cả trên server để layout
+ * render link mạng xã hội ngay trong HTML của SSR.
+ */
+export async function fetchPublicConfig(): Promise<PublicConfig> {
+  const res = await $fetch<{ data: PublicConfig }>(`${drupalBase()}/api/v1/contact/config`, {
+    headers: { Accept: 'application/json' },
+  })
+  return {
+    recaptcha: res.data?.recaptcha ?? { enabled: false, site_key: '' },
+    social: res.data?.social ?? [],
+  }
+}
+
 async function readError(response: Response): Promise<ContactApiError> {
   const body = await response.json().catch(() => null) as ContactApiErrorBody | null
   return new ContactApiError(

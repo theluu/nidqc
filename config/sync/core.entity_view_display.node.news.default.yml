@@ -6,8 +6,12 @@ dependencies:
     - field.field.node.news.body
     - field.field.node.news.field_attachments
     - field.field.node.news.field_category
+    - field.field.node.news.field_featured
+    - field.field.node.news.field_gallery_images
     - field.field.node.news.field_image
     - field.field.node.news.field_tag
+    - field.field.node.news.field_videos
+    - field.field.node.news.field_youtube_urls
     - node.type.news
   module:
     - file
@@ -73,4 +77,8 @@ content:
     weight: 100
     region: content
 hidden:
+  field_featured: true
+  field_gallery_images: true
+  field_videos: true
+  field_youtube_urls: true
   langcode: true

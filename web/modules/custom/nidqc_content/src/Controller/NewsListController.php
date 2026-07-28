@@ -6,8 +6,10 @@ namespace Drupal\nidqc_content\Controller;
 
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\nidqc_content\NewsPresenter;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,6 +36,7 @@ final class NewsListController implements ContainerInjectionInterface {
     private readonly EntityTypeManagerInterface $entityTypeManager,
     private readonly NewsPresenter $presenter,
     private readonly LoggerInterface $logger,
+    private readonly Connection $database,
   ) {
   }
 
@@ -45,6 +48,7 @@ final class NewsListController implements ContainerInjectionInterface {
       $container->get('entity_type.manager'),
       $container->get('nidqc_content.news_presenter'),
       $container->get('logger.factory')->get('nidqc_content'),
+      $container->get('database'),
     );
   }
 
@@ -53,7 +57,7 @@ final class NewsListController implements ContainerInjectionInterface {
    */
   public function list(Request $request): CacheableJsonResponse {
     $params = $request->query->all();
-    $unknown = array_diff(array_keys($params), ['cat', 'page', 'limit', 'categories']);
+    $unknown = array_diff(array_keys($params), ['cat', 'page', 'limit', 'categories', 'featured']);
     if ($unknown !== []) {
       return $this->errorResponse(
         'INVALID_PARAMETER',
@@ -77,6 +81,13 @@ final class NewsListController implements ContainerInjectionInterface {
       return $this->invalidField('cat', 'Chuyên mục phải là chuỗi.');
     }
 
+    // featured=1 -> chỉ tin đã tích "Tin nổi bật" (khối hero trang chủ).
+    $featuredParam = $params['featured'] ?? '';
+    if (!is_string($featuredParam) || !in_array($featuredParam, ['', '0', '1'], TRUE)) {
+      return $this->invalidField('featured', 'Tin nổi bật chỉ nhận giá trị 0 hoặc 1.');
+    }
+    $featuredOnly = $featuredParam === '1';
+
     try {
       // Chuyên mục nhận UUID (trang /tin-tuc) hoặc tên (trang chủ tách hero/thông
       // báo theo tên chuyên mục), phân tách bằng dấu phẩy.
@@ -93,6 +104,15 @@ final class NewsListController implements ContainerInjectionInterface {
         ->condition('status', 1);
       if ($termIds !== []) {
         $query->condition('field_category.target_id', $termIds, 'IN');
+      }
+      else {
+        // Không lọc danh mục = "mọi tin tức thường". Bài thuộc Thư viện media
+        // (Videos, Hình ảnh) chỉ dành cho block Thư viện nên phải loại ra, nếu
+        // không chúng sẽ chen vào /tin-tuc, thanh tin chạy và các khối trang chủ.
+        $this->excludeMediaCategories($query);
+      }
+      if ($featuredOnly) {
+        $query->condition('field_featured', 1);
       }
 
       $total = (int) (clone $query)->count()->execute();
@@ -148,14 +168,41 @@ final class NewsListController implements ContainerInjectionInterface {
   }
 
   /**
+   * Loại bài thuộc danh mục Thư viện media ra khỏi một truy vấn tin tức.
+   *
+   * Dùng nhóm OR kèm notExists: điều kiện NOT IN đơn thuần chạy trên LEFT JOIN nên
+   * bài CHƯA chọn danh mục sẽ có giá trị NULL và bị loại oan khỏi danh sách.
+   */
+  private function excludeMediaCategories(QueryInterface $query): void {
+    $mediaIds = $this->presenter->mediaCategoryTermIds();
+    if ($mediaIds === []) {
+      return;
+    }
+    $query->condition(
+      $query->orConditionGroup()
+        ->condition('field_category.target_id', array_values($mediaIds), 'NOT IN')
+        ->notExists('field_category')
+    );
+  }
+
+  /**
    * Danh sách chuyên mục Tin tức theo thứ tự sắp xếp trong Drupal.
+   *
+   * Bỏ danh mục Thư viện media: bộ lọc trên trang /tin-tuc không nên chào mời một
+   * chuyên mục mà danh sách bên dưới cố tình không hiển thị.
    */
   private function categories(): array {
     $terms = $this->entityTypeManager->getStorage('taxonomy_term')
       ->loadByProperties(['vid' => 'news_category']);
+    $mediaIds = $this->presenter->mediaCategoryTermIds();
+    $counts = $this->countsByCategory();
     $items = [];
     foreach ($terms as $term) {
+      if (in_array((int) $term->id(), $mediaIds, TRUE)) {
+        continue;
+      }
       $items[] = [
+        'count' => $counts[(int) $term->id()] ?? 0,
         'id' => $term->uuid(),
         'label' => $term->label(),
         'weight' => (int) $term->getWeight(),
@@ -163,9 +210,36 @@ final class NewsListController implements ContainerInjectionInterface {
     }
     usort($items, static fn (array $a, array $b) => $a['weight'] <=> $b['weight']);
     return array_map(
-      static fn (array $item) => ['id' => $item['id'], 'label' => $item['label']],
+      static fn (array $item) => [
+        'id' => $item['id'],
+        'label' => $item['label'],
+        'count' => $item['count'],
+      ],
       $items,
     );
+  }
+
+  /**
+   * Số tin đã xuất bản của từng chuyên mục, khoá là term id.
+   *
+   * Một câu GROUP BY thay vì gọi COUNT cho từng chuyên mục: danh sách chuyên mục
+   * còn dùng ở trang chủ nên 6 truy vấn đếm lặp lại là lãng phí không cần thiết.
+   */
+  private function countsByCategory(): array {
+    $query = $this->database->select('node__field_category', 'c');
+    $query->join('node_field_data', 'n', 'n.nid = c.entity_id AND n.langcode = c.langcode');
+    $query->addField('c', 'field_category_target_id', 'tid');
+    $query->addExpression('COUNT(*)', 'total');
+    $query->condition('c.bundle', 'news')
+      ->condition('n.type', 'news')
+      ->condition('n.status', 1)
+      ->groupBy('c.field_category_target_id');
+
+    $counts = [];
+    foreach ($query->execute() as $row) {
+      $counts[(int) $row->tid] = (int) $row->total;
+    }
+    return $counts;
   }
 
   /**
@@ -198,6 +272,7 @@ final class NewsListController implements ContainerInjectionInterface {
         'url.query_args:page',
         'url.query_args:limit',
         'url.query_args:categories',
+        'url.query_args:featured',
       ]));
     return $response;
   }

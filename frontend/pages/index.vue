@@ -21,13 +21,20 @@ const mapItem = (n) => ({
 })
 
 const { data: split } = await useCachedData('home-news', async () => {
-  const [ev, an] = await Promise.all([
+  const [ev, an, ft] = await Promise.all([
     fetchNewsList({ cat: EVENT_CATS.join(','), limit: 6 }),
-    fetchNewsList({ cat: NOTICE_CATS.join(','), limit: 4 }),
+    // categories=1 đi ghép luôn vào request thông báo — cột chuyên mục cần số tin
+    // của từng mục, không phải gọi thêm một vòng nữa.
+    fetchNewsList({ cat: NOTICE_CATS.join(','), limit: 4, categories: true }),
+    // Tin nổi bật do biên tập viên tự tích, KHÔNG lọc chuyên mục: một thông báo quan
+    // trọng cũng phải lên được hero nếu người quản trị muốn.
+    fetchNewsList({ featured: true, limit: 5 }),
   ])
   return {
     events: ev.data.map(mapItem),
     announcements: an.data.map(mapItem),
+    featured: ft.data.map(mapItem),
+    categories: an.categories || [],
   }
 })
 // PHẢI guard null: useAsyncData trả data = null khi handler lỗi (Drupal chậm/khởi
@@ -36,9 +43,55 @@ const { data: split } = await useCachedData('home-news', async () => {
 // Các computed khác trong file này đã guard sẵn; hai dòng này trước đây bị sót.
 const news = computed(() => split.value?.events || [])
 const announcements = computed(() => split.value?.announcements || [])
+// Chưa tích tin nổi bật nào -> hero lùi về tin sự kiện mới nhất, trang chủ không bao
+// giờ trống khối lớn.
+const featured = computed(() => {
+  const picked = split.value?.featured || []
+  return picked.length ? picked : news.value.slice(0, 1)
+})
+
+// Cột phải khối hero = submenu "Tin tức & Thông báo" của main menu, không phải danh
+// sách tin: sửa menu ở useMainNav.ts là trang chủ đổi theo.
+// Cột phải khối hero = submenu "Tin tức & Thông báo" của main menu, kèm SỐ TIN của
+// từng chuyên mục. Con số mới là thứ phân biệt cột này với đúng 6 link nằm ngay trên
+// thanh menu — không có nó thì đây chỉ là bản sao của menu.
+// Ghép theo slug (?cat=…) chứ không theo nhãn: nhãn trên menu và tên chuyên mục
+// trong Drupal viết khác nhau ("Mua sắm, đấu thầu & công khai minh bạch" với
+// "Mua sắm - đấu thầu") nhưng cùng quy về một slug.
+const newsNavLinks = computed(() => {
+  const counts = new Map(
+    (split.value?.categories || []).map((c) => [categorySlug(c.label), c.count]),
+  )
+  return navChildren('Tin tức & Thông báo').map((link) => ({
+    ...link,
+    count: counts.get(link.to.split('cat=')[1] || '') ?? null,
+  }))
+})
+
+const newsTotal = computed(() =>
+  (split.value?.categories || []).reduce((sum, c) => sum + (c.count || 0), 0),
+)
+
+// Thư viện Video & Hình ảnh — bài thuộc danh mục Videos / Hình ảnh, media đã chuẩn
+// hoá sẵn ở Drupal nên mở lightbox không phải gọi thêm request nào.
+const { data: mediaPosts } = await useCachedData('home-media', () => fetchMediaLibrary(12))
 
 // Khối trang chủ động (quản trị trong Drupal): Hoạt động chuyên môn, Dịch vụ,
 // Cơ sở/Liên hệ, và CTA + Video (node home_block).
+// field_map lưu URL nhúng Google Maps (dùng cho iframe). Trang chủ giờ chỉ cần một
+// LINK mở bản đồ, nên rút toạ độ từ tham số pb của URL nhúng (!2d = kinh độ,
+// !3d = vĩ độ) — chính xác đúng điểm quản trị viên đã ghim. Không rút được thì lùi
+// về tìm theo địa chỉ, vẫn ra đúng chỗ.
+function mapsLink(embed, address) {
+  const m = String(embed || '').match(/!2d(-?\d+(?:\.\d+)?)!3d(-?\d+(?:\.\d+)?)/)
+  if (m) {
+    return `https://www.google.com/maps/search/?api=1&query=${m[2]},${m[1]}`
+  }
+  return address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+    : null
+}
+
 const { data: blocks } = await useCachedData('home-blocks', async () => {
   const [exp, svc, off, hb] = await Promise.all([
     fetchJsonApi('/node/expertise', { 'filter[status]': 1, sort: 'field_weight', 'page[limit]': 30 }),
@@ -57,7 +110,13 @@ const { data: blocks } = await useCachedData('home-blocks', async () => {
   return {
     expertise: exp.data.map((n) => ({ t: n.attributes.title, d: plain(n.attributes.field_description) })),
     services: svc.data.map((n) => ({ label: n.attributes.title, href: n.attributes.field_link?.uri || null })),
-    offices: off.data.map((n) => ({ t: n.attributes.title, addr: n.attributes.field_address, tel: n.attributes.field_phone, map: n.attributes.field_map })),
+    offices: off.data.map((n) => ({
+      t: n.attributes.title,
+      addr: n.attributes.field_address,
+      tel: n.attributes.field_phone,
+      email: n.attributes.field_email || null,
+      map: mapsLink(n.attributes.field_map, n.attributes.field_address),
+    })),
     cta: h ? { heading: h.title, desc: plain(h.field_description), btnLabel: h.field_link?.title || 'Xem thêm', btnHref: h.field_link?.uri || '#' } : null,
     videoUrl: ytEmbed(h?.field_video),
   }
@@ -89,37 +148,26 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
   <div>
     <!-- HERO -->
     <section style="background:#F5F5F5;border-bottom:1px solid #ECECEC;">
-      <div class="nidqc-hero-grid" data-container style="max-width:1280px;margin:0 auto;padding:36px 24px 40px;display:grid;grid-template-columns:1.55fr 1fr;gap:28px;align-items:stretch;">
+      <div class="nidqc-hero-grid" data-container style="max-width:1280px;margin:0 auto;padding:36px 24px 40px;display:grid;grid-template-columns:2.25fr 1fr;gap:28px;align-items:stretch;">
         <template v-if="news && news.length">
-          <NuxtLink :to="news[0].alias" style="display:block;background:#fff;border:1px solid #CCCCCC;box-shadow:0 2px 4px rgba(0,0,0,0.06);text-decoration:none;">
-            <div style="position:relative;width:100%;height:340px;overflow:hidden;background:#0D2870;">
-              <img v-if="news[0].image" :src="news[0].image" alt="" style="width:100%;height:100%;object-fit:cover;">
-              <span style="position:absolute;top:16px;left:16px;background:#0F3093;color:#fff;font-family:'Lexend',sans-serif;font-weight:700;font-size:11.5px;letter-spacing:0.6px;text-transform:uppercase;padding:6px 12px;">Tin tức &amp; sự kiện</span>
-            </div>
-            <div style="padding:22px 24px 26px;">
-              <div style="display:flex;align-items:center;gap:7px;color:#777;font-size:12.5px;margin-bottom:10px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                <span>Cập nhật: {{ news[0].date }}</span>
-              </div>
-              <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:25px;line-height:31px;color:#212529;margin:0;">{{ news[0].title }}</h2>
-            </div>
-          </NuxtLink>
+          <FeaturedHero :items="featured" />
+          <!-- Chuyên mục Tin tức: lấy thẳng submenu "Tin tức & Thông báo" trên main
+               menu (useMainNav) để hai nơi không bao giờ lệch nhau. -->
           <div style="background:#fff;border:1px solid #CCCCCC;display:flex;flex-direction:column;">
             <div style="background:#0F3093;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;">
-              <h3 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.3px;text-transform:uppercase;margin:0;">Tin mới nhất</h3>
+              <h3 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.3px;text-transform:uppercase;margin:0;">Tin tức &amp; Thông báo</h3>
               <NuxtLink to="/tin-tuc" style="color:rgba(255,255,255,0.85);font-size:12.5px;text-decoration:none;display:flex;align-items:center;gap:4px;">Xem tất cả
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
               </NuxtLink>
             </div>
-            <div style="flex:1;display:flex;flex-direction:column;">
-              <NuxtLink v-for="item in news.slice(1, 6)" :key="item.id" :to="item.alias" style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #ECECEC;align-items:center;flex:1;text-decoration:none;">
-                <div style="width:66px;height:52px;flex:0 0 auto;background:#E8F0F7;overflow:hidden;">
-                  <img loading="lazy" v-if="item.image" :src="item.image" alt="" style="width:100%;height:100%;object-fit:cover;">
-                </div>
-                <span style="flex:1;min-width:0;">
-                  <span style="display:block;font-size:13.5px;line-height:19px;color:#212529;font-weight:500;">{{ item.title }}</span>
-                  <span style="display:block;font-size:12px;color:#777;margin-top:4px;">{{ item.date }}</span>
-                </span>
+            <div class="nidqc-cat-list">
+              <NuxtLink v-for="(link, i) in newsNavLinks" :key="i" :to="link.to" class="nidqc-cat-row">
+                <span class="nidqc-cat-label">{{ link.label }}</span>
+                <span v-if="link.count !== null" class="nidqc-cat-count">{{ link.count }}</span>
+              </NuxtLink>
+              <NuxtLink v-if="newsTotal" to="/tin-tuc" class="nidqc-cat-total">
+                <span>Toàn bộ tin &amp; thông báo</span>
+                <span class="nidqc-cat-total-num">{{ newsTotal }}</span>
               </NuxtLink>
             </div>
           </div>
@@ -193,22 +241,29 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
     <section style="background:#fff;padding:44px 0;">
       <div class="nidqc-two-col" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1.6fr 1fr;gap:32px;">
         <div>
-          <div style="display:flex;align-items:center;gap:11px;border-bottom:2px solid #0F3093;padding-bottom:12px;margin-bottom:20px;">
-            <span style="width:6px;height:26px;background:#0F3093;display:inline-block;"></span>
-            <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:24px;letter-spacing:0.3px;text-transform:uppercase;color:#212529;margin:0;">Thư viện video</h2>
-          </div>
-          <div style="position:relative;width:100%;padding-top:56.25%;border:1px solid #CCCCCC;">
-            <iframe v-if="videoUrl" :src="videoUrl" title="Video giới thiệu NIDQC" allowfullscreen
-              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>
-          </div>
+          <!-- Có bài Thư viện (Videos / Hình ảnh) thì hiện slider; chưa có bài nào
+               thì giữ nguyên video giới thiệu cũ lấy từ node home_block. -->
+          <MediaLibrary v-if="mediaPosts && mediaPosts.length" :posts="mediaPosts" />
+          <template v-else>
+            <div style="display:flex;align-items:center;gap:11px;border-bottom:2px solid #0F3093;padding-bottom:12px;margin-bottom:20px;">
+              <span style="width:6px;height:26px;background:#0F3093;display:inline-block;"></span>
+              <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:24px;letter-spacing:0.3px;text-transform:uppercase;color:#212529;margin:0;">Thư viện video</h2>
+            </div>
+            <div style="position:relative;width:100%;padding-top:56.25%;border:1px solid #CCCCCC;">
+              <iframe v-if="videoUrl" :src="videoUrl" title="Video giới thiệu NIDQC" allowfullscreen
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>
+            </div>
+          </template>
         </div>
-        <div v-if="webLinks && webLinks.length">
+        <!-- Cột này cao bằng khối Thư viện bên trái: các hàng chia đều phần chiều cao
+             còn lại (.nidqc-weblink-list) nên đáy hai cột thẳng nhau. -->
+        <div v-if="webLinks && webLinks.length" class="nidqc-weblinks-col">
           <div style="display:flex;align-items:center;gap:11px;border-bottom:2px solid #0F3093;padding-bottom:12px;margin-bottom:20px;">
             <span style="width:6px;height:26px;background:#0F3093;display:inline-block;"></span>
             <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:24px;letter-spacing:0.3px;text-transform:uppercase;color:#212529;margin:0;">Liên kết web</h2>
           </div>
-          <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="nidqc-weblink-list">
             <component :is="l.href ? 'a' : 'div'" v-for="(l, i) in webLinks" :key="i"
               :href="l.href || undefined" :target="l.href ? '_blank' : undefined" :rel="l.href ? 'noopener' : undefined"
               class="nidqc-weblink"
@@ -235,23 +290,35 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
           <h2 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:24px;letter-spacing:0.3px;text-transform:uppercase;color:#212529;margin:0;">Liên hệ</h2>
         </div>
         <div class="nidqc-two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-          <div v-for="(cs, i) in offices" :key="i" style="background:#fff;border:1px solid #CCCCCC;">
-            <div style="padding:18px 20px;border-bottom:1px solid #ECECEC;">
-              <h3 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:17px;color:#0F3093;margin:0 0 10px;">{{ cs.t }}</h3>
-              <p style="display:flex;align-items:flex-start;gap:8px;font-size:13.5px;line-height:20px;color:#495057;margin:0 0 8px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6AC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px;margin-top:2px;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                {{ cs.addr }}
-              </p>
-              <p style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:#495057;margin:0;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6AC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 16px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                {{ cs.tel }}
-              </p>
+          <!-- Bỏ iframe bản đồ (220px mỗi cơ sở) — thay bằng link mở Google Maps.
+               Địa chỉ, điện thoại, email đều bấm được: trên điện thoại là gọi/gửi thư
+               ngay, không phải bôi đen copy. -->
+          <div v-for="(cs, i) in offices" :key="i" class="nidqc-office">
+            <h3 class="nidqc-office__name">{{ cs.t }}</h3>
+            <ul class="nidqc-office__list">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6AC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>{{ cs.addr }}</span>
+              </li>
+              <li v-if="cs.tel">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6AC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <a :href="`tel:${cs.tel.replace(/[^+\d]/g, '')}`">{{ cs.tel }}</a>
+              </li>
+              <li v-if="cs.email">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1D6AC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+                <a :href="`mailto:${cs.email}`">{{ cs.email }}</a>
+              </li>
+            </ul>
+            <!-- Chỉ một nút: form liên hệ dùng chung một hộp thư cho cả Viện, đặt nút
+                 "Gửi liên hệ" trong từng cơ sở sẽ ngụ ý gửi riêng cho cơ sở đó. Nút
+                 chung đã có ngay dưới khối này. -->
+            <div class="nidqc-office__actions">
+              <a v-if="cs.map" :href="cs.map" target="_blank" rel="noopener" class="nidqc-office__btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Xem trên bản đồ
+              </a>
             </div>
-            <iframe :src="cs.map" style="width:100%;height:220px;border:0;display:block;" loading="lazy" referrerpolicy="no-referrer-when-downgrade" :title="`Bản đồ ${cs.t}`"></iframe>
           </div>
-        </div>
-        <div style="margin-top:24px;">
-          <NuxtLink to="/lien-he" style="display:inline-block;background:#0F3093;color:#fff;font-weight:600;font-size:14px;padding:11px 22px;text-decoration:none;">Trang liên hệ &amp; hỗ trợ</NuxtLink>
         </div>
       </div>
     </section>

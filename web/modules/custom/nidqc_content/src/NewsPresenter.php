@@ -36,6 +36,19 @@ final class NewsPresenter {
   public const STYLE_THUMB = 'max_325x325';
 
   /**
+   * Tên danh mục Tin tức dùng cho Thư viện media.
+   *
+   * Tra theo TÊN chứ không chôn term id: id khác nhau giữa dev/staging/production.
+   */
+  public const CATEGORY_VIDEO = 'Videos';
+  public const CATEGORY_IMAGE = 'Hình ảnh';
+
+  /**
+   * Cache term id của các danh mục media trong một request.
+   */
+  private ?array $mediaTermIds = NULL;
+
+  /**
    * Khởi tạo presenter.
    */
   public function __construct(
@@ -62,7 +75,143 @@ final class NewsPresenter {
       'category' => $category?->label() ?? '',
       'image' => $this->imageUrl($node, $styleId),
       'alias' => $node->toUrl()->toString(),
+      'featured' => $this->isFeatured($node),
     ];
+  }
+
+  /**
+   * Tin có được đánh dấu "Tin nổi bật" hay không.
+   *
+   * hasField() vì field_featured chỉ gắn trên bundle news; presenter này cũng
+   * chạy cho tin cũ được tạo trước khi có field (giá trị NULL = không nổi bật).
+   */
+  public function isFeatured(NodeInterface $node): bool {
+    return $node->hasField('field_featured')
+      && (bool) $node->get('field_featured')->value;
+  }
+
+  /**
+   * Term id của hai danh mục Thư viện media (Videos, Hình ảnh).
+   *
+   * Các khối Tin tức thường phải LOẠI TRỪ những danh mục này: bài thư viện chỉ có
+   * ý nghĩa trong block Thư viện, lọt vào danh sách/tìm kiếm là sai yêu cầu.
+   */
+  public function mediaCategoryTermIds(): array {
+    if ($this->mediaTermIds !== NULL) {
+      return $this->mediaTermIds;
+    }
+
+    $wanted = [self::CATEGORY_VIDEO, self::CATEGORY_IMAGE];
+    $ids = [];
+    $terms = $this->entityTypeManager->getStorage('taxonomy_term')
+      ->loadByProperties(['vid' => 'news_category']);
+    foreach ($terms as $term) {
+      if (in_array($term->label(), $wanted, TRUE)) {
+        $ids[$term->label()] = (int) $term->id();
+      }
+    }
+
+    return $this->mediaTermIds = $ids;
+  }
+
+  /**
+   * Bài này thuộc danh mục thư viện nào: 'video', 'image' hoặc NULL.
+   */
+  public function mediaKind(NodeInterface $node): ?string {
+    $label = $node->get('field_category')->entity?->label();
+    return match ($label) {
+      self::CATEGORY_VIDEO => 'video',
+      self::CATEGORY_IMAGE => 'image',
+      default => NULL,
+    };
+  }
+
+  /**
+   * Danh sách media của một bài, đã chuẩn hoá cho frontend.
+   *
+   * Trả về mảng phẳng theo ĐÚNG thứ tự admin sắp trong form (delta của field), gồm:
+   *   ['type' => 'image',   'thumbnail' => …, 'src' => …, 'alt' => …]
+   *   ['type' => 'youtube', 'thumbnail' => …, 'video_id' => …]
+   *   ['type' => 'video',   'thumbnail' => …|null, 'src' => …, 'mime' => …]
+   *
+   * Frontend không phải đụng tới cấu trúc field thô của Drupal.
+   */
+  public function mediaItems(NodeInterface $node): array {
+    $items = [];
+
+    if ($node->hasField('field_gallery_images')) {
+      foreach ($node->get('field_gallery_images') as $item) {
+        $file = $item->entity;
+        if ($file === NULL) {
+          continue;
+        }
+        $uri = $file->getFileUri();
+        $items[] = [
+          'type' => 'image',
+          'thumbnail' => $this->styledUrl($uri, self::STYLE_THUMB) ?? $this->fileUrlGenerator->generateString($uri),
+          'src' => $this->styledUrl($uri, self::STYLE_ARTICLE) ?? $this->fileUrlGenerator->generateString($uri),
+          'alt' => (string) ($item->alt ?? ''),
+        ];
+      }
+    }
+
+    if ($node->hasField('field_youtube_urls')) {
+      foreach ($node->get('field_youtube_urls') as $item) {
+        $videoId = $this->youtubeId((string) $item->uri);
+        if ($videoId === NULL) {
+          continue;
+        }
+        $items[] = [
+          'type' => 'youtube',
+          // Thumbnail lấy thẳng từ CDN của YouTube theo video id.
+          'thumbnail' => 'https://img.youtube.com/vi/' . $videoId . '/hqdefault.jpg',
+          'video_id' => $videoId,
+        ];
+      }
+    }
+
+    if ($node->hasField('field_videos')) {
+      // Video tải lên không có thumbnail riêng -> dùng ảnh đại diện của bài; không
+      // có nữa thì trả NULL để frontend hiện placeholder (yêu cầu 3.3).
+      $fallbackThumb = $this->imageUrl($node, self::STYLE_THUMB);
+      foreach ($node->get('field_videos') as $item) {
+        $file = $item->entity;
+        if ($file === NULL) {
+          continue;
+        }
+        $items[] = [
+          'type' => 'video',
+          'thumbnail' => $fallbackThumb,
+          'src' => $this->fileUrlGenerator->generateString($file->getFileUri()),
+          'mime' => $file->getMimeType(),
+        ];
+      }
+    }
+
+    return $items;
+  }
+
+  /**
+   * Rút video id từ link YouTube, NULL nếu không phải link YouTube hợp lệ.
+   *
+   * Nhận watch?v=…, youtu.be/…, shorts/… và embed/… — id YouTube luôn 11 ký tự.
+   */
+  public function youtubeId(string $url): ?string {
+    $url = trim($url);
+    if ($url === '') {
+      return NULL;
+    }
+
+    $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+    if ($host !== '' && !preg_match('#(^|\.)(youtube\.com|youtu\.be|youtube-nocookie\.com)$#', $host)) {
+      return NULL;
+    }
+
+    if (preg_match('#(?:v=|/(?:shorts|embed|v)/|youtu\.be/)([A-Za-z0-9_-]{11})(?![A-Za-z0-9_-])#', $url, $m) === 1) {
+      return $m[1];
+    }
+
+    return NULL;
   }
 
   /**

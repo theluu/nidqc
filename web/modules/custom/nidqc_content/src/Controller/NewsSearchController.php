@@ -104,6 +104,18 @@ final class NewsSearchController implements ContainerInjectionInterface {
         ->condition('body.value', $keyword, 'CONTAINS');
       $query->condition($matches);
 
+      // Bài Thư viện media (Videos, Hình ảnh) không phải tin đọc được nên không
+      // đưa vào kết quả tìm kiếm. notExists để bài chưa chọn danh mục không bị
+      // loại oan (NOT IN trên LEFT JOIN cho NULL).
+      $mediaIds = $this->presenter->mediaCategoryTermIds();
+      if ($mediaIds !== []) {
+        $query->condition(
+          $query->orConditionGroup()
+            ->condition('field_category.target_id', array_values($mediaIds), 'NOT IN')
+            ->notExists('field_category')
+        );
+      }
+
       $total = (int) (clone $query)->count()->execute();
       $ids = $query
         ->sort('created', 'DESC')
