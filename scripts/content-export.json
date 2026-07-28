@@ -1,0 +1,866 @@
+[
+    {
+        "type": "certificate",
+        "title": "ISO\/IEC 17025",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/nang-luc\/chung-nhan\/isoiec-17025",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Công nhận năng lực phòng thử nghiệm theo chuẩn quốc tế.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "certificate",
+        "title": "GLP",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/nang-luc\/chung-nhan\/glp",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Thực hành tốt phòng kiểm nghiệm thuốc theo quy định Bộ Y tế.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "certificate",
+        "title": "NRA - WHO",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/nang-luc\/chung-nhan\/nra-who",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Đáp ứng tiêu chí cơ quan quản lý quốc gia theo khung đánh giá WHO.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "department",
+        "title": "Phòng Tổ chức - Hành chính",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/co-cau-to-chuc\/phong-to-chuc-hanh-chinh",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Quản lý nhân sự, hành chính - quản trị và công tác văn thư lưu trữ.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "department",
+        "title": "Phòng Kế hoạch - Tài chính",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/co-cau-to-chuc\/phong-ke-hoach-tai-chinh",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Xây dựng kế hoạch, quản lý tài chính - kế toán của Viện.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "department",
+        "title": "Phòng Khoa học - Đào tạo",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/co-cau-to-chuc\/phong-khoa-hoc-dao-tao",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Quản lý hoạt động nghiên cứu khoa học và đào tạo, hợp tác quốc tế.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "department",
+        "title": "Khoa Hóa lý - Đo lường",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/co-cau-to-chuc\/khoa-hoa-ly-do-luong",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Kiểm nghiệm hóa lý, hiệu chuẩn thiết bị đo lường.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "department",
+        "title": "Khoa Dược lý - Sinh học",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/co-cau-to-chuc\/khoa-duoc-ly-sinh-hoc",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Đánh giá tác dụng dược lý và tương đương sinh học.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "department",
+        "title": "Khoa Vi sinh vật",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/co-cau-to-chuc\/khoa-vi-sinh-vat",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Kiểm nghiệm giới hạn nhiễm khuẩn, vô khuẩn của chế phẩm.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "department",
+        "title": "Trung tâm Chất chuẩn - Chất đối chiếu",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/co-cau-to-chuc\/trung-tam-chat-chuan-chat-doi-chieu",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Nghiên cứu, sản xuất và cung ứng chất chuẩn quốc gia.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "department",
+        "title": "Trung tâm Kiểm nghiệm Mỹ phẩm",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/co-cau-to-chuc\/trung-tam-kiem-nghiem-my-pham",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Kiểm tra, giám sát chất lượng mỹ phẩm lưu hành trên thị trường.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "document",
+        "title": "Thông tư quy định về kiểm nghiệm thuốc, nguyên liệu làm thuốc",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/van-ban-tai-lieu\/thong-tu-quy-dinh-ve-kiem-nghiem-thuoc-nguyen-lieu-lam-thuoc",
+        "fields": {
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Văn bản pháp quy"
+                ]
+            },
+            "field_meta": {
+                "__val__": [
+                    {
+                        "value": "Bộ Y tế · Thông tư"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "document",
+        "title": "Quyết định ban hành quy trình kiểm nghiệm nội bộ",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/van-ban-tai-lieu\/quyet-dinh-ban-hanh-quy-trinh-kiem-nghiem-noi-bo",
+        "fields": {
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Văn bản pháp quy"
+                ]
+            },
+            "field_meta": {
+                "__val__": [
+                    {
+                        "value": "Viện KNTTW · Quyết định"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "document",
+        "title": "Nghị định quy định chi tiết một số điều của Luật Dược",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/van-ban-tai-lieu\/nghi-dinh-quy-dinh-chi-tiet-mot-so-dieu-cua-luat-duoc",
+        "fields": {
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Văn bản pháp quy"
+                ]
+            },
+            "field_meta": {
+                "__val__": [
+                    {
+                        "value": "Chính phủ · Nghị định"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "document",
+        "title": "Thông tư hướng dẫn công bố tiêu chuẩn chất lượng thuốc",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/van-ban-tai-lieu\/thong-tu-huong-dan-cong-bo-tieu-chuan-chat-luong-thuoc",
+        "fields": {
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Văn bản pháp quy"
+                ]
+            },
+            "field_meta": {
+                "__val__": [
+                    {
+                        "value": "Bộ Y tế · Thông tư"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "document",
+        "title": "Quy chế quản lý chất chuẩn, chất đối chiếu",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/van-ban-tai-lieu\/quy-che-quan-ly-chat-chuan-chat-doi-chieu",
+        "fields": {
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Văn bản pháp quy"
+                ]
+            },
+            "field_meta": {
+                "__val__": [
+                    {
+                        "value": "Viện KNTTW · Quy chế"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "document",
+        "title": "Quyết định phê duyệt danh mục dược liệu chuẩn",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/van-ban-tai-lieu\/quyet-dinh-phe-duyet-danh-muc-duoc-lieu-chuan",
+        "fields": {
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Văn bản pháp quy"
+                ]
+            },
+            "field_meta": {
+                "__val__": [
+                    {
+                        "value": "Viện KNTTW · Quyết định"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "document",
+        "title": "Quy trình thao tác chuẩn (SOP) phân tích hóa lý",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/van-ban-tai-lieu\/quy-trinh-thao-tac-chuan-sop-phan-tich-hoa-ly",
+        "fields": {
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Tài liệu chuyên môn"
+                ]
+            },
+            "field_meta": {
+                "__val__": [
+                    {
+                        "value": "Tài liệu kỹ thuật · SOP"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "document",
+        "title": "Hướng dẫn thẩm định phương pháp phân tích",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/van-ban-tai-lieu\/huong-dan-tham-dinh-phuong-phap-phan-tich",
+        "fields": {
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Tài liệu chuyên môn"
+                ]
+            },
+            "field_meta": {
+                "__val__": [
+                    {
+                        "value": "Tài liệu kỹ thuật · Hướng dẫn"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "document",
+        "title": "Sổ tay chất lượng phòng thử nghiệm",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/van-ban-tai-lieu\/so-tay-chat-luong-phong-thu-nghiem",
+        "fields": {
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Tài liệu chuyên môn"
+                ]
+            },
+            "field_meta": {
+                "__val__": [
+                    {
+                        "value": "Hệ thống QLCL · Sổ tay"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "document",
+        "title": "Quy trình đánh giá tương đương sinh học",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/van-ban-tai-lieu\/quy-trinh-danh-gia-tuong-duong-sinh-hoc",
+        "fields": {
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Tài liệu chuyên môn"
+                ]
+            },
+            "field_meta": {
+                "__val__": [
+                    {
+                        "value": "Tài liệu kỹ thuật · Quy trình"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "document",
+        "title": "Hướng dẫn lấy mẫu và bảo quản mẫu kiểm nghiệm",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/van-ban-tai-lieu\/huong-dan-lay-mau-va-bao-quan-mau-kiem-nghiem",
+        "fields": {
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Tài liệu chuyên môn"
+                ]
+            },
+            "field_meta": {
+                "__val__": [
+                    {
+                        "value": "Tài liệu kỹ thuật · Hướng dẫn"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "document",
+        "title": "Tài liệu đào tạo nội bộ về GLP",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/van-ban-tai-lieu\/tai-lieu-dao-tao-noi-bo-ve-glp",
+        "fields": {
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Tài liệu chuyên môn"
+                ]
+            },
+            "field_meta": {
+                "__val__": [
+                    {
+                        "value": "Đào tạo nội bộ · Tài liệu"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "equipment",
+        "title": "Hệ thống sắc ký lỏng hiệu năng cao (HPLC\/UHPLC)",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/nang-luc\/thiet-bi\/he-thong-sac-ky-long-hieu-nang-cao-hplcuhplc",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Định lượng, thử tạp chất và đánh giá độ tinh khiết dược chất.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "equipment",
+        "title": "Sắc ký khí ghép khối phổ (GC-MS)",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/nang-luc\/thiet-bi\/sac-ky-khi-ghep-khoi-pho-gc-ms",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Phát hiện và định lượng các hợp chất bay hơi, dung môi tồn dư.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "equipment",
+        "title": "Quang phổ hấp thụ nguyên tử (AAS\/ICP-MS)",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/nang-luc\/thiet-bi\/quang-pho-hap-thu-nguyen-tu-aasicp-ms",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Kiểm soát giới hạn kim loại nặng trong thuốc và dược liệu.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "equipment",
+        "title": "Hệ thống thử độ hòa tan",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/nang-luc\/thiet-bi\/he-thong-thu-do-hoa-tan",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Đánh giá tốc độ giải phóng dược chất theo tiêu chuẩn dược điển.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "equipment",
+        "title": "Phòng vi sinh đạt chuẩn an toàn sinh học",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/nang-luc\/thiet-bi\/phong-vi-sinh-dat-chuan-an-toan-sinh-hoc",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Kiểm nghiệm giới hạn nhiễm khuẩn và vô khuẩn của chế phẩm.",
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "faq",
+        "title": "Làm thế nào để đăng ký dịch vụ kiểm nghiệm tại Viện?",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/faq\/lam-the-nao-de-dang-ky-dich-vu-kiem-nghiem-tai-vien",
+        "fields": {
+            "field_answer": {
+                "__val__": [
+                    {
+                        "value": "Đơn vị gửi mẫu liên hệ trực tiếp phòng Kế hoạch - Tài chính hoặc qua biểu mẫu liên hệ trực tuyến để được hướng dẫn thủ tục và biểu phí kiểm nghiệm.",
+                        "format": "basic_html"
+                    }
+                ]
+            },
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Dịch vụ kiểm nghiệm"
+                ]
+            }
+        }
+    },
+    {
+        "type": "faq",
+        "title": "Thời gian trả kết quả kiểm nghiệm là bao lâu?",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/faq\/thoi-gian-tra-ket-qua-kiem-nghiem-la-bao-lau",
+        "fields": {
+            "field_answer": {
+                "__val__": [
+                    {
+                        "value": "Thời gian trả kết quả phụ thuộc vào loại mẫu và chỉ tiêu kiểm nghiệm, thông thường được thông báo cụ thể khi tiếp nhận mẫu.",
+                        "format": "basic_html"
+                    }
+                ]
+            },
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Dịch vụ kiểm nghiệm"
+                ]
+            }
+        }
+    },
+    {
+        "type": "faq",
+        "title": "Kết quả kiểm nghiệm của Viện có giá trị pháp lý không?",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/faq\/ket-qua-kiem-nghiem-cua-vien-co-gia-tri-phap-ly-khong",
+        "fields": {
+            "field_answer": {
+                "__val__": [
+                    {
+                        "value": "Có. Viện là cơ quan kiểm nghiệm thuốc đầu ngành, kết quả kiểm nghiệm có giá trị pháp lý theo quy định của Bộ Y tế.",
+                        "format": "basic_html"
+                    }
+                ]
+            },
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Dịch vụ kiểm nghiệm"
+                ]
+            }
+        }
+    },
+    {
+        "type": "faq",
+        "title": "Làm thế nào để đặt mua chất chuẩn của Viện?",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/faq\/lam-the-nao-de-dat-mua-chat-chuan-cua-vien",
+        "fields": {
+            "field_answer": {
+                "__val__": [
+                    {
+                        "value": "Truy cập mục Tra cứu chất chuẩn trên trang chủ, tìm sản phẩm cần thiết và làm theo hướng dẫn đăng ký mua trên hệ thống.",
+                        "format": "basic_html"
+                    }
+                ]
+            },
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Chất chuẩn - chất đối chiếu"
+                ]
+            }
+        }
+    },
+    {
+        "type": "faq",
+        "title": "Chất chuẩn có được giao hàng toàn quốc không?",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/faq\/chat-chuan-co-duoc-giao-hang-toan-quoc-khong",
+        "fields": {
+            "field_answer": {
+                "__val__": [
+                    {
+                        "value": "Có. Chất chuẩn được đóng gói và vận chuyển đến các đơn vị trên toàn quốc theo quy định bảo quản phù hợp.",
+                        "format": "basic_html"
+                    }
+                ]
+            },
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Chất chuẩn - chất đối chiếu"
+                ]
+            }
+        }
+    },
+    {
+        "type": "faq",
+        "title": "Vì sao tôi không xem được toàn văn văn bản?",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/faq\/vi-sao-toi-khong-xem-duoc-toan-van-van-ban",
+        "fields": {
+            "field_answer": {
+                "__val__": [
+                    {
+                        "value": "Văn bản pháp quy và tài liệu chuyên môn là hệ thống nội bộ, chỉ hiển thị đầy đủ cho cán bộ, viên chức đã đăng nhập bằng tài khoản được cấp.",
+                        "format": "basic_html"
+                    }
+                ]
+            },
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Văn bản - tài liệu"
+                ]
+            }
+        }
+    },
+    {
+        "type": "faq",
+        "title": "Làm thế nào để được cấp tài khoản truy cập?",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/faq\/lam-the-nao-de-duoc-cap-tai-khoan-truy-cap",
+        "fields": {
+            "field_answer": {
+                "__val__": [
+                    {
+                        "value": "Cán bộ, viên chức liên hệ phòng Tổ chức - Hành chính để được hướng dẫn cấp tài khoản truy cập hệ thống tài liệu nội bộ.",
+                        "format": "basic_html"
+                    }
+                ]
+            },
+            "field_group": {
+                "__ref__": "taxonomy_term",
+                "names": [
+                    "Văn bản - tài liệu"
+                ]
+            }
+        }
+    },
+    {
+        "type": "page",
+        "title": "Giới thiệu chung",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784198321,
+        "alias": "\/gioi-thieu-chung",
+        "fields": {
+            "body": {
+                "__val__": [
+                    {
+                        "value": "<p>Viện Kiểm nghiệm thuốc Trung ương là cơ quan khoa học kỹ thuật đầu ngành, trực thuộc Bộ Y tế, chịu trách nhiệm kiểm tra và giám sát chất lượng thuốc, nguyên liệu làm thuốc và mỹ phẩm trên phạm vi cả nước.<\/p><p>Viện được thành lập nhằm đáp ứng yêu cầu kiểm tra, giám sát chất lượng thuốc phục vụ công tác bảo vệ và chăm sóc sức khỏe nhân dân.<\/p><p>Hiện nay, Viện vận hành hai cơ sở tại Hà Nội, quy tụ đội ngũ cán bộ khoa học kỹ thuật có trình độ chuyên môn cao trong các lĩnh vực hóa lý, dược lý, vi sinh và sinh học phân tử.<\/p>",
+                        "summary": null,
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "page",
+        "title": "Chính sách chất lượng",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784198321,
+        "alias": "\/chinh-sach-chat-luong",
+        "fields": {
+            "body": {
+                "__val__": [
+                    {
+                        "value": "<p>Viện Kiểm nghiệm thuốc Trung ương cam kết duy trì hệ thống quản lý chất lượng theo chuẩn ISO\/IEC 17025, bảo đảm kết quả kiểm nghiệm chính xác, khách quan và tin cậy.<\/p><p>Toàn văn chính sách chất lượng và các chứng nhận liên quan thuộc mục Văn bản - Tài liệu.<\/p>",
+                        "summary": null,
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "page",
+        "title": "Liên hệ",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784198321,
+        "alias": "\/lien-he",
+        "fields": {
+            "body": {
+                "__val__": [
+                    {
+                        "value": "<p>Mọi ý kiến đóng góp, yêu cầu hỗ trợ hoặc phối hợp công tác, xin vui lòng liên hệ theo thông tin dưới đây hoặc gửi qua biểu mẫu trực tuyến. Viện sẽ phản hồi trong thời gian sớm nhất.<\/p><p><strong>Địa chỉ:<\/strong> 48 Hai Bà Trưng, Hoàn Kiếm, Hà Nội<br><strong>Điện thoại:<\/strong> (024) 3825 5075<br><strong>Email:<\/strong> vienkiemnghiem@nidqc.gov.vn<\/p>",
+                        "summary": null,
+                        "format": "basic_html"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "project",
+        "title": "Xây dựng bộ chất chuẩn đối chiếu dược liệu Việt Nam giai đoạn 2024-2026",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/dao-tao-nckh\/xay-dung-bo-chat-chuan-doi-chieu-duoc-lieu-viet-nam-giai-doan-2024-2026",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Đề tài cấp Bộ Y tế, phối hợp các viện nghiên cứu dược liệu trong nước.",
+                        "format": "basic_html"
+                    }
+                ]
+            },
+            "field_year": {
+                "__val__": [
+                    {
+                        "value": "2024"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "project",
+        "title": "Nghiên cứu phương pháp định lượng đồng thời nhiều hoạt chất trong chế phẩm đa thành phần",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/dao-tao-nckh\/nghien-cuu-phuong-phap-dinh-luong-dong-thoi-nhieu-hoat-chat-trong-che-pham-da-thanh-phan",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Ứng dụng sắc ký lỏng khối phổ độ phân giải cao (LC-HRMS) trong kiểm nghiệm thuốc.",
+                        "format": "basic_html"
+                    }
+                ]
+            },
+            "field_year": {
+                "__val__": [
+                    {
+                        "value": "2023"
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "type": "project",
+        "title": "Đánh giá nguy cơ tạp chất tồn dư trong nguyên liệu làm thuốc nhập khẩu",
+        "status": 1,
+        "langcode": "vi",
+        "created": 1784187667,
+        "alias": "\/dao-tao-nckh\/danh-gia-nguy-co-tap-chat-ton-du-trong-nguyen-lieu-lam-thuoc-nhap-khau",
+        "fields": {
+            "field_description": {
+                "__val__": [
+                    {
+                        "value": "Hợp tác nghiên cứu với các phòng kiểm nghiệm khu vực ASEAN.",
+                        "format": "basic_html"
+                    }
+                ]
+            },
+            "field_year": {
+                "__val__": [
+                    {
+                        "value": "2022"
+                    }
+                ]
+            }
+        }
+    }
+]
