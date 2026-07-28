@@ -54,32 +54,25 @@ let lastFocused = null
 const current = computed(() => openPost.value?.items?.[index.value] ?? null)
 const total = computed(() => openPost.value?.items?.length ?? 0)
 
-// Khoá cuộn nền khi mở lightbox.
+// Khoá cuộn nền khi mở lightbox — khoá trên <html>, TUYỆT ĐỐI không đụng <body>.
 //
-// Chỉ đặt overflow:hidden lên <body> là chưa đủ: body hết cuộn được nên trình duyệt
-// đưa vị trí cuộn về 0, đóng lightbox ra là đang ở đầu trang. Ghim body bằng
-// position:fixed kèm top âm giữ nguyên khung nhìn, lúc mở khoá thì cuộn trả lại chỗ cũ.
+// main.css có rule khử banner Google Translate: `body { top: 0 !important;
+// position: static !important; }`. Khai báo !important trong stylesheet thắng cả
+// inline style, nên mọi cách ghim body (position:fixed + top âm) đều bị vô hiệu —
+// nhìn thì tưởng chạy vì lúc đóng đã scrollTo trả về chỗ cũ, nhưng thực tế nền vẫn
+// cuộn được sau lưng lightbox. Google Translate cũng tự đặt inline top cho body.
+//
+// documentElement không dính rule nào nên overflow:hidden ăn thật. Vài trình duyệt
+// đưa vị trí cuộn về 0 khi khoá, nên vẫn lưu lại và trả về lúc mở khoá.
 let savedScroll = 0
 
 function lockScroll() {
   savedScroll = window.scrollY
-  const { style } = document.body
-  style.position = 'fixed'
-  style.top = `-${savedScroll}px`
-  style.left = '0'
-  style.right = '0'
-  style.width = '100%'
-  style.overflow = 'hidden'
+  document.documentElement.style.overflow = 'hidden'
 }
 
 function unlockScroll() {
-  const { style } = document.body
-  style.position = ''
-  style.top = ''
-  style.left = ''
-  style.right = ''
-  style.width = ''
-  style.overflow = ''
+  document.documentElement.style.overflow = ''
   window.scrollTo({ top: savedScroll, behavior: 'instant' })
 }
 
