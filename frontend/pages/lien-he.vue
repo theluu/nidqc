@@ -39,11 +39,17 @@ const lienHeLinks = [
   { label: 'Câu hỏi thường gặp', to: '/faq' },
 ]
 
-onMounted(() => {
+// Nạp reCAPTCHA khi người dùng chạm vào biểu mẫu lần đầu, KHÔNG nạp lúc onMounted:
+// api.js là third-party JS nặng, phần lớn khách vào /lien-he chỉ đọc địa chỉ - điện
+// thoại chứ không gửi form, nạp sẵn chỉ làm chậm trang và tụt Core Web Vitals.
+// initializeRecaptcha tự chống gọi trùng (recaptchaScriptPromise), nên focusin bắn
+// nhiều lần vẫn chỉ có một thẻ <script>. handleSubmit vẫn await được vì
+// executeRecaptcha luôn gọi initializeRecaptcha trước.
+function warmUpRecaptcha() {
   initializeRecaptcha().catch(() => {
     errorMessage.value = 'Không tải được reCAPTCHA. Vui lòng kiểm tra kết nối và tải lại trang.'
   })
-})
+}
 
 async function handleSubmit() {
   if (submitting.value) return
@@ -77,6 +83,12 @@ async function handleSubmit() {
     submitting.value = false
   }
 }
+
+// Badge reCAPTCHA do script Google chèn thẳng vào <body>, nằm ngoài cây component
+// của Vue. Nuxt điều hướng kiểu SPA nên document không unload -> badge bám lại ở mọi
+// trang sau khi rời /lien-he. CSS trong assets/css/main.css ẩn badge mặc định và chỉ
+// hiện khi <body> có class này; useHead tự gỡ class lúc component unmount.
+useHead({ bodyAttrs: { class: 'nidqc-recaptcha' } })
 
 useSeoMeta({ title: 'Liên hệ & hỗ trợ — NIDQC', description: 'Thông tin liên hệ, địa chỉ hai cơ sở và biểu mẫu hỗ trợ của Viện Kiểm nghiệm thuốc Trung ương.', ogTitle: 'Liên hệ & hỗ trợ — NIDQC', ogDescription: 'Thông tin liên hệ, địa chỉ hai cơ sở và biểu mẫu hỗ trợ của Viện Kiểm nghiệm thuốc Trung ương.' })
 </script>
@@ -119,7 +131,7 @@ useSeoMeta({ title: 'Liên hệ & hỗ trợ — NIDQC', description: 'Thông ti
             {{ successMessage }}
           </div>
 
-          <form v-else class="contact-form" @submit.prevent="handleSubmit">
+          <form v-else class="contact-form" @submit.prevent="handleSubmit" @focusin.once="warmUpRecaptcha">
             <div class="contact-form__row">
               <div class="contact-form__field">
                 <label for="contact-name">Họ và tên <span aria-hidden="true">*</span></label>
