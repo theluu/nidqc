@@ -120,18 +120,25 @@ body { margin: 0; }
   .nidqc-nav-inner a { white-space: nowrap; }
 }
 
-/* ===== HERO: 2 cột -> 1 cột ===== */
+/* ===== HERO: 2 cột -> 1 cột =====
+   minmax(0, ...) chứ KHÔNG phải 1fr: `1fr` = `minmax(auto, 1fr)`, nên track không bao
+   giờ hẹp hơn min-content của khối hero. Dải thumbnail bên trong (5 ô × 96px + gap +
+   padding = 558px) đẩy min-content lên 558px -> trên máy 360-414px cả trang bị tràn
+   ngang ~200px. minmax(0, 1fr) cho phép track co hết cỡ, dải thumbnail tự cuộn ngang
+   đúng như thiết kế (overflow-x:auto trong FeaturedHero.vue). */
 @media (max-width: 900px) {
-  .nidqc-hero-grid { grid-template-columns: 1fr !important; }
+  .nidqc-hero-grid { grid-template-columns: minmax(0, 1fr) !important; }
 }
 
-/* ===== GRID card: giảm cột theo màn hình ===== */
+/* ===== GRID card: giảm cột theo màn hình =====
+   Dùng minmax(0, ...) ở mọi nơi — xem ghi chú ở khối HERO bên trên: `1fr` không cho
+   track hẹp hơn min-content của thẻ bên trong, đủ để sinh cuộn ngang trên máy hẹp. */
 @media (max-width: 1100px) {
-  .nidqc-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
-  .nidqc-grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
+  .nidqc-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .nidqc-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 }
 @media (max-width: 640px) {
-  .nidqc-grid-4, .nidqc-grid-3, .nidqc-grid-2 { grid-template-columns: 1fr !important; }
+  .nidqc-grid-4, .nidqc-grid-3, .nidqc-grid-2 { grid-template-columns: minmax(0, 1fr) !important; }
 }
 
 /* ===== FOOTER: grid -> 1 cột ===== */
@@ -164,7 +171,7 @@ body { margin: 0; }
 }
 
 @media (max-width: 768px) {
-  .nidqc-footer-grid { grid-template-columns: 1fr !important; gap: 28px !important; }
+  .nidqc-footer-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 28px !important; }
   .nidqc-footer-bar {
     flex-direction: column;
     justify-content: center;
@@ -173,9 +180,9 @@ body { margin: 0; }
   }
 }
 
-/* ===== 2 cột chung (liên hệ, cơ cấu, năng lực) ===== */
+/* ===== 2 cột chung (liên hệ, cơ cấu, năng lực, thư viện + liên kết web) ===== */
 @media (max-width: 768px) {
-  .nidqc-two-col { grid-template-columns: 1fr !important; }
+  .nidqc-two-col { grid-template-columns: minmax(0, 1fr) !important; }
 }
 
 /* ===== Banner: giữ đúng tỷ lệ ảnh ở mọi kích thước ===== */
@@ -186,8 +193,13 @@ body { margin: 0; }
   .nidqc-page-title { font-size: 24px !important; }
 }
 
-/* ===== HAMBURGER MENU (mobile) ===== */
-@media (max-width: 900px) {
+/* ===== HAMBURGER MENU (mobile + tablet + laptop hẹp) =====
+   Ngưỡng 1199px chứ không phải 900px: 8 mục menu chính (nhãn tiếng Việt dài, white-space
+   :nowrap) cần 1058px, cộng padding 48px + nút tìm kiếm 52px = 1158px. Dưới mức đó thanh
+   nav ngang tràn ra khỏi container -> ở 901-1082px cả trang sinh cuộn ngang, ở 1083-1157px
+   menu đè lên nút tìm kiếm. Submenu là position:absolute nên KHÔNG thể chữa bằng
+   overflow-x:auto (sẽ bị cắt). Drawer dọc đã có sẵn và chạy đúng -> dùng nó tới 1199px. */
+@media (max-width: 1199px) {
   /* Hiện nút 3 gạch, ẩn nav ngang */
   .nidqc-hamburger { display: flex !important; }
   .nidqc-nav-search { display: flex !important; margin-left: auto !important; }
@@ -385,7 +397,7 @@ body { top: 0 !important; position: static !important; }
 }
 .nidqc-article-aside { position: sticky; top: 24px; }
 @media (max-width: 980px) {
-  .nidqc-article-grid { grid-template-columns: 1fr; gap: 32px; }
+  .nidqc-article-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .nidqc-article-aside { position: static; }
 }
 
