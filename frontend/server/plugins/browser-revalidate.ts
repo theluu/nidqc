@@ -33,6 +33,24 @@ export default defineNitroPlugin((nitroApp) => {
     if (!current.includes('s-maxage')) {
       return
     }
-    setResponseHeader(event, 'cache-control', `public, max-age=0, must-revalidate, ${current}`)
+
+    // THAY hẳn, không nối thêm. Trước đây header giữ nguyên phần Nitro sinh ra và chỉ
+    // thêm tiền tố, thành `max-age=0, must-revalidate, s-maxage=600,
+    // stale-while-revalidate` — vẫn còn hai thứ gây hại:
+    //
+    //  - `stale-while-revalidate` KHÔNG có tham số. RFC 5861 bắt buộc delta-seconds;
+    //    chỉ thị cụt là không hợp lệ nên mỗi nơi hiểu một kiểu, có nơi coi như cửa sổ
+    //    rất dài rồi phục vụ bản cũ mà không hỏi lại server.
+    //  - `s-maxage=600` cho phép cache dùng chung giữ bản cũ 10 phút, mà /__purge
+    //    không với tới được — sửa bài xong vẫn hiện nội dung cũ.
+    //
+    // Với payloadExtraction, dữ liệu trang nằm ở /_payload.json chứ không nằm trong
+    // HTML, nên một bản payload cũ bị giữ lại là biên tập viên sửa xong không thấy gì
+    // đổi, còn "xem nguồn" trang thì chẳng có dữ liệu đó để mà nghi ngờ.
+    //
+    // Bỏ cả hai: cache SWR nội bộ của Nitro vẫn phục vụ tức thì và vẫn là nơi DUY
+    // NHẤT giữ bản dựng sẵn, nên /__purge lúc lưu bài là đủ và có hiệu lực ngay.
+    // ETag/304 vẫn còn nên revalidate hầu hết chỉ tốn một response rỗng.
+    setResponseHeader(event, 'cache-control', 'public, max-age=0, must-revalidate')
   })
 })

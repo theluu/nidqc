@@ -63,6 +63,10 @@ export default defineNuxtConfig({
     // rule hẹp hơn ('/tin-tuc/**'...) sẽ không bọc được gì. Cache key gồm cả query
     // string nên mỗi URL vẫn là một entry riêng.
     routeRules: {
+      // Cache-Control mà rule swr sinh ra được viết lại trong
+      // server/plugins/browser-revalidate.ts. KHÔNG đặt `headers` ở đây: cache handler
+      // của Nitro gắn header sau route rules nên khai báo tại chỗ này bị bỏ qua —
+      // đã thử và xác nhận header không hề đổi.
       '/**': { swr: 600 },
       // Endpoint purge phải luôn chạy thật, không được trả từ cache.
       '/__purge': { cache: false },
