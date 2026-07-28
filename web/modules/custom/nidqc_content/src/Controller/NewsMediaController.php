@@ -129,9 +129,22 @@ final class NewsMediaController implements ContainerInjectionInterface {
       return NULL;
     }
 
-    // Ảnh bìa: ưu tiên ảnh đại diện của bài, không có thì lấy thumbnail của media
-    // đầu tiên (ảnh đầu bộ, hoặc thumbnail YouTube).
-    $cover = $this->presenter->imageUrl($node, NewsPresenter::STYLE_CARD);
+    $kind = $this->presenter->mediaKind($node);
+
+    // Bài Videos lấy ảnh bìa từ CHÍNH video đầu tiên (thumbnail YouTube), không dùng
+    // ảnh đại diện: đổi link video là bìa đổi theo ngay. Trước đây bìa lấy field_image
+    // nên biên tập viên thay video xong vẫn thấy bìa cũ, tưởng là chưa lưu được.
+    // Video tải lên không rút được khung hình nên vẫn rơi về ảnh đại diện bên dưới.
+    $cover = NULL;
+    if ($kind === 'video') {
+      foreach ($media as $item) {
+        if ($item['type'] === 'youtube' && !empty($item['thumbnail'])) {
+          $cover = $item['thumbnail'];
+          break;
+        }
+      }
+    }
+    $cover ??= $this->presenter->imageUrl($node, NewsPresenter::STYLE_CARD);
     if ($cover === NULL) {
       foreach ($media as $item) {
         if (!empty($item['thumbnail'])) {
@@ -146,7 +159,7 @@ final class NewsMediaController implements ContainerInjectionInterface {
       'title' => $node->label(),
       'created' => gmdate(DATE_ATOM, (int) $node->getCreatedTime()),
       'alias' => $node->toUrl()->toString(),
-      'kind' => $this->presenter->mediaKind($node),
+      'kind' => $kind,
       'thumbnail' => $cover,
       'count' => count($media),
       'items' => $media,
