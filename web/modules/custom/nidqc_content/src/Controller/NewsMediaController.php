@@ -136,6 +136,7 @@ final class NewsMediaController implements ContainerInjectionInterface {
     // nên biên tập viên thay video xong vẫn thấy bìa cũ, tưởng là chưa lưu được.
     // Video tải lên không rút được khung hình nên vẫn rơi về ảnh đại diện bên dưới.
     $cover = NULL;
+    $coverVideo = NULL;
     if ($kind === 'video') {
       foreach ($media as $item) {
         if ($item['type'] === 'youtube' && !empty($item['thumbnail'])) {
@@ -143,9 +144,21 @@ final class NewsMediaController implements ContainerInjectionInterface {
           break;
         }
       }
+      // Không có YouTube -> lấy chính video tải lên làm bìa; frontend dựng khung
+      // hình đầu. Vẫn đúng nguyên tắc "bài video thì bìa là hình của video".
+      if ($cover === NULL) {
+        foreach ($media as $item) {
+          if ($item['type'] === 'video' && !empty($item['src'])) {
+            $coverVideo = $item['src'];
+            break;
+          }
+        }
+      }
     }
-    $cover ??= $this->presenter->imageUrl($node, NewsPresenter::STYLE_CARD);
-    if ($cover === NULL) {
+    if ($cover === NULL && $coverVideo === NULL) {
+      $cover = $this->presenter->imageUrl($node, NewsPresenter::STYLE_CARD);
+    }
+    if ($cover === NULL && $coverVideo === NULL) {
       foreach ($media as $item) {
         if (!empty($item['thumbnail'])) {
           $cover = $item['thumbnail'];
@@ -161,6 +174,8 @@ final class NewsMediaController implements ContainerInjectionInterface {
       'alias' => $node->toUrl()->toString(),
       'kind' => $kind,
       'thumbnail' => $cover,
+      // Có giá trị khi bìa là khung hình của video tải lên (không có ảnh tĩnh).
+      'cover_video' => $coverVideo,
       'count' => count($media),
       'items' => $media,
     ];

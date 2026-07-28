@@ -16,6 +16,8 @@ export type MediaPost = {
   alias: string
   kind: 'video' | 'image' | null
   thumbnail: string | null
+  // Bìa là khung hình của video tải lên (khi bài không có ảnh tĩnh nào dùng được).
+  cover_video: string | null
   count: number
   items: MediaItem[]
 }
@@ -44,6 +46,7 @@ export async function fetchMediaLibrary(limit = 12): Promise<MediaPost[]> {
   return (res.data || []).map((post) => ({
     ...post,
     thumbnail: mediaUrl(post.thumbnail),
+    cover_video: mediaUrl(post.cover_video),
     items: post.items.map((item) => ({
       ...item,
       thumbnail: mediaUrl(item.thumbnail),

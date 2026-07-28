@@ -171,9 +171,6 @@ final class NewsPresenter {
     }
 
     if ($node->hasField('field_videos')) {
-      // Video tải lên không có thumbnail riêng -> dùng ảnh đại diện của bài; không
-      // có nữa thì trả NULL để frontend hiện placeholder (yêu cầu 3.3).
-      $fallbackThumb = $this->imageUrl($node, self::STYLE_THUMB);
       foreach ($node->get('field_videos') as $item) {
         $file = $item->entity;
         if ($file === NULL) {
@@ -181,7 +178,11 @@ final class NewsPresenter {
         }
         $items[] = [
           'type' => 'video',
-          'thumbnail' => $fallbackThumb,
+          // Để NULL chứ KHÔNG mượn ảnh đại diện của bài: ảnh đó thường chẳng liên
+          // quan gì tới nội dung video (dữ liệu thật đang trả ra logo đơn vị), nhìn
+          // như thiếu thumbnail. Frontend tự dựng khung hình đầu từ chính file bằng
+          // media fragment #t= nên không cần trích ảnh phía server (không có ffmpeg).
+          'thumbnail' => NULL,
           'src' => $this->fileUrlGenerator->generateString($file->getFileUri()),
           'mime' => $file->getMimeType(),
         ];

@@ -26,10 +26,23 @@ function select(i) {
   active.value = i
 }
 
-// Thumbnail đang chọn phải nằm trong tầm nhìn khi dải cuộn ngang trên mobile.
+// Kéo thumbnail đang chọn vào tầm nhìn khi dải cuộn ngang trên mobile.
+//
+// Tự tính scrollLeft thay vì scrollIntoView: scrollIntoView cuộn MỌI khối cha, kể cả
+// document, nên bấm một thumbnail ngoài khung là cả trang nhảy — đúng lỗi "click
+// thumbnail bị đưa lên đầu trang". Đặt scrollLeft chỉ động vào đúng dải này.
 watch(active, (i) => {
-  const thumb = thumbStrip.value?.children[i]
-  thumb?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+  const strip = thumbStrip.value
+  const thumb = strip?.children[i]
+  if (!strip || !thumb) return
+  const left = thumb.offsetLeft
+  const right = left + thumb.offsetWidth
+  if (left < strip.scrollLeft) {
+    strip.scrollTo({ left, behavior: 'smooth' })
+  }
+  else if (right > strip.scrollLeft + strip.clientWidth) {
+    strip.scrollTo({ left: right - strip.clientWidth, behavior: 'smooth' })
+  }
 })
 
 // ===== Lightbox =====
@@ -41,21 +54,51 @@ let lastFocused = null
 const current = computed(() => openPost.value?.items?.[index.value] ?? null)
 const total = computed(() => openPost.value?.items?.length ?? 0)
 
+// Khoá cuộn nền khi mở lightbox.
+//
+// Chỉ đặt overflow:hidden lên <body> là chưa đủ: body hết cuộn được nên trình duyệt
+// đưa vị trí cuộn về 0, đóng lightbox ra là đang ở đầu trang. Ghim body bằng
+// position:fixed kèm top âm giữ nguyên khung nhìn, lúc mở khoá thì cuộn trả lại chỗ cũ.
+let savedScroll = 0
+
+function lockScroll() {
+  savedScroll = window.scrollY
+  const { style } = document.body
+  style.position = 'fixed'
+  style.top = `-${savedScroll}px`
+  style.left = '0'
+  style.right = '0'
+  style.width = '100%'
+  style.overflow = 'hidden'
+}
+
+function unlockScroll() {
+  const { style } = document.body
+  style.position = ''
+  style.top = ''
+  style.left = ''
+  style.right = ''
+  style.width = ''
+  style.overflow = ''
+  window.scrollTo({ top: savedScroll, behavior: 'instant' })
+}
+
 function open(post) {
   if (!post?.items?.length) return
   lastFocused = document.activeElement
   openPost.value = post
   index.value = 0
-  // Khoá cuộn nền để trang phía sau không trôi khi lăn chuột trong lightbox.
-  document.body.style.overflow = 'hidden'
-  nextTick(() => closeBtn.value?.focus())
+  lockScroll()
+  // preventScroll: focus() cũng tự kéo phần tử vào tầm nhìn, mà lightbox nằm ở
+  // position:fixed nên cú kéo đó lại làm trang nền dịch chuyển.
+  nextTick(() => closeBtn.value?.focus({ preventScroll: true }))
 }
 
 function close() {
   openPost.value = null
-  document.body.style.overflow = ''
+  unlockScroll()
   // Trả tiêu điểm về đúng chỗ vừa bấm, không nhảy lên đầu trang.
-  lastFocused?.focus?.()
+  lastFocused?.focus?.({ preventScroll: true })
   lastFocused = null
 }
 
@@ -74,7 +117,8 @@ function onKey(event) {
 onMounted(() => window.addEventListener('keydown', onKey))
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKey)
-  document.body.style.overflow = ''
+  // Rời trang lúc lightbox còn mở thì phải gỡ khoá, không thì trang sau bị ghim cứng.
+  if (openPost.value) unlockScroll()
 })
 
 // nocookie + autoplay: người dùng vừa chủ động bấm mở nên autoplay là đúng ý.
@@ -115,7 +159,12 @@ function formatDate(iso) {
           :aria-hidden="i === active ? undefined : 'true'"
           :aria-label="`Mở thư viện: ${post.title}`" @click="open(post)">
           <span class="lib__media">
-            <img v-if="post.thumbnail" :src="post.thumbnail" :alt="post.title" :loading="i === 0 ? 'eager' : 'lazy'">
+            <!-- Video tải lên không có ảnh tĩnh: nhúng chính file với media fragment
+                 #t= và preload="metadata" để trình duyệt vẽ đúng khung hình đó làm
+                 thumbnail. Không cần trích ảnh phía server (server không có ffmpeg). -->
+            <video v-if="post.cover_video" :src="`${post.cover_video}#t=0.5`"
+              preload="metadata" muted playsinline tabindex="-1" aria-hidden="true"></video>
+            <img v-else-if="post.thumbnail" :src="post.thumbnail" :alt="post.title" :loading="i === 0 ? 'eager' : 'lazy'">
             <span class="lib__kind">
               <svg v-if="post.kind === 'video'" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
               <svg v-else width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg>
@@ -141,7 +190,9 @@ function formatDate(iso) {
           class="lib__thumb" :class="{ 'is-active': i === active }"
           :aria-label="`Xem mục ${i + 1}: ${post.title}`"
           :aria-current="i === active ? 'true' : undefined" @click="select(i)">
-          <img v-if="post.thumbnail" :src="post.thumbnail" alt="" loading="lazy">
+          <video v-if="post.cover_video" :src="`${post.cover_video}#t=0.5`"
+            preload="metadata" muted playsinline tabindex="-1" aria-hidden="true"></video>
+          <img v-else-if="post.thumbnail" :src="post.thumbnail" alt="" loading="lazy">
           <span v-else class="lib__thumb-blank"></span>
           <span v-if="post.kind === 'video'" class="lib__thumb-play" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
@@ -190,6 +241,8 @@ function formatDate(iso) {
                 :aria-label="`Xem mục ${i + 1}`" :aria-current="i === index ? 'true' : undefined"
                 @click="index = i">
                 <img v-if="item.thumbnail" :src="item.thumbnail" alt="" loading="lazy">
+                <video v-else-if="item.type === 'video'" :src="`${item.src}#t=0.5`"
+                  preload="metadata" muted playsinline tabindex="-1" aria-hidden="true"></video>
                 <span v-else class="viewer__thumb-blank"></span>
                 <span v-if="item.type !== 'image'" class="viewer__thumb-play" aria-hidden="true">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
@@ -244,8 +297,10 @@ function formatDate(iso) {
   position: relative; display: block; width: 100%; height: 300px;
   overflow: hidden; background: #0D2870;
 }
-.lib__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
-.lib__slide:hover .lib__media img { transform: scale(1.03); }
+.lib__media img,
+.lib__media video { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.lib__slide:hover .lib__media img,
+.lib__slide:hover .lib__media video { transform: scale(1.03); }
 .lib__kind {
   position: absolute; top: 14px; left: 14px; display: inline-flex; align-items: center; gap: 5px;
   background: #0F3093; color: #fff; font-family: 'Lexend', sans-serif; font-weight: 700;
@@ -280,7 +335,8 @@ function formatDate(iso) {
   padding: 0; border: 0; background: #E8F0F7; cursor: pointer; overflow: hidden;
   box-shadow: inset 0 0 0 2px transparent; transition: box-shadow .25s ease;
 }
-.lib__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lib__thumb img,
+.lib__thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .lib__thumb-blank { display: block; width: 100%; height: 100%; }
 .lib__thumb-play {
   position: absolute; inset: 0; margin: auto; width: 24px; height: 24px; z-index: 2;
@@ -339,7 +395,8 @@ function formatDate(iso) {
   padding: 0; border: 0; background: #1A2C57; cursor: pointer; overflow: hidden;
   opacity: .55; transition: opacity .15s ease, box-shadow .15s ease;
 }
-.viewer__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.viewer__thumb img,
+.viewer__thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .viewer__thumb-blank { display: block; width: 100%; height: 100%; }
 .viewer__thumb-play {
   position: absolute; inset: 0; margin: auto; width: 22px; height: 22px;
@@ -367,7 +424,8 @@ function formatDate(iso) {
 @media (prefers-reduced-motion: reduce) {
   .lib__slide, .lib__media img, .lib__play, .lib__arrow,
   .lib__thumb, .lib__thumb-veil, .viewer__thumb { transition: none; }
-  .lib__slide:hover .lib__media img { transform: none; }
+  .lib__slide:hover .lib__media img,
+  .lib__slide:hover .lib__media video { transform: none; }
   .lib__slide:hover .lib__play { transform: none; }
 }
 </style>
