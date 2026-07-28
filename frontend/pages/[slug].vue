@@ -6,7 +6,7 @@ const route = useRoute()
 const reqUrl = useRequestURL()
 const slug = computed(() => String(route.params.slug))
 
-const { data } = await useCachedData(`news-slug-${route.params.slug}`, async () => {
+const { data, status, error } = await useCachedData(`news-slug-${route.params.slug}`, async () => {
   // MỘT request duy nhất: controller nidqc_content.news_detail tra alias qua bảng
   // path_alias rồi trả luôn node + tin liên quan + tin mới nhất. Xem useNewsDetail.ts
   // để biết vì sao bỏ đường cũ (map alias->nid dựng bằng 16 request JSON:API).
@@ -37,12 +37,29 @@ const { data } = await useCachedData(`news-slug-${route.params.slug}`, async () 
   }
 })
 
-if (!data.value?.node) {
-  throw createError({
-    statusCode: 404,
-    statusMessage: 'Không tìm thấy trang',
-    fatal: true,
-  })
+const notFound = () => createError({
+  statusCode: 404,
+  statusMessage: 'Không tìm thấy trang',
+  fatal: true,
+})
+
+// SSR kết luận ngay: lúc này handler đã chạy xong, không có node nghĩa là alias
+// không tồn tại -> phải trả đúng mã 404 cho trình duyệt và bot.
+if (import.meta.server && !data.value?.node) {
+  throw notFound()
+}
+
+// Client TUYỆT ĐỐI không được kết luận 404 khi fetch chưa xong. useAsyncData hoãn
+// fetch tới onBeforeMount (và trả data = null ngay) mỗi khi hydrate mà payload
+// không có sẵn dữ liệu — chỉ cần payload rỗng vì bất kỳ lý do gì (tách payload,
+// tải `_payload.json` hỏng) là trang 404 đè lên bài viết SSR đã render đúng.
+// Chỉ chốt 404 khi status = 'success' mà vẫn không có node; lỗi fetch thì hiện
+// đúng lỗi đó, đừng đánh tráo thành 404.
+if (import.meta.client) {
+  watch(status, (value) => {
+    if (value === 'success' && !data.value?.node) showError(notFound())
+    else if (value === 'error' && error.value) showError(error.value)
+  }, { immediate: true })
 }
 
 const node = computed(() => data.value?.node || null)

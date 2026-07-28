@@ -30,12 +30,27 @@ export default defineNuxtConfig({
   },
 
   experimental: {
-    // BẮT BUỘC tắt khi có route rules swr ở dưới. Payload extraction làm client tải
-    // `<route>/_payload.json` — URL này CHỈ có path, KHÔNG mang query string. Trang
-    // nào lấy dữ liệu theo query (/tim-kiem?q=…, /tin-tuc?trang=…) sẽ nhận payload
-    // của phiên bản không query rồi ghi đè kết quả SSR đúng lúc hydrate: /tim-kiem
-    // hiện đúng 12 kết quả trong HTML rồi nháy về "0 kết quả".
-    payloadExtraction: false,
+    // PHẢI bật khi có route rules swr ở dưới, dù trước đây tắt có lý do.
+    //
+    // Cờ này chỉ điều khiển phía CLIENT. Phía server, renderer của Nuxt 3.21 quyết
+    // định tách payload bằng `routeOptions.isr || routeOptions.cache` và KHÔNG hề
+    // đọc cờ này (.output/server/chunks/routes/renderer.mjs). Rule `'/**': { swr }`
+    // làm mọi route đều có `cache` -> server LUÔN tách data ra `_payload.json`, còn
+    // client build với cờ tắt thì `loadPayload()` bị tree-shake thành `return null`
+    // nên không bao giờ tải file đó. Kết quả: `payload.data` rỗng lúc hydrate.
+    //
+    // Hậu quả thật: useAsyncData thấy không có cached data + đang hydrate nên hoãn
+    // fetch tới onBeforeMount và trả data = null NGAY, khiến `pages/[slug].vue` ném
+    // createError(404) đè lên bài viết mà SSR vừa render đúng — mở tin tức rồi F5 là
+    // ra trang 404, dù access log ghi 200. Mọi trang khác thì fetch lại toàn bộ dữ
+    // liệu lúc hydrate (Drupal nhận gấp đôi request, nội dung nháy).
+    //
+    // Lý do tắt trước đây — `_payload.json` chỉ mang path, không mang query nên trang
+    // theo query nhận payload của bản không query rồi ghi đè lúc hydrate — nay không
+    // còn: khoá useAsyncData của /tim-kiem và /tin-tuc đều đã gắn query
+    // (`news-search-${q}-p${trang}`, `news-list-${cat}-p${trang}`). Khoá không khớp
+    // thì trang tự fetch lại như hiện tại, KHÔNG bị đè bằng dữ liệu sai.
+    payloadExtraction: true,
   },
 
   nitro: {
