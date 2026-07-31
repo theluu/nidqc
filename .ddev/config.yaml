@@ -14,7 +14,7 @@ composer_version: "2"
 web_environment:
     - NIDQC_RECAPTCHA_BYPASS=0
     - NIDQC_RECAPTCHA_MIN_SCORE=0.5
-    - NIDQC_CONTACT_ADMIN_EMAIL=noreply@nidqc.gov.vn
+    - NIDQC_CONTACT_ADMIN_EMAIL=it@nidqc.gov.vn
     # Drupal gọi vào đây để xoá cache HTML của Nuxt sau khi sửa nội dung
     # (hook trong nidqc_content.module). Token dev; production đặt giá trị riêng.
     - NIDQC_PURGE_URL=http://127.0.0.1:3000/__purge
