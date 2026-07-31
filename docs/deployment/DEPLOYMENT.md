@@ -186,6 +186,19 @@ Không commit dump SQL vào git — `.gitignore` đã chặn `*.sql` / `*.sql.gz
       đặt ngoài git; `NIDQC_RECAPTCHA_BYPASS` không được bật trên production.
 - [ ] SMTP cho form liên hệ dùng Drupal `symfony_mailer`; credential thật đặt bằng config override
       trong `settings.local.php` hoặc cơ chế secret của hạ tầng, không commit vào `config/sync`.
+- [ ] Toàn site chỉ dùng **một** tài khoản SMTP `it@nidqc.gov.vn` (HostVN bắt From phải trùng
+      tài khoản auth). Hai đường mail phải cùng credential đó:
+      - Form liên hệ (`nidqc_contact`): `drush sset nidqc_contact.smtp_username it@nidqc.gov.vn`
+        và `drush sset nidqc_contact.smtp_password '<mật khẩu>'` — State, không qua config export.
+      - Mail core (đặt lại mật khẩu, thông báo update): `config/sync/system.mail.yml` để
+        `user`/`password` là `null`; đặt thật trong `settings.local.php`:
+        ```php
+        $config['system.mail']['mailer_dsn']['user'] = 'it@nidqc.gov.vn';
+        $config['system.mail']['mailer_dsn']['password'] = '<mật khẩu>';
+        ```
+      Thiếu override này thì mọi mail core fail `530 5.7.1 Authentication required`.
+      Kiểm tra nhanh: `drush php:eval` dựng `Dsn(...config('system.mail')->get('mailer_dsn'))`
+      rồi `->start()` — không gửi mail, chỉ xác nhận AUTH.
 - [ ] `NIDQC_CONTACT_ADMIN_EMAIL` trỏ tới hộp thư admin thật của Viện.
 - [ ] CSP production cho phép ngoại lệ tối thiểu cho reCAPTCHA v3 và Google Maps nếu các chức năng
       này được bật: script/frame/connect tới domain Google cần thiết.

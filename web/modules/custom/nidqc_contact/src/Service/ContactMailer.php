@@ -168,7 +168,7 @@ final class ContactMailer {
       return $siteMail;
     }
 
-    return 'noreply@nidqc.gov.vn';
+    return 'it@nidqc.gov.vn';
   }
 
   /**
