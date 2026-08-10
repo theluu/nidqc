@@ -12,7 +12,6 @@ const props = defineProps({
   interval: { type: Number, default: 4000 },
   // Ngày/giờ hiện tại (layout truyền xuống). Đặt ở đây chứ không ở thanh menu vì menu
   // ngang 8 mục đã chiếm gần hết container; thanh này còn chỗ và cũng là dải thông tin.
-  date: { type: String, default: '' },
 })
 
 const active = ref(0)
@@ -82,11 +81,6 @@ watch(paused, restart)
     @focusout="paused = false"
   >
     <div class="ticker__inner" data-container>
-      <span v-if="date" class="ticker__date">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        {{ date }}
-      </span>
-
       <span class="ticker__label">
         <span class="ticker__dot" aria-hidden="true"></span>
         Tin mới
@@ -154,18 +148,6 @@ watch(paused, restart)
   display: flex;
   align-items: center;
   gap: 14px;
-}
-
-.ticker__date {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  flex: 0 0 auto;
-  padding-right: 14px;
-  border-right: 1px solid #E4E9F0;
-  color: #5A6478;
-  font-size: 12.5px;
-  white-space: nowrap;
 }
 
 .ticker__label {
@@ -296,11 +278,6 @@ watch(paused, restart)
 }
 .ticker__all:hover {
   text-decoration: underline;
-}
-
-/* Máy hẹp: bỏ ngày/giờ trước (trang trí), nhường chỗ cho tiêu đề tin. */
-@media (max-width: 900px) {
-  .ticker__date { display: none; }
 }
 
 @media (max-width: 640px) {

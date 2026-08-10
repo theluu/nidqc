@@ -159,8 +159,21 @@ body { margin: 0; }
   padding: 7px 24px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  /* Ngày/giờ bám trái, cụm ngôn ngữ + đăng nhập bám phải. margin-left:auto ở nhóm
+     ngôn ngữ (không phải space-between) để khi chưa có ngày/giờ — lúc SSR — cụm
+     phải vẫn nằm đúng chỗ chứ không nhảy sang trái. */
   gap: 18px;
+}
+.nidqc-topbar .nidqc-lang-quick { margin-left: auto; }
+
+/* Ngày/giờ ở top bar (trước nằm ở thanh "Tin mới", đẩy tiêu đề tin sang phải). */
+.nidqc-topbar__time {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 12.5px;
+  white-space: nowrap;
 }
 /* Mã ngôn ngữ đứng cạnh cờ: trên nền xanh, cờ 22px một mình quá nhỏ để nhận ra. */
 .nidqc-topbar__code {
@@ -341,6 +354,10 @@ body { margin: 0; }
 }
 
 /* Top bar trên máy hẹp: bỏ chữ cho đỡ chật, giữ cờ và icon đăng nhập. */
+/* Máy hẹp: bỏ ngày/giờ trước (thông tin trang trí), rồi tới chữ, giữ cờ và icon. */
+@media (max-width: 760px) {
+  .nidqc-topbar__time { display: none; }
+}
 @media (max-width: 480px) {
   .nidqc-topbar__inner { padding: 6px 16px; gap: 12px; }
   .nidqc-topbar__code,

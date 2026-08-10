@@ -224,6 +224,15 @@ const footerLinks = [
          khung xanh trên–dưới ôm lấy banner thành một khối header gọn. -->
     <div class="nidqc-topbar">
       <div class="nidqc-topbar__inner" data-container>
+        <!-- Ngày/giờ nằm ở nửa trái top bar: trước đây nó ở thanh "Tin mới" và đẩy
+             tiêu đề tin sang phải, còn nửa trái top bar thì bỏ trống. Chỉ render sau
+             khi mount (now = '' lúc SSR) vì giờ máy khách khác giờ máy chủ — in ra
+             ngay trong HTML là hydrate lệch. -->
+        <span v-if="now" class="nidqc-topbar__time">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          {{ now }}
+        </span>
+
         <div class="nidqc-lang-quick">
           <button v-for="l in languages" :key="l.code" type="button"
             class="nidqc-lang-btn" :class="{ 'is-active': curLang === l.code }"
@@ -334,7 +343,7 @@ const footerLinks = [
       </div>
     </header>
 
-    <NewsTicker v-if="tickerNews && tickerNews.length" :items="tickerNews" :date="now" />
+    <NewsTicker v-if="tickerNews && tickerNews.length" :items="tickerNews" />
 
     <!-- ===== NỘI DUNG TRANG ===== -->
     <main>
