@@ -44,6 +44,11 @@ final class NewsPresenter {
   public const CATEGORY_IMAGE = 'Hình ảnh';
 
   /**
+   * Độ dài tối đa (ký tự) của mô tả ngắn trong danh sách.
+   */
+  private const SUMMARY_LENGTH = 220;
+
+  /**
    * Cache term id của các danh mục media trong một request.
    */
   private ?array $mediaTermIds = NULL;
@@ -76,7 +81,39 @@ final class NewsPresenter {
       'image' => $this->imageUrl($node, $styleId),
       'alias' => $node->toUrl()->toString(),
       'featured' => $this->isFeatured($node),
+      // Khối tin nổi bật ở trang chủ hiện ảnh + tiêu đề + MÔ TẢ. Toàn bộ thân bài
+      // là quá nhiều dữ liệu cho một danh sách, nên rút gọn ngay tại đây.
+      'summary' => $this->summary($node),
     ];
+  }
+
+  /**
+   * Mô tả ngắn của bài: ưu tiên phần tóm tắt biên tập viên nhập, không có thì
+   * lấy những câu đầu của thân bài.
+   *
+   * Cắt theo RANH GIỚI TỪ chứ không cắt cứng theo ký tự: tiếng Việt có dấu, cắt
+   * giữa từ vừa xấu vừa dễ ra chữ vô nghĩa.
+   */
+  private function summary(NodeInterface $node): string {
+    if (!$node->hasField('body') || $node->get('body')->isEmpty()) {
+      return '';
+    }
+
+    $item = $node->get('body')->first();
+    $text = trim((string) $item->summary);
+    if ($text === '') {
+      $text = (string) $item->value;
+    }
+
+    $text = trim(preg_replace('/\s+/u', ' ', strip_tags($text)) ?? '');
+    if (mb_strlen($text) <= self::SUMMARY_LENGTH) {
+      return $text;
+    }
+
+    $cut = mb_substr($text, 0, self::SUMMARY_LENGTH);
+    $lastSpace = mb_strrpos($cut, ' ');
+
+    return rtrim($lastSpace === FALSE ? $cut : mb_substr($cut, 0, $lastSpace), " ,.;:-") . '…';
   }
 
   /**

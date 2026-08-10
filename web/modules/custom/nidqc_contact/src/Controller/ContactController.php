@@ -101,12 +101,29 @@ final class ContactController extends ControllerBase {
 
     // Mạng xã hội: chỉ trả kênh đã cấu hình, frontend cứ thế render — không phải
     // biết trước site có những kênh nào.
+    $settings = $this->config('nidqc_contact.settings');
     $social = [];
-    foreach (['facebook', 'youtube', 'zalo'] as $channel) {
-      $url = trim((string) $this->config('nidqc_contact.settings')->get('social.' . $channel));
+    foreach (['facebook', 'youtube', 'zalo', 'tiktok'] as $channel) {
+      $url = trim((string) $settings->get('social.' . $channel));
       if ($url !== '') {
         $social[] = ['key' => $channel, 'url' => $url];
       }
+    }
+
+    // Chân trang: nhóm nào không có cả email lẫn hotline thì không trả về, để
+    // frontend khỏi phải lọc lại.
+    $customerServices = [];
+    foreach ((array) $settings->get('customer_services') as $service) {
+      $email = trim((string) ($service['email'] ?? ''));
+      $hotline = trim((string) ($service['hotline'] ?? ''));
+      if ($email === '' && $hotline === '') {
+        continue;
+      }
+      $customerServices[] = [
+        'label' => (string) ($service['label'] ?? ''),
+        'email' => $email,
+        'hotline' => $hotline,
+      ];
     }
 
     return $this->jsonResponse([
@@ -116,6 +133,13 @@ final class ContactController extends ControllerBase {
           'site_key' => $siteKey,
         ],
         'social' => $social,
+        'footer' => [
+          'tel' => trim((string) $settings->get('footer.tel')),
+          'tel_note' => trim((string) $settings->get('footer.tel_note')),
+          'fax' => trim((string) $settings->get('footer.fax')),
+          'email' => trim((string) $settings->get('footer.email')),
+        ],
+        'customer_services' => $customerServices,
       ],
     ]);
   }

@@ -4,9 +4,15 @@ status: true
 dependencies:
   config:
     - field.field.node.expertise.field_description
+    - field.field.node.expertise.field_image
+    - field.field.node.expertise.field_link
     - field.field.node.expertise.field_weight
+    - image.style.thumbnail
     - node.type.expertise
   module:
+    - content_moderation
+    - image
+    - link
     - path
     - text
 id: node.expertise.default
@@ -28,6 +34,22 @@ content:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
+  field_image:
+    type: image_image
+    weight: 3
+    region: content
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
+    third_party_settings: {  }
+  field_link:
+    type: link_default
+    weight: 4
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
   field_weight:
     type: number
     weight: 2
@@ -41,6 +63,12 @@ content:
     region: content
     settings:
       include_locked: true
+    third_party_settings: {  }
+  moderation_state:
+    type: moderation_state_default
+    weight: 100
+    region: content
+    settings: {  }
     third_party_settings: {  }
   path:
     type: path

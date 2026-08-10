@@ -40,6 +40,9 @@ function drupalBase(): string {
 export type PublicConfig = {
   recaptcha: { enabled: boolean, site_key: string }
   social: { key: string, url: string }[]
+  // Chân trang (feedback 13): thông tin liên hệ chung + đầu mối theo nhóm dịch vụ.
+  footer: { tel: string, tel_note: string, fax: string, email: string }
+  customer_services: { label: string, email: string, hotline: string }[]
 }
 
 /**
@@ -56,6 +59,8 @@ export async function fetchPublicConfig(): Promise<PublicConfig> {
   return {
     recaptcha: res.data?.recaptcha ?? { enabled: false, site_key: '' },
     social: res.data?.social ?? [],
+    footer: res.data?.footer ?? { tel: '', tel_note: '', fax: '', email: '' },
+    customer_services: res.data?.customer_services ?? [],
   }
 }
 

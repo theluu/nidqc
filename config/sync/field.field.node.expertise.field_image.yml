@@ -1,0 +1,38 @@
+uuid: 8ed4d103-6dc7-4c49-83b9-7265c9f4583b
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_image
+    - node.type.expertise
+  module:
+    - image
+id: node.expertise.field_image
+field_name: field_image
+entity_type: node
+bundle: expertise
+label: 'Ảnh minh hoạ'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: '[date:custom:Y]-[date:custom:m]'
+  file_extensions: 'png gif jpg jpeg webp'
+  max_filesize: ''
+  max_resolution: ''
+  min_resolution: ''
+  alt_field: true
+  alt_field_required: true
+  title_field: false
+  title_field_required: false
+  default_image:
+    uuid: null
+    alt: ''
+    title: ''
+    width: null
+    height: null
+field_type: image

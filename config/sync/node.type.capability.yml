@@ -1,0 +1,11 @@
+uuid: dddc087e-6716-47ff-b0a9-4900a1dd56f9
+langcode: vi
+status: true
+dependencies: {  }
+name: 'Danh mục năng lực'
+type: capability
+description: 'Các mục trong cột "Danh mục năng lực" ở khối Dịch vụ trang chủ (Kiểm nghiệm, Hiệu chuẩn, Đào tạo & tư vấn, Đánh giá TĐSH, Thử nghiệm thành thạo).'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

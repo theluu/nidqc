@@ -33,3 +33,21 @@ nidqc_content.news_detail:
   requirements:
     _permission: 'access content'
   methods: [GET]
+
+nidqc_content.static_page:
+  path: '/api/v1/page'
+  defaults:
+    _controller: '\Drupal\nidqc_content\Controller\StaticPageController::detail'
+    _format: 'json'
+  requirements:
+    _permission: 'access content'
+  methods: [GET]
+
+nidqc_content.home_blocks:
+  path: '/api/v1/home/blocks'
+  defaults:
+    _controller: '\Drupal\nidqc_content\Controller\HomeBlocksController::blocks'
+    _format: 'json'
+  requirements:
+    _permission: 'access content'
+  methods: [GET]

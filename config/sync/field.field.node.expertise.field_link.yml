@@ -1,0 +1,23 @@
+uuid: 9191eaf4-5921-4bdf-a0f2-87c525cb2c8d
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_link
+    - node.type.expertise
+  module:
+    - link
+id: node.expertise.field_link
+field_name: field_link
+entity_type: node
+bundle: expertise
+label: 'Đường dẫn bài viết chi tiết'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 0
+  link_type: 17
+field_type: link

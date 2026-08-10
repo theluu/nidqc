@@ -12,3 +12,25 @@ social:
   facebook: 'https://www.facebook.com/nidqc.gov.vn'
   youtube: 'https://www.youtube.com/@nidqc'
   zalo: 'https://zalo.me/nidqc'
+footer:
+  tel: '(024) 3825 5075'
+  tel_note: 'giờ hành chính'
+  fax: ''
+  email: vienkiemnghiem@nidqc.gov.vn
+customer_services:
+  -
+    label: 'Dịch vụ Kiểm nghiệm'
+    email: ''
+    hotline: ''
+  -
+    label: 'Đào tạo'
+    email: ''
+    hotline: ''
+  -
+    label: 'Hiệu chuẩn thiết bị'
+    email: ''
+    hotline: ''
+  -
+    label: 'Cung ứng chất chuẩn'
+    email: ''
+    hotline: ''

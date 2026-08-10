@@ -1,0 +1,21 @@
+uuid: 73e491f1-9825-4b11-a94f-32e9391a0dd5
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_position
+    - node.type.banner
+  module:
+    - options
+id: node.banner.field_position
+field_name: field_position
+entity_type: node
+bundle: banner
+label: 'Vị trí hiển thị'
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

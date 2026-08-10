@@ -9,6 +9,7 @@ use Drupal\Core\Access\CsrfRequestHeaderAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\nidqc_online\Service\OnlineCounter;
+use Drupal\nidqc_online\Service\VisitCounter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,6 +23,7 @@ final class OnlineController extends ControllerBase {
 
   public function __construct(
     private readonly OnlineCounter $counter,
+    private readonly VisitCounter $visits,
     private readonly CsrfTokenGenerator $csrfToken,
     private readonly SessionInterface $session,
     private readonly TimeInterface $time,
@@ -34,6 +36,7 @@ final class OnlineController extends ControllerBase {
   public static function create(ContainerInterface $container): self {
     return new self(
       $container->get('nidqc_online.counter'),
+      $container->get('nidqc_online.visits'),
       $container->get('csrf_token'),
       $container->get('session'),
       $container->get('datetime.time'),
@@ -61,6 +64,10 @@ final class OnlineController extends ControllerBase {
 
     $this->session->start();
     $this->session->set('nidqc_online_seen', $this->time->getRequestTime());
+    // Lượt truy cập tính ở đây: đây là điểm duy nhất mà một trình duyệt chắc chắn
+    // đi qua đúng một lần cho mỗi phiên (trang do Nuxt phục vụ từ cache HTML nên
+    // không đếm được ở phía Drupal render).
+    $this->visits->record($this->session);
 
     return new Response(
       $this->csrfToken->get(CsrfRequestHeaderAccessCheck::TOKEN_KEY),
@@ -86,6 +93,9 @@ final class OnlineController extends ControllerBase {
     }
 
     $this->session->set('nidqc_online_seen', $this->time->getRequestTime());
+    // Phiên mở qua nửa đêm vẫn được tính cho ngày mới — record() tự bỏ qua nếu
+    // hôm nay đã tính rồi.
+    $this->visits->record($this->session);
     $this->session->save();
 
     return $this->countResponse();
@@ -99,6 +109,8 @@ final class OnlineController extends ControllerBase {
       'data' => [
         'count' => $this->counter->count(),
         'window_seconds' => OnlineCounter::WINDOW_SECONDS,
+        // Khối "Thống kê truy cập" ở trang chủ đọc bốn số này.
+        'visits' => $this->visits->stats(),
       ],
     ]);
   }

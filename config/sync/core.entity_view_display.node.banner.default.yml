@@ -1,30 +1,23 @@
-uuid: 96d3a998-cb4a-4277-87e4-07dee697a8d4
+uuid: 298540b5-3a46-4531-a775-560d5cd83551
 langcode: vi
 status: true
 dependencies:
   config:
-    - field.field.node.expertise.field_description
-    - field.field.node.expertise.field_image
-    - field.field.node.expertise.field_link
-    - field.field.node.expertise.field_weight
-    - node.type.expertise
+    - field.field.node.banner.field_image
+    - field.field.node.banner.field_link
+    - field.field.node.banner.field_position
+    - field.field.node.banner.field_weight
+    - node.type.banner
   module:
     - image
     - link
-    - text
+    - options
     - user
-id: node.expertise.default
+id: node.banner.default
 targetEntityType: node
-bundle: expertise
+bundle: banner
 mode: default
 content:
-  field_description:
-    type: text_default
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    weight: 1
-    region: content
   field_image:
     type: image
     label: hidden
@@ -48,14 +41,19 @@ content:
     third_party_settings: {  }
     weight: 0
     region: content
-  field_weight:
-    type: number_integer
+  field_position:
+    type: list_default
     label: hidden
-    settings:
-      thousand_separator: ''
-      prefix_suffix: true
+    settings: {  }
     third_party_settings: {  }
-    weight: 2
+    weight: 0
+    region: content
+  field_weight:
+    type: list_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
     region: content
   links:
     settings: {  }

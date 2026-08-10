@@ -18,96 +18,6 @@ body { margin: 0; }
   border: 0;
 }
 
-.nidqc-search-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: grid;
-  place-items: start center;
-  padding: min(18vh, 160px) 24px 24px;
-  background: rgba(13, 40, 112, 0.78);
-}
-
-.nidqc-search-dialog {
-  position: relative;
-  width: min(640px, 100%);
-  padding: 32px;
-  border-radius: 10px;
-  background: var(--nidqc-white);
-  box-shadow: 0 18px 48px rgba(13, 40, 112, 0.28);
-}
-
-.nidqc-search-dialog h2 {
-  margin: 0 44px 8px 0;
-  color: var(--nidqc-primary);
-  font-family: var(--nidqc-font-heading);
-  font-size: 24px;
-}
-
-.nidqc-search-dialog p {
-  margin: 0 0 22px;
-  color: var(--nidqc-text-muted);
-}
-
-.nidqc-search-close {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  display: grid;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  place-items: center;
-  border: 0;
-  border-radius: 50%;
-  background: var(--nidqc-bg-blue-1);
-  color: var(--nidqc-primary);
-  cursor: pointer;
-}
-
-.nidqc-search-form label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--nidqc-text);
-  font-weight: 600;
-}
-
-.nidqc-search-form__row {
-  display: flex;
-  gap: 10px;
-}
-
-.nidqc-search-form input {
-  min-width: 0;
-  flex: 1;
-  height: 46px;
-  padding: 0 14px;
-  border: 1px solid var(--nidqc-border-strong);
-  border-radius: 6px;
-  color: var(--nidqc-text);
-  font: inherit;
-}
-
-.nidqc-search-form button {
-  min-height: 46px;
-  padding: 0 22px;
-  border: 1px solid var(--nidqc-primary);
-  border-radius: 6px;
-  background: var(--nidqc-primary);
-  color: var(--nidqc-white);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.nidqc-search-close:focus-visible,
-.nidqc-search-form input:focus-visible,
-.nidqc-search-form button:focus-visible,
-.nidqc-nav-search:focus-visible {
-  outline: 3px solid var(--nidqc-primary-light);
-  outline-offset: 3px;
-}
-
 /* Container: co padding trên mobile */
 @media (max-width: 768px) {
   [data-container] { padding-left: 16px !important; padding-right: 16px !important; }
@@ -149,29 +59,9 @@ body { margin: 0; }
   gap: 20px;
 }
 
-.nidqc-online-counter {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.nidqc-online-counter__dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--nidqc-success);
-  box-shadow: 0 0 0 3px rgba(30, 138, 76, 0.22);
-}
-
-.nidqc-online-counter strong {
-  color: var(--nidqc-white);
-  font-weight: 600;
-}
-
+/* Lưới chân trang co giãn ở khối "CHÂN TRANG 3 CỘT" cuối file — ở đây chỉ còn dải
+   bản quyền. Hai nơi cùng khai báo .nidqc-footer-grid thì rule đứng sau thắng. */
 @media (max-width: 768px) {
-  .nidqc-footer-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 28px !important; }
   .nidqc-footer-bar {
     flex-direction: column;
     justify-content: center;
@@ -194,15 +84,15 @@ body { margin: 0; }
 }
 
 /* ===== HAMBURGER MENU (mobile + tablet + laptop hẹp) =====
-   Ngưỡng 1199px chứ không phải 900px: 8 mục menu chính (nhãn tiếng Việt dài, white-space
-   :nowrap) cần 1058px, cộng padding 48px + nút tìm kiếm 52px = 1158px. Dưới mức đó thanh
-   nav ngang tràn ra khỏi container -> ở 901-1082px cả trang sinh cuộn ngang, ở 1083-1157px
-   menu đè lên nút tìm kiếm. Submenu là position:absolute nên KHÔNG thể chữa bằng
-   overflow-x:auto (sẽ bị cắt). Drawer dọc đã có sẵn và chạy đúng -> dùng nó tới 1199px. */
-@media (max-width: 1199px) {
+   Ngưỡng 1259px chứ không phải 900px: 8 mục menu chính (nhãn tiếng Việt dài, white-space
+   :nowrap) cần 1058px, cộng nút "Đăng nhập" ở cụm phải 134px + padding 48px = 1240px.
+   Dưới mức đó thanh nav ngang tràn ra khỏi container -> máy hẹp sinh cuộn ngang, máy
+   1083-1239px thì menu đè lên nút đăng nhập (đã đo: ở đúng 1200px menu chờm 40px).
+   Submenu là position:absolute nên KHÔNG thể chữa bằng overflow-x:auto (sẽ bị cắt).
+   Drawer dọc đã có sẵn và chạy đúng -> dùng nó tới 1259px. */
+@media (max-width: 1259px) {
   /* Hiện nút 3 gạch, ẩn nav ngang */
   .nidqc-hamburger { display: flex !important; }
-  .nidqc-nav-search { display: flex !important; margin-left: auto !important; }
 
   /* Nav thành drawer dọc, ẩn mặc định.
      position:fixed (KHÔNG absolute): drawer absolute bị nhốt trong stacking context
@@ -251,127 +141,211 @@ body { margin: 0; }
   }
 }
 
-@media (max-width: 520px) {
-  .nidqc-search-overlay {
-    padding: 72px 16px 16px;
-  }
-  .nidqc-search-dialog {
-    padding: 26px 20px 22px;
-  }
-  .nidqc-search-form__row {
-    flex-direction: column;
-  }
-  .nidqc-search-form button {
-    width: 100%;
-  }
-}
-
 /* Header cho phép drawer absolute */
 .nidqc-nav-inner { position: relative; }
 
-/* ===== Top bar: ngôn ngữ, mạng xã hội, đăng nhập ===== */
-.nidqc-topbar-sep {
-  width: 1px;
-  height: 14px;
-  background: rgba(255, 255, 255, 0.25);
-  flex: 0 0 auto;
+/* ===== TOP BAR: ngôn ngữ · đăng nhập =====
+   Dải riêng nằm TRÊN banner, nền cùng màu thanh menu (#0F3093) để header thành một
+   khối: xanh - banner - xanh. Bản trước đè lên ảnh banner nên mỗi bề ngang màn hình
+   cụm icon lại rơi vào một chỗ khác trên ảnh, và phải tự vẽ nền trắng cho đọc được.
+   Icon mạng xã hội KHÔNG đặt ở đây: chân trang đã có đủ cụm đó. */
+.nidqc-topbar {
+  background: var(--nidqc-primary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 }
-
-/* Bấm nhanh VI / EN: dạng segmented, ngôn ngữ đang dùng được tô nền. */
-.nidqc-lang-quick {
+.nidqc-topbar__inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 7px 24px;
   display: flex;
   align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
-  overflow: hidden;
+  justify-content: flex-end;
+  gap: 18px;
 }
-.nidqc-lang-btn {
-  background: none;
-  border: 0;
-  cursor: pointer;
-  color: rgba(255, 255, 255, 0.85);
-  font-family: inherit;
+/* Mã ngôn ngữ đứng cạnh cờ: trên nền xanh, cờ 22px một mình quá nhỏ để nhận ra. */
+.nidqc-topbar__code {
+  font-family: 'Lexend', sans-serif;
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.4px;
-  padding: 3px 8px;
-  line-height: 16px;
-  transition: background .15s ease, color .15s ease;
+  line-height: 1;
+  color: #fff;
 }
-.nidqc-lang-btn + .nidqc-lang-btn { border-left: 1px solid rgba(255, 255, 255, 0.3); }
-.nidqc-lang-btn:hover { background: rgba(255, 255, 255, 0.14); color: #fff; }
-.nidqc-lang-btn.is-active { background: #fff; color: #0D2870; }
 
-/* Nút chỉ-có-icon trên top bar (dropdown ngôn ngữ, đăng nhập). */
-.nidqc-icon-btn {
+/* Bấm nhanh Tiếng Việt / English: cờ + mã ngôn ngữ. Ngôn ngữ đang dùng để nguyên
+   màu và có vòng trắng; cái còn lại làm mờ — không tô nền như nút chữ vì nền màu đè
+   lên cờ rất bẩn. */
+.nidqc-lang-quick {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 3px;
-  background: none;
-  border: 0;
-  padding: 4px;
-  cursor: pointer;
-  color: rgba(255, 255, 255, 0.85);
-  text-decoration: none;
-  transition: color .15s ease;
+  gap: 4px;
 }
-.nidqc-icon-btn:hover { color: #fff; }
-
-.nidqc-social-group {
+.nidqc-lang-btn {
   display: flex;
   align-items: center;
   gap: 6px;
+  background: none;
+  border: 0;
+  padding: 4px 7px;
+  border-radius: 999px;
+  cursor: pointer;
+  line-height: 0;
+  opacity: .68;
+  transition: opacity .15s ease, background .15s ease;
+}
+.nidqc-lang-btn:hover { opacity: 1; background: rgba(255, 255, 255, 0.12); }
+.nidqc-lang-btn.is-active { opacity: 1; background: rgba(255, 255, 255, 0.16); }
+.nidqc-flag {
+  display: block;
+  width: 22px;
+  height: 15px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+/* Đăng nhập trên top bar: viền trắng rỗng, kèm gạch ngăn với cụm ngôn ngữ. */
+.nidqc-topbar__login {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  position: relative;
+  padding: 5px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background .15s ease, border-color .15s ease;
+}
+.nidqc-topbar__login::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.28);
+}
+.nidqc-topbar__login:hover { background: rgba(255, 255, 255, 0.16); border-color: #fff; }
+
+/* Mạng xã hội: chỉ còn ở chân trang, tô thẳng màu thương hiệu. */
+.nidqc-social-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .nidqc-social {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.9);
+  background: #8794AC;
+  color: var(--nidqc-white);
   text-decoration: none;
-  transition: background .15s ease, color .15s ease;
+  transition: opacity .15s ease, transform .15s ease;
 }
-/* Hover đổi sang màu thương hiệu để nhận ra ngay đang trỏ vào kênh nào. */
-.nidqc-social.is-facebook:hover { background: #1877F2; color: #fff; }
-.nidqc-social.is-youtube:hover { background: #FF0000; color: #fff; }
-.nidqc-social.is-zalo:hover { background: #0068FF; color: #fff; }
+.nidqc-social.is-facebook { background: #1877F2; }
+.nidqc-social.is-youtube { background: #FF0000; }
+.nidqc-social.is-zalo { background: #0068FF; }
+.nidqc-social.is-tiktok { background: #111; }
+.nidqc-social:hover { opacity: .85; transform: translateY(-1px); }
 
-.nidqc-icon-btn:focus-visible,
 .nidqc-social:focus-visible,
+.nidqc-topbar__login:focus-visible,
 .nidqc-lang-btn:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;
 }
 
-/* ===== Top bar responsive: khử tràn ngang trên mobile =====
-   Nội dung top bar (ngày/giờ + ngôn ngữ + mạng xã hội + đăng nhập) rộng hơn màn
-   mobile -> tràn ngang, vỡ header top và sinh cuộn ngang (kéo drawer menu ra
-   ngoài vùng nhìn). Ẩn ngày/giờ (trang trí) trước, hẹp nữa thì bỏ mạng xã hội. */
-@media (max-width: 640px) {
-  .nidqc-topbar { padding-left: 16px !important; padding-right: 16px !important; }
-  /* Ẩn ngày/giờ khiến actions là item flex duy nhất -> margin-left:auto để dồn về phải
-     (giữ đúng vị trí như desktop thay vì nhảy sang trái). */
-  .nidqc-topbar-actions { gap: 12px !important; margin-left: auto; }
-  .nidqc-topbar-date { display: none !important; }
-  /* Dropdown ngôn ngữ: neo cố định theo mép phải viewport để KHÔNG tràn ra ngoài màn
-     (right:0 của nó neo vào nút "Ngôn ngữ" — nút không sát mép phải nên panel 220px
-     bị lọt ra ngoài bên trái). Đặt dưới top bar (cao 34px). */
-  .nidqc-lang-menu {
-    position: fixed !important;
-    top: 34px !important;
-    right: 8px !important;
-    left: auto !important;
-    max-width: calc(100vw - 16px);
-  }
+/* ===== Cụm phải thanh menu: icon tìm kiếm ===== */
+.nidqc-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding-left: 16px;
 }
-/* Máy rất hẹp: bỏ mạng xã hội (đã có ở footer), giữ ngôn ngữ + đăng nhập. */
-@media (max-width: 400px) {
-  .nidqc-social-group,
-  .nidqc-social-group + .nidqc-topbar-sep { display: none !important; }
+.nidqc-nav-search {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  align-self: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 50%;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+.nidqc-nav-search:hover { background: rgba(255, 255, 255, 0.16); border-color: rgba(255, 255, 255, 0.7); }
+.nidqc-nav-search:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* Hộp tìm kiếm mở ra dưới thanh menu, chiếm trọn bề ngang thanh. */
+.nidqc-nav-search-panel {
+  background: #0D2870;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+.nidqc-nav-search-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 14px 24px;
+}
+.nidqc-nav-search-form input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--nidqc-text);
+  font: inherit;
+  font-size: 15px;
+}
+.nidqc-nav-search-form input:focus-visible {
+  outline: 3px solid var(--nidqc-primary-light);
+  outline-offset: 1px;
+}
+.nidqc-nav-search-form button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--nidqc-primary);
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.nidqc-nav-search-form button:hover { background: #E8F0F7; }
+.nidqc-nav-search-form button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+@media (max-width: 520px) {
+  .nidqc-nav-search-form { padding: 12px 16px; gap: 8px; }
+  .nidqc-nav-search-form button { padding: 0 14px; }
+}
+
+/* Top bar trên máy hẹp: bỏ chữ cho đỡ chật, giữ cờ và icon đăng nhập. */
+@media (max-width: 480px) {
+  .nidqc-topbar__inner { padding: 6px 16px; gap: 12px; }
+  .nidqc-topbar__code,
+  .nidqc-topbar__login-text { display: none; }
+  .nidqc-topbar__login { padding: 5px 9px; }
 }
 
 /* ===== Google Translate: ẩn banner/tooltip mặc định, tránh xô layout ===== */
@@ -456,131 +430,6 @@ body { top: 0 !important; position: static !important; }
 .nidqc-share-btn:hover { background: #0F3093; color: #fff; border-color: #0F3093; }
 .nidqc-share-btn:hover svg { stroke: #fff; }
 
-/* ===== Cột "Tin tức & Thông báo" ở khối hero trang chủ =====
-   Đọc như một mục lục sổ đăng ký: tên chuyên mục bên trái, SỐ TIN bên phải, canh
-   theo một đường gáy dọc mảnh. Con số là phần thông tin thật — sáu link này vốn đã
-   nằm nguyên trên thanh menu ngay phía trên, nếu chỉ có tên thì cột chỉ là bản sao.
-   Số dùng chữ số đều bề ngang (tabular) để cột phải thẳng hàng tuyệt đối. */
-.nidqc-cat-list {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  /* Đường gáy: một nét dọc duy nhất chạy suốt cột số, vẽ bằng gradient nên không
-     cần thêm phần tử rỗng nào trong DOM. */
-  background-image: linear-gradient(#ECECEC, #ECECEC);
-  background-size: 1px 100%;
-  background-position: calc(100% - 62px) 0;
-  background-repeat: no-repeat;
-}
-
-.nidqc-cat-row {
-  position: relative;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 20px 0 22px;
-  min-height: 52px;
-  border-bottom: 1px solid #F1F1F1;
-  text-decoration: none;
-  transition: background .16s ease;
-}
-.nidqc-cat-row:last-of-type { border-bottom: 0; }
-
-/* Vạch nhấn bên trái: cao 0 khi nghỉ, kéo dài ra khi trỏ vào — đây là toàn bộ
-   chuyển động của khối, không thêm gì nữa. */
-.nidqc-cat-row::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 3px;
-  height: 0;
-  background: #0F3093;
-  transform: translateY(-50%);
-  transition: height .2s ease;
-}
-.nidqc-cat-row:hover { background: #F7FAFD; }
-.nidqc-cat-row:hover::before { height: 100%; }
-
-.nidqc-cat-label {
-  flex: 1;
-  min-width: 0;
-  font-size: 13.5px;
-  line-height: 19px;
-  font-weight: 500;
-  color: #212529;
-}
-.nidqc-cat-row:hover .nidqc-cat-label { color: #0F3093; }
-
-.nidqc-cat-count {
-  flex: 0 0 42px;
-  text-align: right;
-  font-family: 'Lexend', sans-serif;
-  font-variant-numeric: tabular-nums;
-  font-size: 15px;
-  font-weight: 600;
-  color: #9AA4B2;
-  transition: color .16s ease;
-}
-.nidqc-cat-row:hover .nidqc-cat-count { color: #0F3093; }
-
-/* Dòng tổng: đóng cột lại bằng một con số lớn hơn, nền đậm để tách khỏi các mục. */
-.nidqc-cat-total {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: auto;
-  padding: 14px 20px 14px 22px;
-  background: #F0F4FA;
-  border-top: 1px solid #E1E8F2;
-  font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
-  color: #0F3093;
-  text-decoration: none;
-  transition: background .16s ease;
-}
-.nidqc-cat-total:hover { background: #E4EDF8; }
-.nidqc-cat-total-num {
-  flex: 0 0 42px;
-  text-align: right;
-  font-family: 'Lexend', sans-serif;
-  font-variant-numeric: tabular-nums;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: 0;
-}
-
-.nidqc-cat-row:focus-visible,
-.nidqc-cat-total:focus-visible {
-  outline: 2px solid #1D6AC5;
-  outline-offset: -2px;
-}
-
-/* ===== Cột "Liên kết web" ở trang chủ =====
-   Cao bằng khối Thư viện bên cạnh: cột kéo dài theo grid, danh sách chiếm phần còn
-   lại và các hàng chia đều chiều cao đó. min-height giữ hàng không bị bẹp khi có
-   nhiều liên kết; khi ít liên kết thì hàng giãn ra thay vì để cột hụt một khoảng. */
-.nidqc-weblinks-col {
-  display: flex;
-  flex-direction: column;
-}
-.nidqc-weblink-list {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.nidqc-weblink {
-  flex: 1;
-  min-height: 68px;
-  transition: border-color .15s ease, background .15s ease;
-}
-a.nidqc-weblink:hover { border-color: #0F3093; background: #EEF4FB; }
-
 /* ===== Badge reCAPTCHA v3 =====
    Script Google chèn thẳng <div class="grecaptcha-badge"> vào <body>, nằm ngoài cây
    component của Vue. Nuxt điều hướng kiểu SPA nên document không unload -> badge bám
@@ -593,80 +442,487 @@ body.nidqc-recaptcha .grecaptcha-badge { visibility: visible; }
 @media (prefers-reduced-motion: reduce) {
   .nidqc-related-card, .nidqc-related-card .nidqc-related-thumb img,
   .nidqc-aside-item, .nidqc-share-btn, .nidqc-weblink,
-  .nidqc-cat-row, .nidqc-cat-row::before, .nidqc-cat-count, .nidqc-cat-total { transition: none; }
+  .nidqc-tile, .nidqc-tile img, .nidqc-highlight img, .nidqc-capability { transition: none; }
   .nidqc-related-card:hover { transform: none; }
   .nidqc-related-card:hover .nidqc-related-thumb img { transform: none; }
 }
 
-/* ===== Khối Liên hệ (Cơ sở) ở trang chủ =====
-   Trước đây mỗi cơ sở kèm một iframe Google Maps cao 220px — tốn gần nửa màn hình
-   cho thứ hầu như không ai tương tác ngay tại trang chủ, lại kéo theo script bên thứ
-   ba. Nay chỉ còn thông tin liên hệ bấm được + link mở bản đồ. */
-.nidqc-office {
+/* ==========================================================================
+   TRANG CHỦ — bố cục theo "Feedback NIDQC" (08/2026)
+   ========================================================================== */
+
+/* Nhịp dọc THỐNG NHẤT cho mọi section trang chủ. Trước đây mỗi khối tự đặt padding
+   (28/44/26/38px) nên khoảng cách giữa các dải so le, nhìn thụt thò. Một class duy
+   nhất -> mọi section cách nhau đúng một khoảng như nhau. */
+.nidqc-section { padding: 48px 0; }
+
+/* Cột trong section nhiều cột: kéo dài hết chiều cao hàng grid để đáy các cột thẳng
+   nhau, thay vì cột ngắn cột dài. Danh sách bên trong nở ra lấp phần dư. */
+.nidqc-col {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 20px 22px;
-  background: #fff;
-  border: 1px solid #CCCCCC;
+  min-width: 0;
 }
-.nidqc-office__name {
+.nidqc-col > .nidqc-capability-list,
+.nidqc-col > .nidqc-highlight-list,
+.nidqc-col > .nidqc-weblink-list,
+.nidqc-col > .nidqc-stats { flex: 1; }
+
+/* Tiêu đề khối: gạch dọc + gạch chân, dùng lại ở mọi section trang chủ để các
+   khối trông là một hệ thống chứ không phải mỗi chỗ một kiểu. */
+.nidqc-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--nidqc-primary);
+}
+.nidqc-heading__bar {
+  display: inline-block;
+  width: 6px;
+  height: 24px;
+  background: var(--nidqc-primary);
+}
+.nidqc-heading__text {
   margin: 0;
   font-family: 'Lexend', sans-serif;
   font-weight: 700;
-  font-size: 17px;
-  color: #0F3093;
+  font-size: 21px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--nidqc-text);
 }
-.nidqc-office__list {
+
+/* ===== Thẻ "tiêu đề + ảnh" dùng cho Dịch vụ và Hoạt động chuyên môn =====
+   Feedback 6 và 8 bỏ phần mô tả, chỉ còn ảnh và tiêu đề. Ảnh khoá tỷ lệ 16:10 để
+   ảnh admin tải lên đủ mọi kích thước vẫn xếp thành lưới thẳng hàng. */
+.nidqc-tile {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #CCCCCC;
+  text-decoration: none;
+  overflow: hidden;
+  transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+a.nidqc-tile:hover {
+  border-color: var(--nidqc-primary);
+  box-shadow: 0 10px 22px rgba(15, 48, 147, 0.12);
+  transform: translateY(-3px);
+}
+.nidqc-tile__media {
+  display: block;
+  aspect-ratio: 16 / 10;
+  background: #E8F0F7;
+  overflow: hidden;
+}
+.nidqc-tile__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .35s ease;
+}
+a.nidqc-tile:hover .nidqc-tile__media img { transform: scale(1.05); }
+.nidqc-tile__label {
+  display: block;
+  padding: 14px 16px 16px;
+  font-family: 'Lexend', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 21px;
+  color: var(--nidqc-primary);
+}
+.nidqc-tile:focus-visible { outline: 2px solid #1D6AC5; outline-offset: 2px; }
+
+/* ===== Nút "Tra cứu chất chuẩn" =====
+   Feedback 6: khác hẳn các link dịch vụ (dẫn sang trang mua chuẩn) nên phải nổi bật,
+   đặt nguyên một dải ngang phía trên lưới dịch vụ. */
+.nidqc-standards-cta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 16px 20px;
+  background: var(--nidqc-primary);
+  color: #fff;
+  text-decoration: none;
+  transition: background .16s ease;
+}
+.nidqc-standards-cta:hover { background: #0D2870; }
+.nidqc-standards-cta:focus-visible { outline: 3px solid #1D6AC5; outline-offset: 2px; }
+.nidqc-standards-cta__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+}
+.nidqc-standards-cta__body { flex: 1; min-width: 0; }
+.nidqc-standards-cta__body strong {
+  display: block;
+  font-family: 'Lexend', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+}
+.nidqc-standards-cta__body span {
+  display: block;
+  margin-top: 3px;
+  font-size: 13.5px;
+  line-height: 19px;
+  color: rgba(255, 255, 255, 0.82);
+}
+.nidqc-standards-cta__arrow { flex: 0 0 18px; }
+
+/* ===== Danh mục năng lực (cột phải khối Dịch vụ) ===== */
+.nidqc-capability-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.nidqc-capability-list > li { display: flex; flex: 1; }
+.nidqc-capability {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #F5F8FC;
+  border: 1px solid #E4E9F0;
+  text-decoration: none;
+  transition: border-color .15s ease, background .15s ease;
+}
+a.nidqc-capability:hover { background: #EEF4FB; border-color: var(--nidqc-primary); }
+.nidqc-capability:focus-visible { outline: 2px solid #1D6AC5; outline-offset: 2px; }
+.nidqc-capability__num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--nidqc-primary);
+  color: #fff;
+  font-family: 'Lexend', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+.nidqc-capability__body { min-width: 0; }
+.nidqc-capability__label {
+  display: block;
+  font-family: 'Lexend', sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--nidqc-primary);
+}
+.nidqc-capability__desc {
+  display: block;
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 18px;
+  color: var(--nidqc-text-muted);
+}
+
+/* ===== Liên kết nổi bật (cột phải khối Hoạt động chuyên môn) =====
+   Ảnh + tiêu đề đè lên, giống dải banner phải của nidqc.gov.vn. */
+.nidqc-highlight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.nidqc-highlight {
+  position: relative;
+  display: block;
+  /* min-height + flex thay cho aspect-ratio: ô phải nở được để đáy cột thẳng hàng
+     với cột bên trái; aspect-ratio khoá cứng chiều cao nên không nở được. */
+  flex: 1;
+  min-height: 96px;
+  border: 1px solid #DCE4EF;
+  overflow: hidden;
+  text-decoration: none;
+  background: #0D2870;
+}
+.nidqc-highlight img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .35s ease;
+}
+.nidqc-highlight:hover img { transform: scale(1.05); }
+.nidqc-highlight span {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 26px 14px 10px;
+  background: linear-gradient(to top, rgba(8, 24, 66, 0.9), rgba(8, 24, 66, 0));
+  color: #fff;
+  font-family: 'Lexend', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 19px;
+}
+.nidqc-highlight:focus-visible { outline: 2px solid #1D6AC5; outline-offset: 2px; }
+
+/* ===== Liên kết web (cột giữa section 6) ===== */
+.nidqc-weblink-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.nidqc-weblink {
+  display: flex;
+  /* Nở để đáy cột thẳng với khối Thư viện bên cạnh, nhưng có trần: hàng chỉ có logo
+     40px + một dòng chữ, cao quá 76px là loãng. Phần dư còn lại dồn xuống cuối. */
+  flex: 1;
+  max-height: 76px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: #F5F8FC;
+  border: 1px solid #ECECEC;
+  color: var(--nidqc-text);
+  text-decoration: none;
+  transition: border-color .15s ease, background .15s ease;
+}
+a.nidqc-weblink:hover { border-color: var(--nidqc-primary); background: #EEF4FB; }
+.nidqc-weblink:focus-visible { outline: 2px solid #1D6AC5; outline-offset: 2px; }
+.nidqc-weblink__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border: 1px solid #ECECEC;
+  overflow: hidden;
+}
+.nidqc-weblink__logo img { width: 100%; height: 100%; object-fit: contain; }
+.nidqc-weblink__label {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Lexend', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 19px;
+  color: var(--nidqc-primary);
+}
+
+/* ===== Thống kê truy cập (cột phải section 7, feedback 11) ===== */
+.nidqc-stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #E4E9F0;
+  background: #fff;
+}
+.nidqc-stats li {
+  display: flex;
+  flex: 1;
+  max-height: 62px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid #F0F0F0;
+  font-size: 13.5px;
+  color: var(--nidqc-text-muted);
+}
+.nidqc-stats li:last-child {
+  border-bottom: 0;
+  background: #F3F7FC;
+}
+.nidqc-stats li.is-live { background: #EEF4FB; }
+.nidqc-stats__label { display: inline-flex; align-items: center; gap: 7px; }
+.nidqc-stats__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22A06B;
+  box-shadow: 0 0 0 3px rgba(34, 160, 107, 0.18);
+}
+.nidqc-stats__value {
+  font-family: 'Lexend', sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--nidqc-primary);
+}
+
+/* ===== Sơ đồ menu cuối trang (feedback 12) ===== */
+.nidqc-sitemap {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 24px;
+}
+.nidqc-sitemap__col { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.nidqc-sitemap__head {
+  font-family: 'Lexend', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--nidqc-primary);
+  text-decoration: none;
+  padding-bottom: 8px;
+  margin-bottom: 3px;
+  border-bottom: 1px solid #DCE4EF;
+}
+.nidqc-sitemap__link {
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--nidqc-text-muted);
+  text-decoration: none;
+}
+.nidqc-sitemap__head:hover,
+.nidqc-sitemap__link:hover { color: var(--nidqc-primary); text-decoration: underline; }
+
+/* ===== Responsive trang chủ ===== */
+@media (max-width: 1100px) {
+  .nidqc-sitemap { grid-template-columns: repeat(3, 1fr); }
+  .nidqc-three-col { grid-template-columns: 1fr 1fr !important; }
+  /* Thư viện là khối rộng nhất -> cho nó chiếm cả hàng, hai cột còn lại xếp dưới. */
+  .nidqc-three-col > :first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 900px) {
+  .nidqc-service-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 640px) {
+  .nidqc-sitemap { grid-template-columns: repeat(2, 1fr); }
+  .nidqc-three-col { grid-template-columns: 1fr !important; }
+  .nidqc-heading__text { font-size: 18px; }
+  .nidqc-standards-cta { gap: 12px; padding: 14px; }
+  .nidqc-standards-cta__body strong { font-size: 15px; }
+}
+
+/* ==========================================================================
+   CHÂN TRANG 3 CỘT (feedback 13)
+   ========================================================================== */
+.nidqc-footer__title {
+  margin: 0 0 18px;
+  font-family: 'Lexend', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 24px;
+}
+.nidqc-footer__label {
+  margin: 0 0 12px;
+  font-family: 'Lexend', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+}
+.nidqc-footer__label + .nidqc-footer__list { margin-bottom: 22px; }
+
+.nidqc-footer__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 9px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.nidqc-office__list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
   font-size: 13.5px;
   line-height: 20px;
-  color: #495057;
+  color: rgba(255, 255, 255, 0.78);
 }
-.nidqc-office__list svg { flex: 0 0 16px; margin-top: 2px; }
-.nidqc-office__list a {
-  color: #495057;
+.nidqc-footer__office { font-weight: 600; color: #fff; }
+.nidqc-footer__note { color: rgba(255, 255, 255, 0.55); }
+.nidqc-footer__list a {
+  color: rgba(255, 255, 255, 0.88);
   text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: color .15s ease, border-color .15s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
 }
-.nidqc-office__list a:hover { color: #0F3093; border-bottom-color: #0F3093; }
+.nidqc-footer__list a:hover { color: #fff; border-bottom-color: #fff; }
 
-.nidqc-office__actions {
+/* Link bản đồ đứng ngay sau địa chỉ, cỡ nhỏ để không cạnh tranh với chính địa chỉ. */
+.nidqc-footer__map {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  white-space: nowrap;
+  font-size: 12px;
+  color: #9FC2F0 !important;
+  border-bottom: 0 !important;
+}
+.nidqc-footer__map:hover { text-decoration: underline; }
+
+/* Bốn đầu mối dịch vụ: số thứ tự do CSS sinh, khớp bảng trong tài liệu feedback. */
+.nidqc-footer__services {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  counter-reset: nidqc-service;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  font-size: 13.5px;
+  line-height: 20px;
+}
+.nidqc-footer__services li { counter-increment: nidqc-service; }
+.nidqc-footer__service-name::before {
+  content: counter(nidqc-service) ". ";
+}
+.nidqc-footer__service-name {
+  display: block;
+  color: #fff;
+  font-weight: 600;
+}
+.nidqc-footer__services a {
+  display: block;
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+}
+.nidqc-footer__services a:hover { color: #fff; text-decoration: underline; }
+.nidqc-footer__empty {
+  margin: 0 0 20px;
+  font-size: 13px;
+  line-height: 20px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.nidqc-footer__quick {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 13.5px;
+}
+.nidqc-footer__quick a { color: rgba(255, 255, 255, 0.8); text-decoration: none; }
+.nidqc-footer__quick a:hover { color: #fff; text-decoration: underline; }
+
+.nidqc-footer__social {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: auto;
-  padding-top: 4px;
+  margin-bottom: 20px;
 }
-.nidqc-office__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 9px 16px;
-  background: #0F3093;
-  border: 1px solid #0F3093;
-  color: #fff;
+.nidqc-footer__social .nidqc-social { width: 34px; height: 34px; }
+.nidqc-footer__about {
+  margin: 0;
   font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background .15s ease, color .15s ease;
+  line-height: 20px;
+  color: rgba(255, 255, 255, 0.62);
 }
-.nidqc-office__btn:hover { background: #0D2870; border-color: #0D2870; }
-.nidqc-office__btn.is-ghost { background: #fff; color: #0F3093; }
-.nidqc-office__btn.is-ghost:hover { background: #EEF4FB; }
-.nidqc-office__btn:focus-visible { outline: 2px solid #1D6AC5; outline-offset: 2px; }
 
-@media (prefers-reduced-motion: reduce) {
-  .nidqc-office__list a, .nidqc-office__btn { transition: none; }
+@media (max-width: 900px) {
+  .nidqc-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 28px !important; }
+  .nidqc-footer-grid > :first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  .nidqc-footer-grid { grid-template-columns: 1fr !important; }
 }

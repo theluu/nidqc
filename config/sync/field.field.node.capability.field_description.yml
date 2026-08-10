@@ -1,0 +1,22 @@
+uuid: d837cda3-93b6-473f-9c5d-9ab4e451a419
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - node.type.capability
+  module:
+    - text
+id: node.capability.field_description
+field_name: field_description
+entity_type: node
+bundle: capability
+label: 'Mô tả ngắn'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

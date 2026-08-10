@@ -4,3 +4,8 @@ services:
     arguments:
       - '@database'
       - '@datetime.time'
+  nidqc_online.visits:
+    class: Drupal\nidqc_online\Service\VisitCounter
+    arguments:
+      - '@database'
+      - '@datetime.time'

@@ -47,3 +47,38 @@ nidqc_contact.settings:
         zalo:
           type: string
           label: 'Zalo official account URL'
+        tiktok:
+          type: string
+          label: 'TikTok channel URL'
+    footer:
+      type: mapping
+      label: 'Footer contact block'
+      mapping:
+        tel:
+          type: string
+          label: 'Switchboard number'
+        tel_note:
+          type: string
+          label: 'Note shown next to the switchboard number'
+        fax:
+          type: string
+          label: 'Fax number'
+        email:
+          type: string
+          label: 'Public contact email'
+    customer_services:
+      type: sequence
+      label: 'Customer service contact points'
+      sequence:
+        type: mapping
+        label: 'Contact point'
+        mapping:
+          label:
+            type: label
+            label: 'Service name'
+          email:
+            type: string
+            label: 'Email'
+          hotline:
+            type: string
+            label: 'Hotline'

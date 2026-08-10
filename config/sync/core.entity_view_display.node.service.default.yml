@@ -3,10 +3,12 @@ langcode: vi
 status: true
 dependencies:
   config:
+    - field.field.node.service.field_image
     - field.field.node.service.field_link
     - field.field.node.service.field_weight
     - node.type.service
   module:
+    - image
     - link
     - user
 id: node.service.default
@@ -14,6 +16,17 @@ targetEntityType: node
 bundle: service
 mode: default
 content:
+  field_image:
+    type: image
+    label: hidden
+    settings:
+      image_link: ''
+      image_style: ''
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 0
+    region: content
   field_link:
     type: link
     label: hidden

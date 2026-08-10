@@ -1,38 +1,26 @@
-uuid: 96d3a998-cb4a-4277-87e4-07dee697a8d4
+uuid: 831c88c7-0fc1-450a-991b-b6669586d698
 langcode: vi
 status: true
 dependencies:
   config:
-    - field.field.node.expertise.field_description
-    - field.field.node.expertise.field_image
-    - field.field.node.expertise.field_link
-    - field.field.node.expertise.field_weight
-    - node.type.expertise
+    - field.field.node.capability.field_description
+    - field.field.node.capability.field_link
+    - field.field.node.capability.field_weight
+    - node.type.capability
   module:
-    - image
     - link
+    - options
     - text
     - user
-id: node.expertise.default
+id: node.capability.default
 targetEntityType: node
-bundle: expertise
+bundle: capability
 mode: default
 content:
   field_description:
     type: text_default
     label: hidden
     settings: {  }
-    third_party_settings: {  }
-    weight: 1
-    region: content
-  field_image:
-    type: image
-    label: hidden
-    settings:
-      image_link: ''
-      image_style: ''
-      image_loading:
-        attribute: lazy
     third_party_settings: {  }
     weight: 0
     region: content
@@ -49,13 +37,11 @@ content:
     weight: 0
     region: content
   field_weight:
-    type: number_integer
+    type: list_default
     label: hidden
-    settings:
-      thousand_separator: ''
-      prefix_suffix: true
+    settings: {  }
     third_party_settings: {  }
-    weight: 2
+    weight: 0
     region: content
   links:
     settings: {  }

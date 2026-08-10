@@ -1,0 +1,23 @@
+uuid: 5c52e2e2-e0c3-48b0-b518-036acdd7d988
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_weight
+    - node.type.capability
+id: node.capability.field_weight
+field_name: field_weight
+entity_type: node
+bundle: capability
+label: 'Thứ tự (nhỏ hiện trước)'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

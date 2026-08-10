@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, nextTick, provide, onMounted, onUnmounted } from 'vue';
 
 /**
  * Layout dùng chung mọi trang — tái tạo từ design đã duyệt.
@@ -11,12 +11,16 @@ const openMenu = ref(null);
 const mobileOpen = ref(false);
 const navBottom = ref(50);
 const headerEl = ref(null);
-const langOpen = ref(false);
+const curLang = ref('vi');
+// Ô tìm kiếm nằm sau icon kính lúp trên thanh menu (feedback 3) chứ không chiếm chỗ
+// thường trực trên banner nữa.
 const searchOpen = ref(false);
 const searchInput = ref(null);
-const searchTrigger = ref(null);
-const curLang = ref('vi');
-const { onlineCount } = await useOnlineCounter();
+// Bộ đếm chạy MỘT lần ở layout rồi chia xuống trang: gọi useOnlineCounter() thêm
+// lần nữa trong trang chủ sẽ dựng thêm một interval heartbeat thứ hai, tức là mỗi
+// khách gửi gấp đôi request và bị đếm hai lần.
+const { onlineCount, visits } = await useOnlineCounter();
+provide('nidqcOnline', { onlineCount, visits });
 
 // Thanh tin chạy dưới main menu — dùng chung cho MỌI trang nên fetch ở layout.
 // useCachedData khoá theo key nên điều hướng client-side không gọi lại Drupal; lỗi
@@ -26,7 +30,6 @@ const { data: tickerNews } = await useCachedData('layout-ticker', async () => {
   return res.data.map((n) => ({ id: n.id, title: n.title, alias: n.alias }));
 });
 let timer;
-let googleLanguageSyncTimer;
 
 const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
 function tick() {
@@ -36,34 +39,47 @@ function tick() {
 }
 
 /**
- * Đa ngôn ngữ:
+ * Đa ngôn ngữ — CHỈ hai thứ tiếng (feedback 1):
  *  - Tiếng Việt: nội dung chính thức.
- *  - English và các ngôn ngữ khác: Google Translate dịch máy toàn trang.
+ *  - English: Google Translate dịch máy toàn trang.
+ *
+ * Dropdown ~100 thứ tiếng của Google Translate đã bỏ: Viện chỉ phục vụ hai ngôn
+ * ngữ này, danh sách dài chỉ làm rối thanh tiện ích.
  *
  * ⚠️ Đây là site về THUỐC. Dịch MÁY nội dung y tế/dược có thể sai nghĩa. Bản dịch
  * máy chỉ để tham khảo; nội dung chính thức là tiếng Việt.
  */
 const defaultLanguage = { code: 'vi', label: 'Tiếng Việt' };
-const languages = ref([defaultLanguage]);
-
-// Hai ngôn ngữ bấm nhanh trên top bar. Phần còn lại (~100 thứ tiếng của Google
-// Translate) vẫn nằm trong dropdown bên cạnh.
-const quickLanguages = [
-  { code: 'vi', short: 'VI', label: 'Tiếng Việt' },
-  { code: 'en', short: 'EN', label: 'English' },
+const languages = [
+  defaultLanguage,
+  { code: 'en', label: 'English' },
 ];
 
-// Link mạng xã hội quản trị trong Drupal: /admin/config/nidqc/settings (mục "Mạng xã
-// hội"). Chỉ kênh nào điền URL mới được trả về, nên không cần lọc thêm ở đây.
-const SOCIAL_LABELS = { facebook: 'Facebook', youtube: 'YouTube', zalo: 'Zalo' };
-const { data: socialLinks } = await useCachedData('layout-social', async () => {
+// Cấu hình chân trang + mạng xã hội, quản trị trong Drupal tại
+// /admin/config/nidqc/settings. Chỉ kênh nào điền URL mới được trả về, nên không
+// cần lọc thêm ở đây.
+const SOCIAL_LABELS = { facebook: 'Facebook', youtube: 'YouTube', zalo: 'Zalo', tiktok: 'TikTok' };
+const { data: siteConfig } = await useCachedData('layout-site-config', async () => {
   const res = await fetchPublicConfig();
-  return (res.social || []).map((s) => ({
-    key: s.key,
-    url: s.url,
-    label: SOCIAL_LABELS[s.key] || s.key,
-  }));
+  return {
+    social: (res.social || []).map((s) => ({
+      key: s.key,
+      url: s.url,
+      label: SOCIAL_LABELS[s.key] || s.key,
+    })),
+    contact: res.footer,
+    customerServices: res.customer_services || [],
+  };
 });
+const socialLinks = computed(() => siteConfig.value?.social || []);
+const footerContact = computed(() => siteConfig.value?.contact || null);
+const customerServices = computed(() => siteConfig.value?.customerServices || []);
+
+// Địa chỉ các cơ sở cho cột 1 của chân trang — quản trị bằng content type "Cơ sở",
+// lấy từ cùng endpoint với các khối trang chủ. Dùng CHUNG khoá 'home-blocks' với
+// pages/index.vue: useCachedData khoá theo key nên trang chủ không gọi thêm lần nào.
+const { data: homeBlocks } = await useCachedData('home-blocks', fetchHomeBlocks);
+const offices = computed(() => homeBlocks.value?.offices || []);
 
 function googleTranslateCookieDomains() {
   const hostname = location.hostname;
@@ -93,50 +109,25 @@ function resetGoogleTranslate() {
   writeGoogleTranslateCookie('/vi/vi', 60);
 }
 
-function syncGoogleLanguages(attempt = 0) {
-  const combo = document.querySelector('.goog-te-combo');
-  const options = combo ? Array.from(combo.options).filter((option) => option.value) : [];
-
-  if (options.length) {
-    languages.value = [
-      defaultLanguage,
-      ...options
-        .map((option) => ({
-          code: option.value,
-          label: (option.textContent || '').trim().replace(/\s+/g, ' ') || option.value,
-        }))
-        .filter((language) => language.code !== defaultLanguage.code),
-    ];
-    return;
-  }
-
-  if (attempt < 40) {
-    googleLanguageSyncTimer = window.setTimeout(() => syncGoogleLanguages(attempt + 1), 250);
-  }
-}
-
 function loadGoogleTranslate() {
-  if (window.__gtLoaded) {
-    syncGoogleLanguages();
-    return;
-  }
+  if (window.__gtLoaded) return;
   window.__gtLoaded = true;
   window.googleTranslateElementInit = () => {
     new window.google.translate.TranslateElement(
-      { pageLanguage: 'vi', autoDisplay: false },
+      // includedLanguages: chỉ nạp tiếng Anh — widget không còn phải dựng danh sách
+      // ~100 thứ tiếng mà giao diện đã bỏ.
+      { pageLanguage: 'vi', includedLanguages: 'en', autoDisplay: false },
       'google_translate_element',
     );
-    syncGoogleLanguages();
   };
   const s = document.createElement('script');
   s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
   document.head.appendChild(s);
 }
 
-/** Đổi ngôn ngữ: 'vi' = gốc; còn lại = Google Translate dịch toàn trang. */
+/** Đổi ngôn ngữ: 'vi' = gốc; 'en' = Google Translate dịch toàn trang. */
 function setLang(code) {
   curLang.value = code;
-  langOpen.value = false;
 
   if (code === 'vi') {
     resetGoogleTranslate();
@@ -175,24 +166,22 @@ function setMobile(open) {
   }
 }
 
-async function openSearch(event) {
-  event?.preventDefault();
-  setMobile(false);
-  searchOpen.value = true;
-  await nextTick();
-  searchInput.value?.focus();
-}
-
-async function closeSearch() {
-  searchOpen.value = false;
-  await nextTick();
-  searchTrigger.value?.focus();
-}
-
-function handleEscape(event) {
-  if (event.key === 'Escape' && searchOpen.value) {
-    closeSearch();
+/**
+ * Mở/đóng hộp tìm kiếm sau icon kính lúp trên thanh menu.
+ *
+ * Mở thì đưa con trỏ thẳng vào ô nhập: người dùng bấm kính lúp là để gõ ngay, bắt
+ * họ bấm thêm một nhát nữa vào ô là thừa. Đóng bằng Esc như mọi hộp thoại khác.
+ */
+function toggleSearch(open) {
+  searchOpen.value = open;
+  if (open) {
+    setMobile(false);
+    nextTick(() => searchInput.value?.focus());
   }
+}
+
+function onKeydown(event) {
+  if (event.key === 'Escape' && searchOpen.value) toggleSearch(false);
 }
 
 onMounted(() => {
@@ -200,14 +189,13 @@ onMounted(() => {
   timer = setInterval(tick, 30000);
   resetGoogleTranslate();
   loadGoogleTranslate();
-  document.addEventListener('keydown', handleEscape);
+  window.addEventListener('keydown', onKeydown);
 });
 onUnmounted(() => {
   clearInterval(timer);
-  clearTimeout(googleLanguageSyncTimer);
+  window.removeEventListener('keydown', onKeydown);
   window.removeEventListener('scroll', syncNavBottom);
   window.removeEventListener('resize', syncNavBottom);
-  document.removeEventListener('keydown', handleEscape);
 });
 
 // Menu chính dùng chung với trang chủ — xem composables/useMainNav.ts.
@@ -225,66 +213,57 @@ const footerLinks = [
 <template>
   <div style="background:#FFFFFF;min-height:100vh;font-family:'Be Vietnam Pro',sans-serif;color:#333;">
 
-    <!-- ===== TOP BAR ===== -->
-    <div style="background:#0D2870;color:#fff;">
-      <div class="nidqc-topbar" style="max-width:1280px;margin:0 auto;padding:0 24px;height:34px;display:flex;align-items:center;justify-content:space-between;">
-        <div class="nidqc-topbar-date" style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(255,255,255,0.82);min-width:0;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-          <span>{{ now }}</span>
+    <!-- ===== TOP BAR: ngôn ngữ · mạng xã hội · đăng nhập =====
+         Feedback 1-2: chỉ hai cờ Vi/En (bỏ danh sách ~100 thứ tiếng), kèm icon
+         YouTube/Facebook/Zalo và icon đăng nhập. Ô tìm kiếm đã chuyển thành icon
+         kính lúp trên thanh menu (feedback 3).
+
+         Dải riêng NẰM TRÊN banner, nền cùng màu thanh menu. Bản trước đè lên ảnh
+         banner: cụm icon phải tự vẽ nền trắng cho đọc được, và ở mỗi bề ngang màn
+         hình nó lại rơi vào một chỗ khác trên ảnh. Dải riêng thì vị trí cố định và
+         khung xanh trên–dưới ôm lấy banner thành một khối header gọn. -->
+    <div class="nidqc-topbar">
+      <div class="nidqc-topbar__inner" data-container>
+        <div class="nidqc-lang-quick">
+          <button v-for="l in languages" :key="l.code" type="button"
+            class="nidqc-lang-btn" :class="{ 'is-active': curLang === l.code }"
+            :aria-pressed="curLang === l.code ? 'true' : 'false'"
+            :title="l.label" @click="setLang(l.code)">
+            <!-- Cờ vẽ bằng SVG inline: không thêm request ảnh, nét sắc ở mọi DPI. -->
+            <svg v-if="l.code === 'vi'" class="nidqc-flag" viewBox="0 0 30 20" role="img" aria-hidden="true">
+              <rect width="30" height="20" fill="#DA251D"/>
+              <path fill="#FFFF00" d="M15 5 16.23 8.8 20.23 8.8 17 11.15 18.23 14.95 15 12.6 11.77 14.95 13 11.15 9.77 8.8 13.77 8.8Z"/>
+            </svg>
+            <svg v-else class="nidqc-flag" viewBox="0 0 60 40" role="img" aria-hidden="true">
+              <clipPath id="nidqc-flag-uk">
+                <path d="M30 20h30v20zv20H0zH0V0zV0h30z"/>
+              </clipPath>
+              <rect width="60" height="40" fill="#012169"/>
+              <path d="M0 0 60 40M60 0 0 40" stroke="#FFFFFF" stroke-width="8"/>
+              <path d="M0 0 60 40M60 0 0 40" stroke="#C8102E" stroke-width="5" clip-path="url(#nidqc-flag-uk)"/>
+              <path d="M30 0V40M0 20H60" stroke="#FFFFFF" stroke-width="13"/>
+              <path d="M30 0V40M0 20H60" stroke="#C8102E" stroke-width="8"/>
+            </svg>
+            <span class="nidqc-topbar__code">{{ l.code.toUpperCase() }}</span>
+            <span class="nidqc-visually-hidden">{{ l.label }}</span>
+          </button>
         </div>
-        <div class="nidqc-topbar-actions" style="display:flex;align-items:center;gap:12px;font-size:12.5px;">
-          <!-- Bấm nhanh VI / EN — hai ngôn ngữ dùng nhiều nhất, khỏi phải mở dropdown. -->
-          <div class="nidqc-lang-quick">
-            <button v-for="l in quickLanguages" :key="l.code" type="button"
-              class="nidqc-lang-btn" :class="{ 'is-active': curLang === l.code }"
-              :aria-pressed="curLang === l.code ? 'true' : 'false'"
-              :title="l.label" @click="setLang(l.code)">
-              {{ l.short }}
-            </button>
-          </div>
-          <!-- Dropdown mọi thứ tiếng (Google Translate) -->
-          <div style="position:relative;">
-            <button data-testid="language-menu-toggle" @click="langOpen = !langOpen"
-              class="nidqc-icon-btn" title="Ngôn ngữ khác" aria-haspopup="true" :aria-expanded="langOpen ? 'true' : 'false'">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
-              <span class="nidqc-visually-hidden">Ngôn ngữ khác</span>
-            </button>
-            <div v-if="langOpen" data-testid="language-menu" class="nidqc-lang-menu" style="position:absolute;top:100%;right:0;margin-top:6px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.2);z-index:70;min-width:220px;max-height:420px;overflow-y:auto;padding:6px 0;">
-              <button v-for="l in languages" :key="l.code" data-testid="language-option" @click="setLang(l.code)"
-                :style="`display:block;width:100%;text-align:left;background:none;border:0;cursor:pointer;padding:8px 16px;font-size:13px;color:#212529;${curLang===l.code?'font-weight:700;background:#E8F0F7;':''}`">
-                {{ l.label }}
-              </button>
-            </div>
-          </div>
-          <span v-if="socialLinks && socialLinks.length" class="nidqc-topbar-sep"></span>
 
-          <!-- Mạng xã hội (cấu hình trong Drupal) -->
-          <div v-if="socialLinks && socialLinks.length" class="nidqc-social-group">
-            <a v-for="s in socialLinks" :key="s.key" :href="s.url" target="_blank" rel="noopener"
-              class="nidqc-social" :class="`is-${s.key}`" :title="s.label">
-              <svg v-if="s.key === 'facebook'" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8.5V7a1.5 1.5 0 0 1 1.5-1.5H17V2.6A15 15 0 0 0 14.9 2.5C12.3 2.5 10.5 4.1 10.5 7v1.5H8v3.2h2.5V21h3.5v-9.3h2.6l.4-3.2H14z"/></svg>
-              <svg v-else-if="s.key === 'youtube'" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15.2V8.8l5.2 3.2z"/></svg>
-              <!-- Zalo: bong bóng chat + chữ Z (không dùng logo gốc để khỏi vẽ sai nhận diện). -->
-              <svg v-else width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7A8.4 8.4 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.5 8.5 0 0 1 21 11.5z"/><path d="M9.8 9h5l-5 5.5h5"/></svg>
-              <span class="nidqc-visually-hidden">{{ s.label }}</span>
-            </a>
-          </div>
+        <!-- Chỉ còn đăng nhập: icon mạng xã hội đã có ở chân trang, để hai nơi là
+             lặp cùng một cụm link trên mọi trang. -->
+        <a href="/user/login" class="nidqc-topbar__login" title="Đăng nhập hệ thống">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+          <span class="nidqc-topbar__login-text">Đăng nhập</span>
+          <span class="nidqc-visually-hidden">hệ thống</span>
+        </a>
 
-          <span class="nidqc-topbar-sep"></span>
-
-          <a href="/user/login" class="nidqc-icon-btn nidqc-login" title="Đăng nhập hệ thống">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
-            <span class="nidqc-visually-hidden">Đăng nhập hệ thống</span>
-          </a>
-          <!-- Element ẩn cho Google Translate -->
-          <div id="google_translate_element" style="display:none;"></div>
-        </div>
+        <!-- Element ẩn cho Google Translate (phải nằm trong DOM để script gắn vào) -->
+        <div id="google_translate_element" style="display:none;"></div>
       </div>
     </div>
 
     <!-- ===== BANNER ===== -->
-    <div class="nidqc-banner" style="background:#fff;border-bottom:1px solid #ECECEC;">
+    <div class="nidqc-banner" style="background:#fff;">
       <NuxtLink to="/" style="display:block;">
         <img src="https://nidqc.gov.vn/sites/all/themes/nidqc/images/upload/banner-header.jpg"
              alt="Viện Kiểm nghiệm thuốc Trung ương" style="display:block;width:100%;height:auto;">
@@ -326,70 +305,114 @@ const footerLinks = [
             </div>
           </div>
         </nav>
-        <!-- Thẻ <a> THƯỜNG, không phải NuxtLink: NuxtLink tự điều hướng qua Vue Router
-             nên preventDefault() không chặn được -> bấm icon vừa mở popup vừa nhảy sang
-             /tim-kiem. Với <a> thường, có JS thì @click.prevent mở popup và ở lại trang;
-             không JS thì href đưa thẳng tới trang tìm kiếm (progressive enhancement).
-             ref trên phần tử thường cũng trả về DOM node nên .focus() chạy đúng. -->
-        <a ref="searchTrigger" href="/tim-kiem" title="Tìm kiếm Tin tức" class="nidqc-nav-search"
-           aria-haspopup="dialog" :aria-expanded="searchOpen ? 'true' : 'false'" @click.prevent="openSearch"
-           style="align-self:center;display:flex;align-items:center;justify-content:center;width:42px;height:34px;background:#1D6AC5;border-radius:18px;margin-left:10px;flex:0 0 auto;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-          <span class="nidqc-visually-hidden">Tìm kiếm Tin tức</span>
-        </a>
+        <!-- Feedback 3: icon tìm kiếm nằm trên thanh menu. Thanh này dính đỉnh trang
+             nên với tới được ở mọi vị trí cuộn — ô tìm kiếm thường trực trên banner
+             thì cuộn xuống là mất. Nút đăng nhập đã chuyển lên header (feedback 2). -->
+        <div class="nidqc-nav-right">
+          <button type="button" class="nidqc-nav-search" :aria-expanded="searchOpen"
+            aria-controls="nidqc-nav-search-panel" title="Tìm kiếm" @click="toggleSearch(!searchOpen)">
+            <svg v-if="!searchOpen" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <svg v-else width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            <span class="nidqc-visually-hidden">Tìm kiếm</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Hộp tìm kiếm mở ra ngay dưới thanh menu, chiều rộng bằng container.
+           Form GET thật: không có JS vẫn submit sang /tim-kiem?q=… bình thường. -->
+      <div v-if="searchOpen" id="nidqc-nav-search-panel" class="nidqc-nav-search-panel">
+        <form class="nidqc-nav-search-form" data-container action="/tim-kiem" method="get" role="search"
+          @submit="toggleSearch(false)">
+          <label for="nidqc-nav-search-input" class="nidqc-visually-hidden">Tìm kiếm trên website</label>
+          <input id="nidqc-nav-search-input" ref="searchInput" name="q" type="search" minlength="2" maxlength="200"
+                 required autocomplete="off" placeholder="Nhập từ khoá cần tìm…">
+          <button type="submit">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            Tìm kiếm
+          </button>
+        </form>
       </div>
     </header>
 
-    <NewsTicker v-if="tickerNews && tickerNews.length" :items="tickerNews" />
-
-    <div v-if="searchOpen" class="nidqc-search-overlay" role="presentation" @mousedown.self="closeSearch">
-      <section class="nidqc-search-dialog" role="dialog" aria-modal="true" aria-labelledby="nidqc-search-title">
-        <button type="button" class="nidqc-search-close" aria-label="Đóng tìm kiếm" @click="closeSearch">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
-        </button>
-        <h2 id="nidqc-search-title">Tìm kiếm Tin tức</h2>
-        <p>Nhập từ khóa để tìm trong tiêu đề và nội dung Tin tức.</p>
-        <form class="nidqc-search-form" action="/tim-kiem" method="get">
-          <label for="nidqc-search-input">Từ khóa</label>
-          <div class="nidqc-search-form__row">
-            <input id="nidqc-search-input" ref="searchInput" name="q" type="search" minlength="2" maxlength="200" required autocomplete="off" placeholder="Nhập từ khóa tìm kiếm…">
-            <button type="submit">Tìm kiếm</button>
-          </div>
-        </form>
-      </section>
-    </div>
+    <NewsTicker v-if="tickerNews && tickerNews.length" :items="tickerNews" :date="now" />
 
     <!-- ===== NỘI DUNG TRANG ===== -->
     <main>
       <slot />
     </main>
 
-    <!-- ===== FOOTER ===== -->
+    <!-- ===== FOOTER (feedback 13) =====
+         Ba cột: thông tin Viện · đầu mối dành cho khách hàng · mạng xã hội.
+         Địa chỉ và link bản đồ lấy từ content type "Cơ sở"; điện thoại/fax/email và
+         bốn đầu mối dịch vụ lấy từ /admin/config/nidqc/settings. -->
     <footer style="background:#0D2870;color:#fff;">
-      <div class="nidqc-footer-grid" data-container style="max-width:1280px;margin:0 auto;padding:46px 24px 20px;display:grid;grid-template-columns:2fr 1fr 1.3fr;gap:40px;">
+      <div class="nidqc-footer-grid" data-container style="max-width:1280px;margin:0 auto;padding:44px 24px 22px;display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px;">
         <div>
-          <h3 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:18px;margin:0 0 12px;line-height:24px;">Viện Kiểm nghiệm thuốc Trung ương</h3>
-          <p style="font-size:13.5px;line-height:21px;color:rgba(255,255,255,0.72);margin:0;max-width:430px;">Cơ quan khoa học kỹ thuật đầu ngành về kiểm tra, giám sát chất lượng thuốc, nguyên liệu làm thuốc và mỹ phẩm trên phạm vi cả nước.</p>
+          <h3 class="nidqc-footer__title">Viện Kiểm nghiệm thuốc Trung ương</h3>
+
+          <h4 class="nidqc-footer__label">Địa chỉ</h4>
+          <ul class="nidqc-footer__list">
+            <li v-for="(o, i) in offices || []" :key="i">
+              <span class="nidqc-footer__office">{{ o.title }}:</span>
+              {{ o.address }}
+              <a v-if="o.map" :href="o.map" target="_blank" rel="noopener" class="nidqc-footer__map">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Bản đồ
+              </a>
+            </li>
+          </ul>
+
+          <h4 class="nidqc-footer__label">Thông tin liên hệ công việc</h4>
+          <ul class="nidqc-footer__list">
+            <li v-if="footerContact?.tel">
+              Tel: <a :href="`tel:${footerContact.tel.replace(/[^+\d]/g, '')}`">{{ footerContact.tel }}</a>
+              <span v-if="footerContact.tel_note" class="nidqc-footer__note">&nbsp;({{ footerContact.tel_note }})</span>
+            </li>
+            <li v-if="footerContact?.fax">Fax: {{ footerContact.fax }}</li>
+            <li v-if="footerContact?.email">
+              Email: <a :href="`mailto:${footerContact.email}`">{{ footerContact.email }}</a>
+            </li>
+          </ul>
         </div>
+
         <div>
-          <h4 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:0.5px;text-transform:uppercase;color:rgba(255,255,255,0.6);margin:0 0 14px;">Liên kết nhanh</h4>
-          <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px;">
-            <NuxtLink v-for="(l, i) in footerLinks" :key="i" :to="l.to" style="color:rgba(255,255,255,0.85);text-decoration:none;">{{ l.label }}</NuxtLink>
+          <h4 class="nidqc-footer__label">Thông tin dành cho khách hàng</h4>
+          <ol v-if="customerServices.length" class="nidqc-footer__services">
+            <li v-for="(s, i) in customerServices" :key="i">
+              <span class="nidqc-footer__service-name">{{ s.label }}</span>
+              <a v-if="s.email" :href="`mailto:${s.email}`">{{ s.email }}</a>
+              <a v-if="s.hotline" :href="`tel:${s.hotline.replace(/[^+\d]/g, '')}`">{{ s.hotline }}</a>
+            </li>
+          </ol>
+          <p v-else class="nidqc-footer__empty">
+            Đầu mối liên hệ theo từng dịch vụ đang được cập nhật. Trong thời gian này,
+            xin liên hệ qua số điện thoại và email chung của Viện.
+          </p>
+          <div class="nidqc-footer__quick">
+            <NuxtLink v-for="(l, i) in footerLinks" :key="i" :to="l.to">{{ l.label }}</NuxtLink>
           </div>
         </div>
+
         <div>
-          <h4 style="font-family:'Lexend',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:0.5px;text-transform:uppercase;color:rgba(255,255,255,0.6);margin:0 0 14px;">Liên hệ</h4>
-          <p style="font-size:13.5px;line-height:21px;color:rgba(255,255,255,0.72);margin:0;">48 Hai Bà Trưng, Hoàn Kiếm, Hà Nội<br>ĐT: (024) 3825 5075</p>
+          <h4 class="nidqc-footer__label">Liên kết mạng xã hội</h4>
+          <div v-if="socialLinks.length" class="nidqc-footer__social">
+            <a v-for="s in socialLinks" :key="s.key" :href="s.url" target="_blank" rel="noopener"
+              class="nidqc-social" :class="`is-${s.key}`" :title="s.label">
+              <SocialIcon :channel="s.key" :size="17" />
+              <span class="nidqc-visually-hidden">{{ s.label }}</span>
+            </a>
+          </div>
+          <p class="nidqc-footer__about">
+            Cơ quan khoa học kỹ thuật đầu ngành về kiểm tra, giám sát chất lượng thuốc,
+            nguyên liệu làm thuốc và mỹ phẩm trên phạm vi cả nước.
+          </p>
         </div>
       </div>
       <div style="border-top:1px solid rgba(255,255,255,0.14);">
+        <!-- Chỉ còn dòng bản quyền: số người đang trực tuyến đã có ở khối "Thống kê
+             truy cập" trên trang chủ, để hai chỗ là đếm một thứ hai lần. -->
         <div class="nidqc-footer-bar" data-container style="max-width:1280px;margin:0 auto;padding:16px 24px;font-size:12.5px;color:rgba(255,255,255,0.6);">
           <span>Bản quyền © 2026 thuộc về Viện Kiểm nghiệm thuốc Trung ương.</span>
-          <span class="nidqc-online-counter" aria-live="polite" aria-atomic="true">
-            <span class="nidqc-online-counter__dot" aria-hidden="true"></span>
-            Đang trực tuyến:
-            <strong>{{ onlineCount ?? '—' }}</strong>
-          </span>
         </div>
       </div>
     </footer>

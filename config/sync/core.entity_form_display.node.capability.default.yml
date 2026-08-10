@@ -1,21 +1,20 @@
-uuid: a469f7ec-55b4-4ffc-8577-83fba0791249
+uuid: 9f23f735-2e5e-4f02-86d5-3f1623b8bfde
 langcode: vi
 status: true
 dependencies:
   config:
-    - field.field.node.service.field_image
-    - field.field.node.service.field_link
-    - field.field.node.service.field_weight
-    - image.style.thumbnail
-    - node.type.service
+    - field.field.node.capability.field_description
+    - field.field.node.capability.field_link
+    - field.field.node.capability.field_weight
+    - node.type.capability
   module:
     - content_moderation
-    - image
     - link
     - path
-id: node.service.default
+    - text
+id: node.capability.default
 targetEntityType: node
-bundle: service
+bundle: capability
 mode: default
 content:
   created:
@@ -24,13 +23,13 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
-  field_image:
-    type: image_image
-    weight: 3
+  field_description:
+    type: text_textarea
+    weight: 2
     region: content
     settings:
-      progress_indicator: throbber
-      preview_image_style: thumbnail
+      rows: 5
+      placeholder: ''
     third_party_settings: {  }
   field_link:
     type: link_default
@@ -42,7 +41,7 @@ content:
     third_party_settings: {  }
   field_weight:
     type: number
-    weight: 2
+    weight: 3
     region: content
     settings:
       placeholder: ''

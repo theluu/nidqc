@@ -1,0 +1,30 @@
+uuid: 2101f2d3-9c00-4c2c-afdd-d5be31c8a43c
+langcode: vi
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_position
+field_name: field_position
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: ads_1
+      label: 'Banner quảng cáo 1 (dưới khối Dịch vụ)'
+    -
+      value: ads_2
+      label: 'Banner quảng cáo 2 (dưới khối Hoạt động chuyên môn)'
+    -
+      value: sidebar
+      label: 'Liên kết nổi bật (cột phải Hoạt động chuyên môn)'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

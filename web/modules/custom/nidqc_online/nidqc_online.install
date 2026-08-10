@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Bảng lưu lượt truy cập theo ngày cho khối "Thống kê truy cập" ở trang chủ.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Định nghĩa bảng đếm lượt truy cập.
+ *
+ * Chỉ lưu MỘT con số cho mỗi ngày: không IP, không user agent, không định danh
+ * người truy cập. Đủ để hiện "hôm nay / tháng / năm / tổng" mà không đụng tới dữ
+ * liệu cá nhân — site cơ quan nhà nước không có lý do gì phải lưu nhiều hơn.
+ */
+function nidqc_online_schema(): array {
+  return [
+    'nidqc_visit_daily' => [
+      'description' => 'Số lượt truy cập của từng ngày (không lưu dữ liệu định danh).',
+      'fields' => [
+        'day' => [
+          'type' => 'varchar',
+          'length' => 10,
+          'not null' => TRUE,
+          'description' => 'Ngày dạng YYYY-MM-DD theo giờ Việt Nam.',
+        ],
+        'visits' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+          'description' => 'Số phiên truy cập ghi nhận trong ngày.',
+        ],
+      ],
+      'primary key' => ['day'],
+    ],
+  ];
+}
+
+/**
+ * Tạo bảng nidqc_visit_daily cho các site đã cài module từ trước.
+ */
+function nidqc_online_update_11001(): void {
+  $schema = \Drupal::database()->schema();
+  if (!$schema->tableExists('nidqc_visit_daily')) {
+    $schema->createTable('nidqc_visit_daily', nidqc_online_schema()['nidqc_visit_daily']);
+  }
+}

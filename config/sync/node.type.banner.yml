@@ -1,0 +1,11 @@
+uuid: fabbeb34-a531-4ca3-b28d-66b66748b087
+langcode: vi
+status: true
+dependencies: {  }
+name: 'Banner & liên kết ảnh'
+type: banner
+description: 'Ảnh có đường dẫn dùng cho hai dải banner quảng cáo ở trang chủ và cột liên kết nổi bật bên phải khối Hoạt động chuyên môn. Chọn vị trí ở ô "Vị trí hiển thị".'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

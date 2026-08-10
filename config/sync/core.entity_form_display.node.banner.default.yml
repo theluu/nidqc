@@ -1,21 +1,22 @@
-uuid: a469f7ec-55b4-4ffc-8577-83fba0791249
+uuid: 7a4c99dc-a617-48c4-9146-20c7528cd12c
 langcode: vi
 status: true
 dependencies:
   config:
-    - field.field.node.service.field_image
-    - field.field.node.service.field_link
-    - field.field.node.service.field_weight
+    - field.field.node.banner.field_image
+    - field.field.node.banner.field_link
+    - field.field.node.banner.field_position
+    - field.field.node.banner.field_weight
     - image.style.thumbnail
-    - node.type.service
+    - node.type.banner
   module:
     - content_moderation
     - image
     - link
     - path
-id: node.service.default
+id: node.banner.default
 targetEntityType: node
-bundle: service
+bundle: banner
 mode: default
 content:
   created:
@@ -26,7 +27,7 @@ content:
     third_party_settings: {  }
   field_image:
     type: image_image
-    weight: 3
+    weight: 1
     region: content
     settings:
       progress_indicator: throbber
@@ -34,15 +35,21 @@ content:
     third_party_settings: {  }
   field_link:
     type: link_default
-    weight: 1
+    weight: 2
     region: content
     settings:
       placeholder_url: ''
       placeholder_title: ''
     third_party_settings: {  }
+  field_position:
+    type: options_select
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   field_weight:
     type: number
-    weight: 2
+    weight: 4
     region: content
     settings:
       placeholder: ''

@@ -211,6 +211,61 @@ final class NidqcSettingsForm extends ConfigFormBase {
       ];
     }
 
+    $form['footer'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Chân trang — thông tin liên hệ chung'),
+      '#open' => TRUE,
+      '#description' => $this->t('Địa chỉ và bản đồ của từng cơ sở lấy từ nội dung "Cơ sở" (/admin/content). Các ô dưới đây là thông tin dùng chung cho cả Viện.'),
+    ];
+    $form['footer']['footer_tel'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Điện thoại'),
+      '#default_value' => $settings->get('footer.tel') ?: '',
+      '#maxlength' => 64,
+    ];
+    $form['footer']['footer_tel_note'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Ghi chú cạnh số điện thoại'),
+      '#default_value' => $settings->get('footer.tel_note') ?: 'giờ hành chính',
+      '#maxlength' => 64,
+    ];
+    $form['footer']['footer_fax'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Fax'),
+      '#default_value' => $settings->get('footer.fax') ?: '',
+      '#maxlength' => 64,
+    ];
+    $form['footer']['footer_email'] = [
+      '#type' => 'email',
+      '#title' => $this->t('Email liên hệ công việc'),
+      '#default_value' => $settings->get('footer.email') ?: '',
+    ];
+
+    $form['customer_services'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Chân trang — thông tin dành cho khách hàng'),
+      '#open' => TRUE,
+      '#description' => $this->t('Đầu mối liên hệ theo từng nhóm dịch vụ. Nhóm nào bỏ trống cả email lẫn hotline thì không hiện ở chân trang.'),
+    ];
+    $stored = $this->storedCustomerServices();
+    foreach ($this->customerServiceKeys() as $key => $label) {
+      $form['customer_services'][$key] = [
+        '#type' => 'fieldset',
+        '#title' => $label,
+      ];
+      $form['customer_services'][$key]['cs_' . $key . '_email'] = [
+        '#type' => 'email',
+        '#title' => $this->t('Email'),
+        '#default_value' => $stored[$key]['email'] ?? '',
+      ];
+      $form['customer_services'][$key]['cs_' . $key . '_hotline'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Hotline'),
+        '#default_value' => $stored[$key]['hotline'] ?? '',
+        '#maxlength' => 64,
+      ];
+    }
+
     $form['site'] = [
       '#type' => 'details',
       '#title' => $this->t('Thông tin website'),
@@ -328,6 +383,25 @@ final class NidqcSettingsForm extends ConfigFormBase {
     foreach (array_keys($this->socialChannels()) as $key) {
       $settings->set('social.' . $key, trim((string) $form_state->getValue('social_' . $key)));
     }
+
+    $settings
+      ->set('footer.tel', trim((string) $form_state->getValue('footer_tel')))
+      ->set('footer.tel_note', trim((string) $form_state->getValue('footer_tel_note')))
+      ->set('footer.fax', trim((string) $form_state->getValue('footer_fax')))
+      ->set('footer.email', trim((string) $form_state->getValue('footer_email')));
+
+    // Lưu cả nhóm bỏ trống: thứ tự và nhãn của bốn nhóm là cố định theo yêu cầu
+    // nghiệp vụ, frontend mới là nơi quyết định ẩn nhóm rỗng.
+    $services = [];
+    foreach ($this->customerServiceKeys() as $key => $label) {
+      $services[] = [
+        'label' => (string) $label,
+        'email' => trim((string) $form_state->getValue('cs_' . $key . '_email')),
+        'hotline' => trim((string) $form_state->getValue('cs_' . $key . '_hotline')),
+      ];
+    }
+    $settings->set('customer_services', $services);
+
     $settings->save();
 
     $this->configFactory->getEditable('system.site')
@@ -378,7 +452,45 @@ final class NidqcSettingsForm extends ConfigFormBase {
       'facebook' => $this->t('Facebook'),
       'youtube' => $this->t('YouTube'),
       'zalo' => $this->t('Zalo'),
+      'tiktok' => $this->t('TikTok'),
     ];
+  }
+
+  /**
+   * Bốn nhóm dịch vụ ở chân trang: khoá máy => nhãn hiển thị.
+   *
+   * Danh sách cố định theo yêu cầu nghiệp vụ (bảng chân trang trong tài liệu
+   * feedback). Thêm nhóm mới thì thêm ở đây, thứ tự trong mảng là thứ tự hiển thị.
+   */
+  private function customerServiceKeys(): array {
+    return [
+      'testing' => $this->t('Dịch vụ Kiểm nghiệm'),
+      'training' => $this->t('Đào tạo'),
+      'calibration' => $this->t('Hiệu chuẩn thiết bị'),
+      'standards' => $this->t('Cung ứng chất chuẩn'),
+    ];
+  }
+
+  /**
+   * Giá trị đã lưu của bốn nhóm dịch vụ, tra được theo khoá.
+   *
+   * Config lưu dạng danh sách có thứ tự (sequence) nên phải ghép lại theo thứ tự
+   * khai báo trong customerServiceKeys() thì form mới điền đúng ô.
+   */
+  private function storedCustomerServices(): array {
+    $stored = $this->config('nidqc_contact.settings')->get('customer_services');
+    $stored = is_array($stored) ? array_values($stored) : [];
+    $keys = array_keys($this->customerServiceKeys());
+
+    $result = [];
+    foreach ($keys as $index => $key) {
+      $result[$key] = [
+        'email' => (string) ($stored[$index]['email'] ?? ''),
+        'hotline' => (string) ($stored[$index]['hotline'] ?? ''),
+      ];
+    }
+
+    return $result;
   }
 
   /**
