@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.node.service.field_image
     - field.field.node.service.field_link
+    - field.field.node.service.field_service_category
     - field.field.node.service.field_weight
     - node.type.service
   module:
@@ -54,4 +55,5 @@ content:
     weight: 100
     region: content
 hidden:
+  field_service_category: true
   langcode: true

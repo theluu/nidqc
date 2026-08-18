@@ -1,0 +1,24 @@
+uuid: ab329de4-5503-4c04-8b23-34f6fb594490
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.capability
+  module:
+    - node
+id: capability
+label: 'Danh mục năng lực'
+type: 'canonical_entities:node'
+pattern: '/danh-muc-nang-luc/[node:title]'
+selection_criteria:
+  capability-bundle-check:
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: node
+    bundles:
+      capability: capability
+    uuid: capability-bundle-check
+selection_logic: and
+weight: -5
+relationships: {  }

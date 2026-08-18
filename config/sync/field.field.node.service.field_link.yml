@@ -11,8 +11,8 @@ id: node.service.field_link
 field_name: field_link
 entity_type: node
 bundle: service
-label: 'Đường dẫn'
-description: ''
+label: 'Link ngoài (không bắt buộc)'
+description: 'Bỏ trống là đúng trong hầu hết trường hợp: ô trên trang chủ tự trỏ tới danh sách bài viết của danh mục đã chọn ở trên. Chỉ điền khi muốn ô này dẫn sang một trang bên ngoài.'
 required: false
 translatable: true
 default_value: {  }

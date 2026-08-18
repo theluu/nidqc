@@ -19,8 +19,11 @@ use Symfony\Component\HttpFoundation\Request;
  * Trả nội dung một TRANG TĨNH theo alias.
  *
  * Feedback 08/2026 yêu cầu mỗi dịch vụ, mỗi mục "Danh mục năng lực" và mỗi hoạt
- * động chuyên môn đều bấm được sang một bài viết riêng. Những bài đó là node
- * `page` với alias nhiều cấp (/dich-vu/…, /danh-muc-nang-luc/…). JSON:API không
+ * động chuyên môn đều bấm được sang một bài viết riêng. Bài của hoạt động chuyên môn
+ * và của mục năng lực nay nằm NGAY TRONG node expertise/capability (ô "Nội dung bài
+ * viết"), alias do pathauto sinh — trước kia là một node `page` riêng mà biên tập
+ * viên phải tự gõ alias rồi dán ngược vào ô Đường dẫn. Alias vẫn nhiều cấp
+ * (/hoat-dong-chuyen-mon/…, /danh-muc-nang-luc/…). JSON:API không
  * lọc được trên computed field 'path' nên đường cũ (fetchPageByAlias) phải liệt kê
  * toàn bộ node page rồi khớp alias phía JS — sẽ hỏng ngay khi số trang vượt
  * page[limit]. Ở đây alias tra thẳng bảng path_alias, đúng một query có index.
@@ -41,7 +44,7 @@ final class StaticPageController implements ContainerInjectionInterface {
    * Danh sách trắng chứ không phải danh sách đen: thêm content type mới không
    * được vô tình phơi nội dung nội bộ (VD contact_submission) ra API công khai.
    */
-  private const ALLOWED_BUNDLES = ['page', 'document', 'faq', 'department', 'equipment', 'certificate', 'project', 'service_post'];
+  private const ALLOWED_BUNDLES = ['page', 'document', 'faq', 'department', 'equipment', 'certificate', 'project', 'service_post', 'expertise', 'capability'];
 
   /**
    * Khởi tạo controller trang tĩnh.

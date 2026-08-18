@@ -6,3 +6,10 @@ services:
       - '@file_url_generator'
       - '@stream_wrapper_manager'
       - '@image.factory'
+
+  # Dùng chung cho HomeBlocksController (sinh đường dẫn khối Dịch vụ) và
+  # ServiceListController (tra ngược slug -> danh mục): một quy tắc bỏ dấu duy nhất.
+  nidqc_content.slugger:
+    class: Drupal\nidqc_content\Slugger
+    arguments:
+      - '@transliteration'

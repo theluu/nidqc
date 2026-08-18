@@ -3,6 +3,7 @@ langcode: vi
 status: true
 dependencies:
   config:
+    - field.field.node.expertise.body
     - field.field.node.expertise.field_description
     - field.field.node.expertise.field_image
     - field.field.node.expertise.field_link
@@ -63,4 +64,5 @@ content:
     weight: 100
     region: content
 hidden:
+  body: true
   langcode: true

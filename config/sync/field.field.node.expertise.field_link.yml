@@ -11,8 +11,8 @@ id: node.expertise.field_link
 field_name: field_link
 entity_type: node
 bundle: expertise
-label: 'Đường dẫn bài viết chi tiết'
-description: ''
+label: 'Link ngoài (không bắt buộc)'
+description: 'Bỏ trống là đúng trong hầu hết trường hợp: ô trên trang chủ tự trỏ tới trang riêng của chính hoạt động này (nội dung nhập ở ô "Nội dung bài viết" bên dưới). Chỉ điền khi muốn ô này dẫn sang một trang bên ngoài.'
 required: false
 translatable: true
 default_value: {  }

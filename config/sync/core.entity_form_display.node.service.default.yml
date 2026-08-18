@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.node.service.field_image
     - field.field.node.service.field_link
+    - field.field.node.service.field_service_category
     - field.field.node.service.field_weight
     - image.style.thumbnail
     - node.type.service
@@ -26,7 +27,7 @@ content:
     third_party_settings: {  }
   field_image:
     type: image_image
-    weight: 3
+    weight: 1
     region: content
     settings:
       progress_indicator: throbber
@@ -34,11 +35,17 @@ content:
     third_party_settings: {  }
   field_link:
     type: link_default
-    weight: 1
+    weight: 8
     region: content
     settings:
       placeholder_url: ''
       placeholder_title: ''
+    third_party_settings: {  }
+  field_service_category:
+    type: options_select
+    weight: 0
+    region: content
+    settings: {  }
     third_party_settings: {  }
   field_weight:
     type: number

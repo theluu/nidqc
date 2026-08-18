@@ -1,0 +1,29 @@
+uuid: f6b4612c-455b-4fb2-b371-68b89c2bb49b
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_service_category
+    - node.type.service
+    - taxonomy.vocabulary.service_category
+id: node.service.field_service_category
+field_name: field_service_category
+entity_type: node
+bundle: service
+label: 'Danh mục dịch vụ'
+description: 'Ô vuông trên trang chủ sẽ tự dẫn tới danh sách bài viết của danh mục này. Không phải gõ đường dẫn.'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      service_category: service_category
+    sort:
+      field: weight
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\nidqc_content\Controller;
 
-use Drupal\Component\Transliteration\TransliterationInterface;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\nidqc_content\NewsPresenter;
+use Drupal\nidqc_content\Slugger;
 use Drupal\taxonomy\TermInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -37,7 +37,7 @@ final class ServiceListController implements ContainerInjectionInterface {
   public function __construct(
     private readonly EntityTypeManagerInterface $entityTypeManager,
     private readonly NewsPresenter $presenter,
-    private readonly TransliterationInterface $transliteration,
+    private readonly Slugger $slugger,
     private readonly LoggerInterface $logger,
   ) {
   }
@@ -49,7 +49,7 @@ final class ServiceListController implements ContainerInjectionInterface {
     return new self(
       $container->get('entity_type.manager'),
       $container->get('nidqc_content.news_presenter'),
-      $container->get('transliteration'),
+      $container->get('nidqc_content.slugger'),
       $container->get('logger.factory')->get('nidqc_content'),
     );
   }
@@ -208,15 +208,12 @@ final class ServiceListController implements ContainerInjectionInterface {
   /**
    * Tên term -> slug trên URL.
    *
-   * Phải khớp với alias pathauto sinh ra (/dich-vu/<danh-muc>/<tieu-de>) và với
-   * categorySlug() phía Nuxt: cùng một quy tắc bỏ dấu -> chữ thường -> gạch nối.
+   * Phải khớp với alias pathauto sinh ra (/dich-vu/<danh-muc>/<tieu-de>), với đường
+   * dẫn mà HomeBlocksController sinh cho ô Dịch vụ ở trang chủ, và với categorySlug()
+   * phía Nuxt — nên quy tắc bỏ dấu nằm ở Slugger dùng chung, không chép lại ở đây.
    */
   private function slug(string $value): string {
-    $ascii = $this->transliteration->transliterate($value, 'vi', '-');
-    $ascii = strtolower($ascii);
-    $ascii = preg_replace('/[^a-z0-9]+/', '-', $ascii) ?? '';
-
-    return trim($ascii, '-');
+    return $this->slugger->slug($value);
   }
 
   /**

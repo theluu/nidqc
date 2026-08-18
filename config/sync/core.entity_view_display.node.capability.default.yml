@@ -3,6 +3,7 @@ langcode: vi
 status: true
 dependencies:
   config:
+    - field.field.node.capability.body
     - field.field.node.capability.field_description
     - field.field.node.capability.field_link
     - field.field.node.capability.field_weight
@@ -49,4 +50,5 @@ content:
     weight: 100
     region: content
 hidden:
+  body: true
   langcode: true

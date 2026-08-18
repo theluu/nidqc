@@ -9,7 +9,9 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\nidqc_content\NewsPresenter;
+use Drupal\nidqc_content\Slugger;
 use Drupal\node\NodeInterface;
+use Drupal\path_alias\AliasManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,6 +34,8 @@ final class HomeBlocksController implements ContainerInjectionInterface {
   public function __construct(
     private readonly EntityTypeManagerInterface $entityTypeManager,
     private readonly NewsPresenter $presenter,
+    private readonly Slugger $slugger,
+    private readonly AliasManagerInterface $aliasManager,
     private readonly LoggerInterface $logger,
   ) {
   }
@@ -43,6 +47,8 @@ final class HomeBlocksController implements ContainerInjectionInterface {
     return new self(
       $container->get('entity_type.manager'),
       $container->get('nidqc_content.news_presenter'),
+      $container->get('nidqc_content.slugger'),
+      $container->get('path_alias.manager'),
       $container->get('logger.factory')->get('nidqc_content'),
     );
   }
@@ -65,6 +71,8 @@ final class HomeBlocksController implements ContainerInjectionInterface {
       'node_list:web_link',
       'node_list:office',
       'node_list:home_block',
+      // Đường dẫn ô Dịch vụ sinh từ TÊN term: đổi tên danh mục là khối phải dựng lại.
+      'taxonomy_term_list:service_category',
     ]);
 
     try {
@@ -97,19 +105,19 @@ final class HomeBlocksController implements ContainerInjectionInterface {
       $payload = [
         'services' => array_map(fn (NodeInterface $n): array => [
           'title' => $n->label(),
-          'url' => $this->linkUrl($n),
+          'url' => $this->serviceUrl($n),
           'image' => $this->presenter->imageUrl($n, NewsPresenter::STYLE_CARD),
         ], $this->load('service')),
 
         'capabilities' => array_map(fn (NodeInterface $n): array => [
           'title' => $n->label(),
-          'url' => $this->linkUrl($n),
+          'url' => $this->ownPageUrl($n),
           'description' => $this->plainText($n, 'field_description'),
         ], $this->load('capability')),
 
         'expertise' => array_map(fn (NodeInterface $n): array => [
           'title' => $n->label(),
-          'url' => $this->linkUrl($n),
+          'url' => $this->ownPageUrl($n),
           'image' => $this->presenter->imageUrl($n, NewsPresenter::STYLE_CARD),
         ], $this->load('expertise')),
 
@@ -176,6 +184,54 @@ final class HomeBlocksController implements ContainerInjectionInterface {
     }
 
     return str_starts_with($uri, 'internal:') ? substr($uri, strlen('internal:')) : $uri;
+  }
+
+  /**
+   * Đường dẫn của một ô Dịch vụ trên trang chủ.
+   *
+   * Sinh từ DANH MỤC đã chọn (/dich-vu/<slug tên danh mục>) thay vì bắt biên tập
+   * viên gõ tay URL: gõ lệch một ký tự là ô bấm vào ra 404 mà không có gì báo. Cùng
+   * bộ Slugger với ServiceListController nên slug hai bên không thể lệch nhau.
+   *
+   * field_link vẫn được tôn trọng và ĐỨNG TRƯỚC — vài ô cần trỏ sang hệ thống cũ.
+   */
+  private function serviceUrl(NodeInterface $node): ?string {
+    $manual = $this->linkUrl($node);
+    if ($manual !== NULL) {
+      return $manual;
+    }
+    if (!$node->hasField('field_service_category') || $node->get('field_service_category')->isEmpty()) {
+      return NULL;
+    }
+    $term = $node->get('field_service_category')->entity;
+    if ($term === NULL) {
+      return NULL;
+    }
+
+    return '/dich-vu/' . $this->slugger->slug((string) $term->label());
+  }
+
+  /**
+   * Đường dẫn tới trang riêng của chính node đó (Hoạt động chuyên môn, Năng lực).
+   *
+   * Bài viết nay nằm ngay trong node — pathauto tự sinh alias
+   * /hoat-dong-chuyen-mon/… và /danh-muc-nang-luc/… nên không còn cảnh nhập nội dung
+   * ở một node "Trang tĩnh" khác rồi dán đường dẫn ngược lại vào đây.
+   *
+   * Chưa nhập nội dung -> trả NULL: ô vẫn hiện ảnh + tiêu đề nhưng không bấm được,
+   * tốt hơn là dẫn người đọc tới một trang trống.
+   */
+  private function ownPageUrl(NodeInterface $node): ?string {
+    $manual = $this->linkUrl($node);
+    if ($manual !== NULL) {
+      return $manual;
+    }
+    if (!$node->hasField('body') || $node->get('body')->isEmpty()) {
+      return NULL;
+    }
+    $alias = $this->aliasManager->getAliasByPath('/node/' . $node->id());
+
+    return $alias !== '/node/' . $node->id() ? $alias : NULL;
   }
 
   /**
