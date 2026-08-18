@@ -13,6 +13,10 @@ export type NavItem = NavLink & {
   children: NavLink[]
 }
 
+// Nhãn mục menu có submenu lấy động từ khối trang chủ — dùng chung cho cả nơi khai
+// báo và nơi thay thế, đổi tên mục thì không phải nhớ sửa hai chỗ.
+export const EXPERTISE_LABEL = 'Hoạt động chuyên môn'
+
 // Menu lấy từ design (const NAV). href trỏ route Vue. 9 mục, submenu 2 tầng.
 export const mainNav: NavItem[] = [
   { label: 'Trang chủ', to: '/', children: [] },
@@ -22,9 +26,12 @@ export const mainNav: NavItem[] = [
     { label: 'Năng lực', to: '/nang-luc' },
     { label: 'Cơ cấu tổ chức', to: '/co-cau-to-chuc' },
   ] },
-  // Mỗi hoạt động trỏ thẳng sang bài viết của nó, khớp với 5 thẻ trong khối
-  // "Hoạt động chuyên môn" ở trang chủ (/api/v1/home/blocks -> expertise).
-  { label: 'Hoạt động chuyên môn', to: '/#hoat-dong-chuyen-mon', children: [
+  // Submenu này chỉ là BẢN DỰ PHÒNG: lúc chạy, layout thay nó bằng chính các thẻ
+  // trong khối "Hoạt động chuyên môn" ở trang chủ (/api/v1/home/blocks -> expertise)
+  // qua mainNavWithExpertise(). Chép cứng thì admin thêm/sửa/xoá một hoạt động trong
+  // Drupal là menu và khối lệch nhau ngay. Giữ lại danh sách này để khi API lỗi menu
+  // vẫn có mục con thay vì rỗng.
+  { label: EXPERTISE_LABEL, to: '/#hoat-dong-chuyen-mon', children: [
     { label: 'Chỉ đạo tuyến', to: '/hoat-dong-chuyen-mon/chi-dao-tuyen' },
     { label: 'Kiểm nghiệm và giám sát chất lượng thuốc', to: '/hoat-dong-chuyen-mon/kiem-nghiem-va-giam-sat-chat-luong-thuoc' },
     { label: 'Hợp tác quốc tế', to: '/hoat-dong-chuyen-mon/hop-tac-quoc-te' },
@@ -68,6 +75,28 @@ export const mainNav: NavItem[] = [
     { label: 'Câu hỏi thường gặp', to: '/faq' },
   ] },
 ]
+
+/**
+ * Menu chính với submenu "Hoạt động chuyên môn" dựng từ khối cùng tên ở trang chủ.
+ *
+ * Nhận thẳng mảng expertise của /api/v1/home/blocks (title + url) nên hai chỗ luôn
+ * hiện đúng một danh sách, theo đúng thứ tự field_weight mà admin sắp trong Drupal.
+ *
+ * Bỏ qua mục không có link: khối trang chủ vẫn vẽ được thẻ không bấm được (thẻ chỉ
+ * có ảnh + tiêu đề), nhưng một dòng menu không đi đâu cả thì chỉ làm người dùng bấm
+ * hụt. Không còn mục nào có link -> trả nguyên menu tĩnh.
+ */
+export function mainNavWithExpertise(items?: { title: string, url?: string | null }[] | null): NavItem[] {
+  const children = (items ?? [])
+    .filter((item): item is { title: string, url: string } => typeof item.url === 'string' && item.url !== '')
+    .map((item) => ({ label: item.title, to: item.url }))
+
+  if (children.length === 0) {
+    return mainNav
+  }
+
+  return mainNav.map((item) => (item.label === EXPERTISE_LABEL ? { ...item, children } : item))
+}
 
 /**
  * Submenu của một mục menu chính, tra theo nhãn.

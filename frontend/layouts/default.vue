@@ -199,7 +199,12 @@ onUnmounted(() => {
 });
 
 // Menu chính dùng chung với trang chủ — xem composables/useMainNav.ts.
-const nav = mainNav;
+//
+// Submenu "Hoạt động chuyên môn" lấy thẳng từ khối cùng tên ở trang chủ: cùng dữ
+// liệu homeBlocks đã fetch ở trên nên KHÔNG tốn thêm request, mà admin sửa khối
+// trong Drupal là menu đổi theo ngay. Trước đây 5 mục chép cứng trong useMainNav.ts,
+// trùng khớp chỉ vì có người nhớ sửa cả hai chỗ.
+const nav = computed(() => mainNavWithExpertise(homeBlocks.value?.expertise));
 
 const footerLinks = [
   { label: 'Giới thiệu chung', to: '/gioi-thieu-chung' },
