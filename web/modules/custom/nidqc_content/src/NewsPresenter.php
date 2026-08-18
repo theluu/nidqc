@@ -66,10 +66,15 @@ final class NewsPresenter {
 
   /**
    * Dựng item danh sách (dùng cho tin liên quan, tin mới nhất, trang danh sách).
+   *
+   * hasField() ở hai field của riêng Tin tức: danh sách Bài viết dịch vụ dùng lại
+   * đúng hình dạng item này để chung component thẻ tin ở frontend, mà bundle
+   * service_post không có field_category/field_tag — get() trên field không tồn tại
+   * thì ném exception chứ không trả rỗng.
    */
   public function listItem(NodeInterface $node, string $styleId): array {
-    $category = $node->get('field_category')->entity;
-    $tag = trim((string) $node->get('field_tag')->value);
+    $category = $node->hasField('field_category') ? $node->get('field_category')->entity : NULL;
+    $tag = $node->hasField('field_tag') ? trim((string) $node->get('field_tag')->value) : '';
     return [
       'id' => (int) $node->id(),
       'title' => $node->label(),

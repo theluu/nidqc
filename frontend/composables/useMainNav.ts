@@ -22,25 +22,34 @@ export const mainNav: NavItem[] = [
     { label: 'Năng lực', to: '/nang-luc' },
     { label: 'Cơ cấu tổ chức', to: '/co-cau-to-chuc' },
   ] },
+  // Mỗi hoạt động trỏ thẳng sang bài viết của nó, khớp với 5 thẻ trong khối
+  // "Hoạt động chuyên môn" ở trang chủ (/api/v1/home/blocks -> expertise).
   { label: 'Hoạt động chuyên môn', to: '/#hoat-dong-chuyen-mon', children: [
-    { label: 'Chỉ đạo tuyến', to: '/#hoat-dong-chuyen-mon' },
-    { label: 'Kiểm nghiệm và giám sát chất lượng thuốc', to: '/#hoat-dong-chuyen-mon' },
-    { label: 'Hợp tác quốc tế', to: '/#hoat-dong-chuyen-mon' },
-    { label: 'Hoạt động NRA', to: '/#hoat-dong-chuyen-mon' },
-    { label: 'Tạp chí Kiểm nghiệm Dược và Mỹ phẩm', to: '/#hoat-dong-chuyen-mon' },
+    { label: 'Chỉ đạo tuyến', to: '/hoat-dong-chuyen-mon/chi-dao-tuyen' },
+    { label: 'Kiểm nghiệm và giám sát chất lượng thuốc', to: '/hoat-dong-chuyen-mon/kiem-nghiem-va-giam-sat-chat-luong-thuoc' },
+    { label: 'Hợp tác quốc tế', to: '/hoat-dong-chuyen-mon/hop-tac-quoc-te' },
+    { label: 'Hoạt động NRA', to: '/hoat-dong-chuyen-mon/hoat-dong-nra' },
+    { label: 'Tạp chí Kiểm nghiệm Dược và Mỹ phẩm', to: '/hoat-dong-chuyen-mon/tap-chi-kiem-nghiem-duoc-va-my-pham' },
   ] },
   { label: 'Đào tạo & NCKH', to: '/dao-tao-nckh', children: [
     { label: 'Đào tạo tiến sỹ', to: '/dao-tao-nckh' },
     { label: 'Nghiên cứu khoa học', to: '/dao-tao-nckh' },
   ] },
+  // Mỗi dịch vụ trỏ thẳng sang DANH SÁCH BÀI VIẾT của nó (/dich-vu/<danh-muc>),
+  // không còn nhảy về mỏ neo #dich-vu ở trang chủ. Đoạn slug phải khớp tên term
+  // trong vocabulary service_category — cùng quy tắc bỏ dấu với ServiceListController
+  // và với alias pathauto của bài viết dịch vụ.
+  //
+  // "Cung ứng chất chuẩn" KHÔNG phải một danh mục dịch vụ: nó dẫn sang trang tra
+  // cứu chất chuẩn ở hệ thống cũ, nên giữ link ngoài chứ không có danh sách bài.
   { label: 'Dịch vụ', to: '/#dich-vu', children: [
-    { label: 'Phân tích - Kiểm nghiệm', to: '/#dich-vu' },
-    { label: 'Đánh giá tương đương sinh học (TĐSH)', to: '/#dich-vu' },
-    { label: 'Đào tạo và tư vấn kỹ thuật', to: '/#dich-vu' },
-    { label: 'Hiệu chuẩn', to: '/#dich-vu' },
-    { label: 'Nghiên cứu - Chuyển giao', to: '/#dich-vu' },
-    { label: 'Thử nghiệm thành thạo', to: '/#dich-vu' },
-    { label: 'Cung ứng chất chuẩn', to: '/#chat-chuan' },
+    { label: 'Phân tích - Kiểm nghiệm', to: '/dich-vu/phan-tich-kiem-nghiem' },
+    { label: 'Đánh giá tương đương sinh học (TĐSH)', to: '/dich-vu/danh-gia-tuong-duong-sinh-hoc-tdsh' },
+    { label: 'Đào tạo và tư vấn kỹ thuật', to: '/dich-vu/dao-tao-va-tu-van-ky-thuat' },
+    { label: 'Hiệu chuẩn', to: '/dich-vu/hieu-chuan' },
+    { label: 'Nghiên cứu - Chuyển giao', to: '/dich-vu/nghien-cuu-chuyen-giao' },
+    { label: 'Thử nghiệm thành thạo', to: '/dich-vu/thu-nghiem-thanh-thao' },
+    { label: 'Cung ứng chất chuẩn', to: 'https://nidqc.gov.vn/tim-kiem-chat-chuan' },
   ] },
   { label: 'Tin tức & Thông báo', to: '/tin-tuc', children: [
     { label: 'Thông báo', to: '/tin-tuc?cat=thong-bao' },
@@ -68,4 +77,15 @@ export const mainNav: NavItem[] = [
  */
 export function navChildren(label: string): NavLink[] {
   return mainNav.find((item) => item.label === label)?.children ?? []
+}
+
+/**
+ * Link ra ngoài site hay không.
+ *
+ * Menu có vài mục trỏ sang hệ thống cũ (VD tra cứu chất chuẩn). NuxtLink tự nhận
+ * ra URL tuyệt đối và render <a href>, nhưng KHÔNG tự thêm target/rel — mà mở
+ * trang ngoài đè lên tab hiện tại thì người dùng mất chỗ đang đọc.
+ */
+export function isExternalLink(to: string): boolean {
+  return /^https?:\/\//.test(to)
 }

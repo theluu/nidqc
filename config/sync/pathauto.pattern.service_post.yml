@@ -1,0 +1,24 @@
+uuid: 93a0cec7-b4ca-4298-bc36-5789f5c2095a
+langcode: vi
+status: true
+dependencies:
+  config:
+    - node.type.service_post
+  module:
+    - node
+id: service_post
+label: 'Bài viết dịch vụ'
+type: 'canonical_entities:node'
+pattern: '/dich-vu/[node:field_service_category:entity:name]/[node:title]'
+selection_criteria:
+  service-post-bundle-check:
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: node
+    bundles:
+      service_post: service_post
+    uuid: service-post-bundle-check
+selection_logic: and
+weight: -5
+relationships: {  }

@@ -51,3 +51,12 @@ nidqc_content.home_blocks:
   requirements:
     _permission: 'access content'
   methods: [GET]
+
+nidqc_content.service_list:
+  path: '/api/v1/service/list'
+  defaults:
+    _controller: '\Drupal\nidqc_content\Controller\ServiceListController::list'
+    _format: 'json'
+  requirements:
+    _permission: 'access content'
+  methods: [GET]

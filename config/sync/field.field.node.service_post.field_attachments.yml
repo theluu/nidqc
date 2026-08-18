@@ -1,0 +1,27 @@
+uuid: 48bea3ed-837b-4907-8ab5-eb9421d1cba3
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_attachments
+    - node.type.service_post
+  module:
+    - file
+id: node.service_post.field_attachments
+field_name: field_attachments
+entity_type: node
+bundle: service_post
+label: 'Tài liệu đính kèm'
+description: 'File đính kèm của bài viết (biểu mẫu, báo giá, quy trình…).'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: 'service/files/[date:custom:Y-m]'
+  file_extensions: 'pdf doc docx xls xlsx ppt pptx rar zip jpg jpeg png gif webp'
+  max_filesize: ''
+  description_field: true
+field_type: file

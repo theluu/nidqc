@@ -296,7 +296,9 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
           <NuxtLink :to="item.to" class="nidqc-sitemap__head">{{ item.label }}</NuxtLink>
           <!-- Mục con lấy từ mainNav nên dùng khoá `label`, KHÁC các khối lấy từ
                /api/v1/home/blocks (dùng `title`). -->
-          <NuxtLink v-for="(child, j) in item.children" :key="j" :to="child.to" class="nidqc-sitemap__link">{{ child.label }}</NuxtLink>
+          <NuxtLink v-for="(child, j) in item.children" :key="j" :to="child.to" class="nidqc-sitemap__link"
+            :target="isExternalLink(child.to) ? '_blank' : undefined"
+            :rel="isExternalLink(child.to) ? 'noopener' : undefined">{{ child.label }}</NuxtLink>
         </div>
       </div>
     </section>

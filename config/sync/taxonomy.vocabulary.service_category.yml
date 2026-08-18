@@ -1,0 +1,9 @@
+uuid: 9fa4881c-03fb-4e02-bf42-1810677dd5fa
+langcode: vi
+status: true
+dependencies: {  }
+name: 'Danh mục dịch vụ'
+vid: service_category
+description: 'Mỗi danh mục là một dịch vụ ở trang chủ; bài viết chọn danh mục nào sẽ hiện trong danh sách của dịch vụ đó.'
+weight: 0
+new_revision: false

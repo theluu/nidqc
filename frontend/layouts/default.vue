@@ -308,6 +308,8 @@ const footerLinks = [
             <div v-if="item.children.length && openMenu === i" class="nidqc-submenu"
                  style="position:absolute;top:100%;left:0;min-width:220px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.14);z-index:50;">
               <NuxtLink v-for="(c, j) in item.children" :key="j" :to="c.to" @click="setMobile(false)"
+                :target="isExternalLink(c.to) ? '_blank' : undefined"
+                :rel="isExternalLink(c.to) ? 'noopener' : undefined"
                 style="display:block;padding:11px 18px;font-size:13.5px;line-height:18px;color:#212529;border-bottom:1px solid #F0F0F0;white-space:nowrap;text-decoration:none;">
                 {{ c.label }}
               </NuxtLink>

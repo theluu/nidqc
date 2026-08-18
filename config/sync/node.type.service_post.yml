@@ -1,0 +1,11 @@
+uuid: 51cf858c-54f5-4156-aea3-bea2cae6378c
+langcode: vi
+status: true
+dependencies: {  }
+name: 'Bài viết dịch vụ'
+type: service_post
+description: 'Bài viết hiện trong danh sách của một dịch vụ (/dich-vu/…).'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

@@ -1,0 +1,24 @@
+uuid: 1c911afc-11fd-4a38-92e3-1aa39bf0a095
+langcode: vi
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - node.type.service_post
+  module:
+    - text
+id: node.service_post.body
+field_name: body
+entity_type: node
+bundle: service_post
+label: 'Nội dung'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: false
+  required_summary: false
+  allowed_formats: {  }
+field_type: text_with_summary

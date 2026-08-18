@@ -41,7 +41,7 @@ final class StaticPageController implements ContainerInjectionInterface {
    * Danh sách trắng chứ không phải danh sách đen: thêm content type mới không
    * được vô tình phơi nội dung nội bộ (VD contact_submission) ra API công khai.
    */
-  private const ALLOWED_BUNDLES = ['page', 'document', 'faq', 'department', 'equipment', 'certificate', 'project'];
+  private const ALLOWED_BUNDLES = ['page', 'document', 'faq', 'department', 'equipment', 'certificate', 'project', 'service_post'];
 
   /**
    * Khởi tạo controller trang tĩnh.
