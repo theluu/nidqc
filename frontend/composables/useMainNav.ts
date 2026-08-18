@@ -13,9 +13,10 @@ export type NavItem = NavLink & {
   children: NavLink[]
 }
 
-// Nhãn mục menu có submenu lấy động từ khối trang chủ — dùng chung cho cả nơi khai
-// báo và nơi thay thế, đổi tên mục thì không phải nhớ sửa hai chỗ.
+// Nhãn hai mục menu có submenu lấy động từ khối trang chủ — dùng chung cho cả nơi
+// khai báo và nơi thay thế, đổi tên mục thì không phải nhớ sửa hai chỗ.
 export const EXPERTISE_LABEL = 'Hoạt động chuyên môn'
+export const SERVICE_LABEL = 'Dịch vụ'
 
 // Menu lấy từ design (const NAV). href trỏ route Vue. 9 mục, submenu 2 tầng.
 export const mainNav: NavItem[] = [
@@ -28,7 +29,7 @@ export const mainNav: NavItem[] = [
   ] },
   // Submenu này chỉ là BẢN DỰ PHÒNG: lúc chạy, layout thay nó bằng chính các thẻ
   // trong khối "Hoạt động chuyên môn" ở trang chủ (/api/v1/home/blocks -> expertise)
-  // qua mainNavWithExpertise(). Chép cứng thì admin thêm/sửa/xoá một hoạt động trong
+  // qua mainNavWithBlocks(). Chép cứng thì admin thêm/sửa/xoá một hoạt động trong
   // Drupal là menu và khối lệch nhau ngay. Giữ lại danh sách này để khi API lỗi menu
   // vẫn có mục con thay vì rỗng.
   { label: EXPERTISE_LABEL, to: '/#hoat-dong-chuyen-mon', children: [
@@ -42,6 +43,11 @@ export const mainNav: NavItem[] = [
     { label: 'Đào tạo tiến sỹ', to: '/dao-tao-nckh' },
     { label: 'Nghiên cứu khoa học', to: '/dao-tao-nckh' },
   ] },
+  // BẢN DỰ PHÒNG như trên: lúc chạy, submenu này được thay bằng chính các thẻ trong
+  // khối "Dịch vụ" ở trang chủ (/api/v1/home/blocks -> services), cộng nút "Tra cứu
+  // chất chuẩn" (-> standards). Admin sửa tiêu đề/link một dịch vụ trong Drupal là
+  // menu đổi theo, không phải sửa file này.
+  //
   // Mỗi dịch vụ trỏ thẳng sang DANH SÁCH BÀI VIẾT của nó (/dich-vu/<danh-muc>),
   // không còn nhảy về mỏ neo #dich-vu ở trang chủ. Đoạn slug phải khớp tên term
   // trong vocabulary service_category — cùng quy tắc bỏ dấu với ServiceListController
@@ -49,7 +55,7 @@ export const mainNav: NavItem[] = [
   //
   // "Cung ứng chất chuẩn" KHÔNG phải một danh mục dịch vụ: nó dẫn sang trang tra
   // cứu chất chuẩn ở hệ thống cũ, nên giữ link ngoài chứ không có danh sách bài.
-  { label: 'Dịch vụ', to: '/#dich-vu', children: [
+  { label: SERVICE_LABEL, to: '/#dich-vu', children: [
     { label: 'Phân tích - Kiểm nghiệm', to: '/dich-vu/phan-tich-kiem-nghiem' },
     { label: 'Đánh giá tương đương sinh học (TĐSH)', to: '/dich-vu/danh-gia-tuong-duong-sinh-hoc-tdsh' },
     { label: 'Đào tạo và tư vấn kỹ thuật', to: '/dich-vu/dao-tao-va-tu-van-ky-thuat' },
@@ -76,26 +82,57 @@ export const mainNav: NavItem[] = [
   ] },
 ]
 
+// Phần payload /api/v1/home/blocks mà menu dùng tới. Khai báo rộng (title + url)
+// thay vì import HomeBlocks để composable menu không phụ thuộc ngược vào tầng fetch.
+type HomeBlockNavItem = { title: string, url?: string | null }
+
+export type HomeBlockNav = {
+  services?: HomeBlockNavItem[] | null
+  expertise?: HomeBlockNavItem[] | null
+  standards?: { label: string, url: string | null } | null
+}
+
 /**
- * Menu chính với submenu "Hoạt động chuyên môn" dựng từ khối cùng tên ở trang chủ.
+ * Đổi mảng thẻ của một khối trang chủ thành mục menu, bỏ thẻ không có link.
+ */
+function toNavLinks(items?: HomeBlockNavItem[] | null): NavLink[] {
+  return (items ?? [])
+    .filter((item): item is { title: string, url: string } => typeof item.url === 'string' && item.url !== '')
+    .map((item) => ({ label: item.title, to: item.url }))
+}
+
+/**
+ * Menu chính với hai submenu "Dịch vụ" và "Hoạt động chuyên môn" dựng từ chính các
+ * khối cùng tên ở trang chủ.
  *
- * Nhận thẳng mảng expertise của /api/v1/home/blocks (title + url) nên hai chỗ luôn
- * hiện đúng một danh sách, theo đúng thứ tự field_weight mà admin sắp trong Drupal.
+ * Nhận thẳng payload của /api/v1/home/blocks (title + url) nên menu và khối trên
+ * trang luôn hiện đúng một danh sách, theo đúng thứ tự field_weight mà admin sắp
+ * trong Drupal. Không có chỗ nào phải chép tay tiêu đề hay đường dẫn nữa.
  *
  * Bỏ qua mục không có link: khối trang chủ vẫn vẽ được thẻ không bấm được (thẻ chỉ
  * có ảnh + tiêu đề), nhưng một dòng menu không đi đâu cả thì chỉ làm người dùng bấm
- * hụt. Không còn mục nào có link -> trả nguyên menu tĩnh.
+ * hụt. Khối nào không còn mục nào có link -> giữ nguyên submenu tĩnh của mục đó.
  */
-export function mainNavWithExpertise(items?: { title: string, url?: string | null }[] | null): NavItem[] {
-  const children = (items ?? [])
-    .filter((item): item is { title: string, url: string } => typeof item.url === 'string' && item.url !== '')
-    .map((item) => ({ label: item.title, to: item.url }))
+export function mainNavWithBlocks(blocks?: HomeBlockNav | null): NavItem[] {
+  const expertise = toNavLinks(blocks?.expertise)
+  const services = toNavLinks(blocks?.services)
 
-  if (children.length === 0) {
-    return mainNav
+  // "Tra cứu chất chuẩn" nằm ở khối home_block chứ không phải bundle service, nên
+  // nối thêm vào cuối — đúng vị trí nó vẫn đứng trong menu tĩnh.
+  if (services.length > 0 && blocks?.standards?.url) {
+    services.push({ label: blocks.standards.label || 'Tra cứu chất chuẩn', to: blocks.standards.url })
   }
 
-  return mainNav.map((item) => (item.label === EXPERTISE_LABEL ? { ...item, children } : item))
+  return mainNav.map((item) => {
+    if (item.label === EXPERTISE_LABEL && expertise.length > 0) {
+      return { ...item, children: expertise }
+    }
+    if (item.label === SERVICE_LABEL && services.length > 0) {
+      return { ...item, children: services }
+    }
+
+    return item
+  })
 }
 
 /**

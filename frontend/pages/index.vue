@@ -120,8 +120,8 @@ const visitRows = computed(() => [
 const formatNumber = (value) => (value === null || value === undefined ? '—' : value.toLocaleString('vi-VN'))
 
 // Sơ đồ menu ở cuối trang (feedback 12) — cùng nguồn với thanh menu trên đầu, kể cả
-// submenu "Hoạt động chuyên môn" lấy động từ khối expertise ở trên.
-const siteMap = computed(() => mainNavWithExpertise(blocks.value?.expertise).filter((item) => item.children.length))
+// hai submenu "Dịch vụ" và "Hoạt động chuyên môn" lấy động từ chính các khối ở trên.
+const siteMap = computed(() => mainNavWithBlocks(blocks.value).filter((item) => item.children.length))
 
 useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương', description: 'Tin tức, thông báo, dịch vụ kiểm nghiệm, tra cứu chất chuẩn và hoạt động chuyên môn của Viện Kiểm nghiệm thuốc Trung ương.', ogTitle: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương', ogDescription: 'Tin tức, thông báo, dịch vụ kiểm nghiệm, tra cứu chất chuẩn và hoạt động chuyên môn của Viện Kiểm nghiệm thuốc Trung ương.' })
 </script>
