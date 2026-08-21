@@ -218,10 +218,10 @@ const footerLinks = [
 <template>
   <div style="background:#FFFFFF;min-height:100vh;font-family:'Be Vietnam Pro',sans-serif;color:#333;">
 
-    <!-- ===== TOP BAR: ngôn ngữ · mạng xã hội · đăng nhập =====
-         Feedback 1-2: chỉ hai cờ Vi/En (bỏ danh sách ~100 thứ tiếng), kèm icon
-         YouTube/Facebook/Zalo và icon đăng nhập. Ô tìm kiếm đã chuyển thành icon
-         kính lúp trên thanh menu (feedback 3).
+    <!-- ===== TOP BAR: ngày/giờ · ngôn ngữ =====
+         Feedback 1: chỉ hai cờ Vi/En (bỏ danh sách ~100 thứ tiếng). Ô tìm kiếm đã
+         chuyển thành icon kính lúp trên thanh menu (feedback 3); nút đăng nhập đã
+         gỡ hẳn (feedback 21/08).
 
          Dải riêng NẰM TRÊN banner, nền cùng màu thanh menu. Bản trước đè lên ảnh
          banner: cụm icon phải tự vẽ nền trắng cho đọc được, và ở mỗi bề ngang màn
@@ -263,13 +263,10 @@ const footerLinks = [
           </button>
         </div>
 
-        <!-- Chỉ còn đăng nhập: icon mạng xã hội đã có ở chân trang, để hai nơi là
-             lặp cùng một cụm link trên mọi trang. -->
-        <a href="/user/login" class="nidqc-topbar__login" title="Đăng nhập hệ thống">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
-          <span class="nidqc-topbar__login-text">Đăng nhập</span>
-          <span class="nidqc-visually-hidden">hệ thống</span>
-        </a>
+        <!-- KHÔNG có lối đăng nhập trên giao diện công khai (feedback 21/08:
+             "Không cần hiển thị trên trang web"). Biên tập viên vào thẳng
+             /user/login bằng đường dẫn, trang bán chuẩn đã tách sang site riêng.
+             Icon mạng xã hội nằm ở chân trang, không lặp lại ở đây. -->
 
         <!-- Element ẩn cho Google Translate (phải nằm trong DOM để script gắn vào) -->
         <div id="google_translate_element" style="display:none;"></div>

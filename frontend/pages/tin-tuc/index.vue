@@ -15,6 +15,8 @@ const mapItem = (n) => ({
   title: n.title,
   date: formatDate(n.created),
   tag: n.tag,
+  // Thẻ tin dạng hàng ngang có chỗ cho trích dẫn 2 dòng (feedback 21/08).
+  summary: n.summary || '',
   image: newsImageUrl(n.image),
   alias: n.alias,
 })

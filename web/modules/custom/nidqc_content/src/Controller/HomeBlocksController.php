@@ -95,7 +95,9 @@ final class HomeBlocksController implements ContainerInjectionInterface {
       foreach ($this->load('home_block') as $node) {
         $link = $node->get('field_link')->first();
         $standards = [
-          'label' => trim((string) $link?->title) !== '' ? (string) $link->title : 'Tra cứu chất chuẩn',
+          // Khách chốt 21/08: nút này gọi là "Cung ứng chất chuẩn" — trùng tên mục
+          // trong menu Dịch vụ và đầu mối ở chân trang, để một thứ chỉ có một tên.
+          'label' => trim((string) $link?->title) !== '' ? (string) $link->title : 'Cung ứng chất chuẩn',
           'url' => $this->linkUrl($node),
           'note' => $this->plainText($node, 'field_description'),
         ];

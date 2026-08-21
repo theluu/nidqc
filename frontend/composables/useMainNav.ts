@@ -37,14 +37,13 @@ export const mainNav: NavItem[] = [
     { label: 'Kiểm nghiệm và giám sát chất lượng thuốc', to: '/hoat-dong-chuyen-mon/kiem-nghiem-va-giam-sat-chat-luong-thuoc' },
     { label: 'Hợp tác quốc tế', to: '/hoat-dong-chuyen-mon/hop-tac-quoc-te' },
     { label: 'Hoạt động NRA', to: '/hoat-dong-chuyen-mon/hoat-dong-nra' },
-    { label: 'Tạp chí Kiểm nghiệm Dược và Mỹ phẩm', to: '/hoat-dong-chuyen-mon/tap-chi-kiem-nghiem-duoc-va-my-pham' },
   ] },
   { label: 'Đào tạo & NCKH', to: '/dao-tao-nckh', children: [
     { label: 'Đào tạo tiến sỹ', to: '/dao-tao-nckh' },
     { label: 'Nghiên cứu khoa học', to: '/dao-tao-nckh' },
   ] },
   // BẢN DỰ PHÒNG như trên: lúc chạy, submenu này được thay bằng chính các thẻ trong
-  // khối "Dịch vụ" ở trang chủ (/api/v1/home/blocks -> services), cộng nút "Tra cứu
+  // khối "Dịch vụ" ở trang chủ (/api/v1/home/blocks -> services), cộng nút "Cung ứng
   // chất chuẩn" (-> standards). Admin sửa tiêu đề/link một dịch vụ trong Drupal là
   // menu đổi theo, không phải sửa file này.
   //
@@ -67,7 +66,11 @@ export const mainNav: NavItem[] = [
   { label: 'Tin tức & Thông báo', to: '/tin-tuc', children: [
     { label: 'Thông báo', to: '/tin-tuc?cat=thong-bao' },
     { label: 'Tin hoạt động', to: '/tin-tuc?cat=tin-hoat-dong' },
-    { label: 'Mua sắm, đấu thầu & công khai minh bạch', to: '/tin-tuc?cat=mua-sam-dau-thau' },
+    // Nhãn NGẮN: mục này vừa là dòng menu vừa là nhãn tab ở trang chủ, mà dải tab
+    // chỉ rộng bằng một cột — "Mua sắm, đấu thầu & công khai minh bạch" bị cắt cụt
+    // thành "Mua sắm, đấu thầu & cô…". Tên đầy đủ vẫn còn ở tiêu đề khối trên trang
+    // chủ và ở tiêu đề trang chuyên mục. Slug giữ nguyên nên link cũ không hỏng.
+    { label: 'Mua sắm, đấu thầu', to: '/tin-tuc?cat=mua-sam-dau-thau' },
     { label: 'Đào tạo', to: '/tin-tuc?cat=dao-tao' },
     { label: 'Hội nghị - Hội thảo', to: '/tin-tuc?cat=hoi-nghi-hoi-thao' },
     { label: 'Tuyển dụng', to: '/tin-tuc?cat=tuyen-dung' },
@@ -117,10 +120,10 @@ export function mainNavWithBlocks(blocks?: HomeBlockNav | null): NavItem[] {
   const expertise = toNavLinks(blocks?.expertise)
   const services = toNavLinks(blocks?.services)
 
-  // "Tra cứu chất chuẩn" nằm ở khối home_block chứ không phải bundle service, nên
+  // "Cung ứng chất chuẩn" nằm ở khối home_block chứ không phải bundle service, nên
   // nối thêm vào cuối — đúng vị trí nó vẫn đứng trong menu tĩnh.
   if (services.length > 0 && blocks?.standards?.url) {
-    services.push({ label: blocks.standards.label || 'Tra cứu chất chuẩn', to: blocks.standards.url })
+    services.push({ label: blocks.standards.label || 'Cung ứng chất chuẩn', to: blocks.standards.url })
   }
 
   return mainNav.map((item) => {

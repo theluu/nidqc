@@ -11,6 +11,10 @@ type NewsListItem = {
   category: string
   image: string | null
   alias: string
+  // Nhãn hiện trên thẻ tin; rỗng thì presenter trả về tên chuyên mục.
+  tag: string
+  // Mô tả ngắn do NewsPresenter::summary() rút từ tóm tắt hoặc thân bài.
+  summary: string
   // Tin cũ (tạo trước khi có field_featured) không có khoá này -> optional.
   featured?: boolean
 }

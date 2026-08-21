@@ -15,7 +15,7 @@ field_name: field_tag
 entity_type: node
 bundle: news
 label: Nhãn
-description: ''
+description: 'Chữ hiển thị trên góc thẻ tin ở trang danh sách, ví dụ TIN HOẠT ĐỘNG hay THÔNG BÁO. Để trống thì tự lấy tên chuyên mục đã chọn ở trên — bình thường không cần điền, chỉ dùng khi muốn ghi nhãn khác tên chuyên mục.'
 required: false
 translatable: false
 default_value: {  }

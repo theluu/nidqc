@@ -17,7 +17,7 @@ field_name: field_image
 entity_type: node
 bundle: news
 label: 'Ảnh đại diện'
-description: ''
+description: 'Định dạng: JPG, JPEG, PNG, GIF, WEBP. Dung lượng tối đa 10 MB. Ảnh lớn hơn 2560px sẽ được tự động thu nhỏ khi tải lên. Ảnh ngang tỷ lệ 16:10 hiển thị đẹp nhất.'
 required: false
 translatable: false
 default_value: {  }
@@ -27,8 +27,8 @@ settings:
   handler_settings: {  }
   file_directory: '[date:custom:Y]-[date:custom:m]'
   file_extensions: 'png gif jpg jpeg webp'
-  max_filesize: ''
-  max_resolution: ''
+  max_filesize: '10 MB'
+  max_resolution: '2560x2560'
   min_resolution: ''
   alt_field: true
   alt_field_required: true

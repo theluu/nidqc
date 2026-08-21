@@ -152,7 +152,7 @@ $seedNode([
   'type' => 'home_block',
   'title' => 'Chất chuẩn – chất đối chiếu',
   'field_description' => ['value' => 'Tra cứu và đăng ký cung ứng chất chuẩn, chất đối chiếu phục vụ kiểm nghiệm.', 'format' => 'basic_html'],
-  'field_link' => ['uri' => 'https://nidqc.gov.vn/tim-kiem-chat-chuan', 'title' => 'Tra cứu chất chuẩn'],
+  'field_link' => ['uri' => 'https://nidqc.gov.vn/tim-kiem-chat-chuan', 'title' => 'Cung ứng chất chuẩn'],
   'field_video' => '7k9OhYB8Q5A',
 ]);
 

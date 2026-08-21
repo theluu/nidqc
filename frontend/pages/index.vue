@@ -3,7 +3,7 @@
 //
 // Thứ tự section bám đúng tài liệu "Feedback NIDQC" (08/2026):
 //   1. Tin nổi bật (1 tin, hiệu ứng lướt) + cột tab chuyên mục tin tức   (feedback 4-5)
-//   2. Dịch vụ (title + ảnh) | Danh mục năng lực, kèm nút Tra cứu chất chuẩn (6)
+//   2. Dịch vụ (title + ảnh) | Danh mục năng lực, kèm nút Cung ứng chất chuẩn (6)
 //   3. Banner quảng cáo slideshow                                          (7)
 //   4. Hoạt động chuyên môn (title + ảnh) | Liên kết nổi bật               (8)
 //   5. Banner quảng cáo slideshow                                          (9)
@@ -93,7 +93,7 @@ const procurementColumn = newsColumn('mua-sam-dau-thau')
 const { data: mediaPosts } = await useCachedData('home-media', () => fetchMediaLibrary(12))
 
 // Khối trang chủ động (quản trị trong Drupal): Dịch vụ, Danh mục năng lực, Hoạt
-// động chuyên môn, Banner, Liên kết web và nút Tra cứu chất chuẩn — tất cả trong
+// động chuyên môn, Banner, Liên kết web và nút Cung ứng chất chuẩn — tất cả trong
 // MỘT request, ảnh đã qua image style (xem composables/useHomeBlocks.ts).
 const { data: blocks } = await useCachedData('home-blocks', fetchHomeBlocks)
 
@@ -104,7 +104,7 @@ const ads1 = computed(() => blocks.value?.banners?.ads_1 || [])
 const ads2 = computed(() => blocks.value?.banners?.ads_2 || [])
 const sidebarLinks = computed(() => blocks.value?.banners?.sidebar || [])
 const webLinks = computed(() => blocks.value?.web_links || [])
-// Nút "Tra cứu chất chuẩn" — nổi bật hẳn so với các link dịch vụ vì nó dẫn sang
+// Nút "Cung ứng chất chuẩn" — nổi bật hẳn so với các link dịch vụ vì nó dẫn sang
 // trang mua chuẩn chứ không phải một bài giới thiệu (feedback 6).
 const standards = computed(() => blocks.value?.standards || null)
 
@@ -119,9 +119,12 @@ const visitRows = computed(() => [
 ])
 const formatNumber = (value) => (value === null || value === undefined ? '—' : value.toLocaleString('vi-VN'))
 
-// Sơ đồ menu ở cuối trang (feedback 12) — cùng nguồn với thanh menu trên đầu, kể cả
-// hai submenu "Dịch vụ" và "Hoạt động chuyên môn" lấy động từ chính các khối ở trên.
-const siteMap = computed(() => mainNavWithBlocks(blocks.value).filter((item) => item.children.length))
+// Sơ đồ menu ở cuối trang (feedback 12) — cùng nguồn với thanh menu trên đầu.
+//
+// CHỈ mục cấp 1 (feedback 21/08: "Chỉ cần tên tab thôi, không cần chi tiết như
+// vầy"): bản trước trải hết mục con của 7 nhóm thành một bảng chữ dày đặc, lặp lại
+// đúng những gì mega menu ở đầu trang đã có.
+const siteMap = computed(() => mainNavWithBlocks(blocks.value).filter((item) => item.to !== '/'))
 
 useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương', description: 'Tin tức, thông báo, dịch vụ kiểm nghiệm, tra cứu chất chuẩn và hoạt động chuyên môn của Viện Kiểm nghiệm thuốc Trung ương.', ogTitle: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương', ogDescription: 'Tin tức, thông báo, dịch vụ kiểm nghiệm, tra cứu chất chuẩn và hoạt động chuyên môn của Viện Kiểm nghiệm thuốc Trung ương.' })
 </script>
@@ -222,15 +225,21 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
             <span class="nidqc-heading__bar"></span>
             <h2 class="nidqc-heading__text">Liên kết nổi bật</h2>
           </div>
-          <div class="nidqc-highlight-list">
-            <a v-for="(l, i) in sidebarLinks" :key="i"
-              :href="l.url || undefined"
-              :target="l.url && /^https?:/.test(l.url) ? '_blank' : undefined"
-              :rel="l.url && /^https?:/.test(l.url) ? 'noopener' : undefined"
-              class="nidqc-highlight">
-              <img :src="l.image" :alt="l.title" loading="lazy">
-              <span>{{ l.title }}</span>
-            </a>
+          <!-- Khung cuộn: danh sách nằm TUYỆT ĐỐI bên trong nên nó không cộng chiều
+               cao vào hàng grid — chiều cao hàng do cột "Hoạt động chuyên môn" bên
+               trái quyết định, đúng yêu cầu của khách. Nhiều banner hơn thì cuộn
+               trong khối chứ không đẩy cả section dài ra. -->
+          <div class="nidqc-highlight-scroll">
+            <div class="nidqc-highlight-list">
+              <a v-for="(l, i) in sidebarLinks" :key="i"
+                :href="l.url || undefined"
+                :target="l.url && /^https?:/.test(l.url) ? '_blank' : undefined"
+                :rel="l.url && /^https?:/.test(l.url) ? 'noopener' : undefined"
+                class="nidqc-highlight">
+                <img :src="l.image" :alt="l.title" loading="lazy">
+                <span>{{ l.title }}</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -242,8 +251,10 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
     <!-- ===== 6. TIN THÔNG BÁO | TIN MUA SẮM (feedback 10) ===== -->
     <section v-if="noticeColumn || procurementColumn" class="nidqc-section" style="background:#fff;" id="thong-bao">
       <div class="nidqc-two-col" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;">
-        <NewsColumn v-if="noticeColumn" title="Tin thông báo" :items="noticeColumn.items" :to="noticeColumn.to" />
-        <NewsColumn v-if="procurementColumn" title="Tin mua sắm" :items="procurementColumn.items" :to="procurementColumn.to" />
+        <NewsColumn v-if="noticeColumn" title="Thông báo" :items="noticeColumn.items" :to="noticeColumn.to" />
+        <!-- Tên ĐẦY ĐỦ ở đây, khác nhãn tab đã rút gọn thành "Mua sắm, đấu thầu":
+             tiêu đề khối rộng cả nửa trang nên chứa được, còn nhãn tab thì không. -->
+        <NewsColumn v-if="procurementColumn" title="Mua sắm, đấu thầu, công khai minh bạch" :items="procurementColumn.items" :to="procurementColumn.to" />
       </div>
     </section>
 
@@ -293,14 +304,9 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
     <!-- ===== 8. SƠ ĐỒ MENU (feedback 12) ===== -->
     <section class="nidqc-section" style="background:#F5F5F5;border-top:1px solid #ECECEC;">
       <div class="nidqc-sitemap" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;">
-        <div v-for="(item, i) in siteMap" :key="i" class="nidqc-sitemap__col">
-          <NuxtLink :to="item.to" class="nidqc-sitemap__head">{{ item.label }}</NuxtLink>
-          <!-- Mục con lấy từ mainNav nên dùng khoá `label`, KHÁC các khối lấy từ
-               /api/v1/home/blocks (dùng `title`). -->
-          <NuxtLink v-for="(child, j) in item.children" :key="j" :to="child.to" class="nidqc-sitemap__link"
-            :target="isExternalLink(child.to) ? '_blank' : undefined"
-            :rel="isExternalLink(child.to) ? 'noopener' : undefined">{{ child.label }}</NuxtLink>
-        </div>
+        <NuxtLink v-for="(item, i) in siteMap" :key="i" :to="item.to" class="nidqc-sitemap__head">
+          {{ item.label }}
+        </NuxtLink>
       </div>
     </section>
   </div>

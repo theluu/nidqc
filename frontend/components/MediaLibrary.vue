@@ -286,8 +286,11 @@ function formatDate(iso) {
 .lib__slide.is-active { opacity: 1; visibility: visible; }
 .lib__slide:focus-visible { outline: 2px solid #1D6AC5; outline-offset: -2px; }
 
+/* 250px thay vì 300px: khối này quyết định chiều cao cả section ba cột, mà hai cột
+   bên cạnh (Liên kết web, Thống kê truy cập) chỉ cao ~300px. Hạ xuống cho ba cột
+   gần bằng nhau (feedback 21/08 "Bố trí chiều cao các mục cho hợp lý"). */
 .lib__media {
-  position: relative; display: block; width: 100%; height: 300px;
+  position: relative; display: block; width: 100%; height: 250px;
   overflow: hidden; background: #0D2870;
 }
 .lib__media img,

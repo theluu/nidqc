@@ -77,20 +77,24 @@ const visibleTabs = computed(() => props.tabs.filter((tab) => tab.items && tab.i
   min-height: 0;
 }
 
-/* Dải tab cuộn ngang: 6 chuyên mục với nhãn tiếng Việt dài không thể vừa bề ngang
-   một cột hẹp, mà xuống dòng thì dải tab cao gần bằng phần nội dung. */
+/* Dải tab XUỐNG NHIỀU HÀNG (feedback 21/08: mockup của khách xếp tab thành hai
+   hàng "[Thông báo] [Tin hoạt động]" / "[Mua sắm, đấu thầu] [Đào tạo]").
+   Bản trước cuộn ngang một hàng: tab thứ ba trở đi nằm ngoài khung, người dùng
+   không thấy là có tab khác nên coi như mất luôn các chuyên mục đó.
+   Nút co giãn theo nội dung nhưng có min-width để hai nút cùng hàng không lệch
+   nhau quá nhiều. */
 .tabs__strip {
   display: flex;
+  flex-wrap: wrap;
   gap: 2px;
   background: #0F3093;
   padding: 0 2px;
-  overflow-x: auto;
-  scrollbar-width: none;
 }
-.tabs__strip::-webkit-scrollbar { display: none; }
 .tabs__btn {
-  flex: 0 0 auto;
-  padding: 12px 14px;
+  flex: 1 1 auto;
+  min-width: 120px;
+  text-align: center;
+  padding: 11px 12px;
   border: 0;
   background: none;
   color: rgba(255, 255, 255, 0.78);
@@ -98,7 +102,7 @@ const visibleTabs = computed(() => props.tabs.filter((tab) => tab.items && tab.i
   font-family: 'Lexend', sans-serif;
   font-size: 12.5px;
   font-weight: 600;
-  white-space: nowrap;
+  line-height: 16px;
   cursor: pointer;
   border-bottom: 3px solid transparent;
   transition: color .15s ease, background .15s ease;
@@ -116,14 +120,24 @@ const visibleTabs = computed(() => props.tabs.filter((tab) => tab.items && tab.i
 .tabs__panel { display: none; flex-direction: column; flex: 1; min-height: 0; }
 .tabs__panel.is-active { display: flex; }
 
+/* Các dòng tin GIÃN ĐỀU lấp hết chiều cao còn lại. Khối hero bên trái cao hơn cột
+   này (ảnh 16:9 + khối chữ), align-items:stretch kéo cột tab cho bằng — nếu danh
+   sách không nở thì phần dư dồn thành một mảng trắng ngay trên link "Xem tất cả".
+   Giãn đều cũng đúng mockup khách gửi: 5 dòng tin chia đều chiều cao khung. */
 .tabs__list {
   list-style: none;
   margin: 0;
   padding: 0;
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
+.tabs__list > li { display: flex; flex: 1; }
 .tabs__item {
-  display: block;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
   padding: 12px 16px;
   border-bottom: 1px solid #F0F0F0;
   text-decoration: none;
@@ -142,7 +156,8 @@ const visibleTabs = computed(() => props.tabs.filter((tab) => tab.items && tab.i
 }
 .tabs__item:hover .tabs__title { color: #0F3093; }
 .tabs__date {
-  display: inline-flex;
+  display: flex;
+  align-self: flex-start;
   align-items: center;
   gap: 5px;
   margin-top: 6px;

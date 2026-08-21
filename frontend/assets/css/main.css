@@ -216,31 +216,6 @@ body { margin: 0; }
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5);
 }
 
-/* Đăng nhập trên top bar: viền trắng rỗng, kèm gạch ngăn với cụm ngôn ngữ. */
-.nidqc-topbar__login {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  position: relative;
-  padding: 5px 13px;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  border-radius: 999px;
-  color: #fff;
-  font-size: 12.5px;
-  font-weight: 600;
-  white-space: nowrap;
-  text-decoration: none;
-  transition: background .15s ease, border-color .15s ease;
-}
-.nidqc-topbar__login::before {
-  content: '';
-  position: absolute;
-  left: -10px;
-  width: 1px;
-  height: 16px;
-  background: rgba(255, 255, 255, 0.28);
-}
-.nidqc-topbar__login:hover { background: rgba(255, 255, 255, 0.16); border-color: #fff; }
 
 /* Mạng xã hội: chỉ còn ở chân trang, tô thẳng màu thương hiệu. */
 .nidqc-social-group {
@@ -267,7 +242,6 @@ body { margin: 0; }
 .nidqc-social:hover { opacity: .85; transform: translateY(-1px); }
 
 .nidqc-social:focus-visible,
-.nidqc-topbar__login:focus-visible,
 .nidqc-lang-btn:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;
@@ -353,16 +327,13 @@ body { margin: 0; }
   .nidqc-nav-search-form button { padding: 0 14px; }
 }
 
-/* Top bar trên máy hẹp: bỏ chữ cho đỡ chật, giữ cờ và icon đăng nhập. */
-/* Máy hẹp: bỏ ngày/giờ trước (thông tin trang trí), rồi tới chữ, giữ cờ và icon. */
+/* Máy hẹp: bỏ ngày/giờ trước (thông tin trang trí), rồi tới mã ngôn ngữ, giữ cờ. */
 @media (max-width: 760px) {
   .nidqc-topbar__time { display: none; }
 }
 @media (max-width: 480px) {
   .nidqc-topbar__inner { padding: 6px 16px; gap: 12px; }
-  .nidqc-topbar__code,
-  .nidqc-topbar__login-text { display: none; }
-  .nidqc-topbar__login { padding: 5px 9px; }
+  .nidqc-topbar__code { display: none; }
 }
 
 /* ===== Google Translate: ẩn banner/tooltip mặc định, tránh xô layout ===== */
@@ -481,9 +452,15 @@ body.nidqc-recaptcha .grecaptcha-badge { visibility: visible; }
   min-width: 0;
 }
 .nidqc-col > .nidqc-capability-list,
-.nidqc-col > .nidqc-highlight-list,
+.nidqc-col > .nidqc-highlight-scroll { flex: 1; }
+/* Liên kết web và Thống kê truy cập thì KHÔNG kéo giãn (feedback 21/08: "Bố trí
+   chiều cao các mục cho hợp lý"). Cùng hàng với khối Thư viện video cao ~500px,
+   trong khi 5 dòng thống kê chỉ chiếm ~310px — kéo cho bằng nhau thì khung trắng
+   có viền nở ra, để lại gần 200px trắng rỗng ngay giữa trang. Cho hai khung ôm
+   đúng nội dung và bám mép trên, phần dư thành khoảng nghỉ chứ không thành hộp
+   rỗng. */
 .nidqc-col > .nidqc-weblink-list,
-.nidqc-col > .nidqc-stats { flex: 1; }
+.nidqc-col > .nidqc-stats { flex: 0 0 auto; }
 
 /* Tiêu đề khối: gạch dọc + gạch chân, dùng lại ở mọi section trang chủ để các
    khối trông là một hệ thống chứ không phải mỗi chỗ một kiểu. */
@@ -542,13 +519,20 @@ a.nidqc-tile:hover {
   transition: transform .35s ease;
 }
 a.nidqc-tile:hover .nidqc-tile__media img { transform: scale(1.05); }
+/* VIẾT HOA (feedback 21/08: "Các chữ để viết hoa" cho cả Dịch vụ lẫn Hoạt động
+   chuyên môn). Làm bằng CSS chứ KHÔNG sửa tiêu đề node: cùng những node đó còn
+   dựng ra submenu "Dịch vụ"/"Hoạt động chuyên môn" trên thanh menu và breadcrumb
+   trang chi tiết — ở đó chữ hoa toàn bộ vừa xấu vừa sai chính tả tiếng Việt.
+   Cỡ chữ giảm 1px và giãn letter-spacing vì chữ hoa chiếm nhiều bề ngang hơn. */
 .nidqc-tile__label {
   display: block;
   padding: 14px 16px 16px;
   font-family: 'Lexend', sans-serif;
   font-weight: 600;
-  font-size: 15px;
-  line-height: 21px;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
   color: var(--nidqc-primary);
 }
 .nidqc-tile:focus-visible { outline: 2px solid #1D6AC5; outline-offset: 2px; }
@@ -636,9 +620,13 @@ a.nidqc-capability:hover { background: #EEF4FB; border-color: var(--nidqc-primar
 .nidqc-capability__label {
   display: block;
   font-family: 'Lexend', sans-serif;
-  font-size: 14.5px;
+  font-size: 13.5px;
   font-weight: 600;
-  line-height: 20px;
+  line-height: 19px;
+  letter-spacing: 0.2px;
+  /* Viết hoa như khối Dịch vụ — khách chốt danh sách năng lực toàn chữ hoa
+     ("NĂNG LỰC KIỂM NGHIỆM", "DANH MỤC CÁC KHÓA ĐÀO TẠO VÀ TƯ VẤN"…). */
+  text-transform: uppercase;
   color: var(--nidqc-primary);
 }
 .nidqc-capability__desc {
@@ -651,18 +639,41 @@ a.nidqc-capability:hover { background: #EEF4FB; border-color: var(--nidqc-primar
 
 /* ===== Liên kết nổi bật (cột phải khối Hoạt động chuyên môn) =====
    Ảnh + tiêu đề đè lên, giống dải banner phải của nidqc.gov.vn. */
+/* Khối cao ĐÚNG BẰNG cột "Hoạt động chuyên môn" bên trái, không hơn không kém
+   (feedback 21/08: "Chỉnh sao cho chiều cao phù hợp với Hoạt động chuyên môn",
+   "Co lại, bố trí lại cho phù hợp").
+   Hai vấn đề của bản trước, phải chữa cùng lúc:
+     1. Mỗi banner để flex:1 -> cột trái cao thì banner bị thổi lên gần 200px.
+     2. Danh sách nằm thẳng trong ô grid -> nhiều banner thì CHÍNH NÓ kéo hàng grid
+        dài ra, cột trái hở một mảng trắng ở dưới.
+   Cách chữa: danh sách đặt position:absolute trong một khung bọc. Nội dung tuyệt
+   đối không cộng vào chiều cao hàng grid, nên hàng luôn do cột trái quyết định;
+   khung bọc stretch theo hàng, danh sách lấp đầy khung và tự cuộn nếu thừa. */
+.nidqc-highlight-scroll {
+  position: relative;
+  /* Sàn tối thiểu cho trường hợp cột trái quá ngắn (chỉ 1-2 thẻ). */
+  min-height: 240px;
+}
 .nidqc-highlight-list {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 .nidqc-highlight {
   position: relative;
   display: block;
-  /* min-height + flex thay cho aspect-ratio: ô phải nở được để đáy cột thẳng hàng
-     với cột bên trái; aspect-ratio khoá cứng chiều cao nên không nở được. */
-  flex: 1;
-  min-height: 96px;
+  /* Chia đều chiều cao khung — khung đã bị khoá bằng cột trái nên chia đều nghĩa là
+     "co lại vừa đủ" chứ không phình ra như bản trước.
+     min-height: dưới ngưỡng này thì ảnh không còn nhìn ra gì, thà cuộn.
+     max-height: chặn chiều ngược lại, cột chỉ có 1-2 banner thì không thổi mỗi cái
+     thành nửa màn hình. */
+  flex: 1 1 0;
+  min-height: 92px;
+  max-height: 150px;
   border: 1px solid #DCE4EF;
   overflow: hidden;
   text-decoration: none;
@@ -679,13 +690,13 @@ a.nidqc-capability:hover { background: #EEF4FB; border-color: var(--nidqc-primar
 .nidqc-highlight span {
   position: absolute;
   inset: auto 0 0 0;
-  padding: 26px 14px 10px;
+  padding: 22px 12px 9px;
   background: linear-gradient(to top, rgba(8, 24, 66, 0.9), rgba(8, 24, 66, 0));
   color: #fff;
   font-family: 'Lexend', sans-serif;
-  font-size: 13.5px;
+  font-size: 12.5px;
   font-weight: 600;
-  line-height: 19px;
+  line-height: 17px;
 }
 .nidqc-highlight:focus-visible { outline: 2px solid #1D6AC5; outline-offset: 2px; }
 
@@ -746,8 +757,6 @@ a.nidqc-weblink:hover { border-color: var(--nidqc-primary); background: #EEF4FB;
 }
 .nidqc-stats li {
   display: flex;
-  flex: 1;
-  max-height: 62px;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -778,12 +787,15 @@ a.nidqc-weblink:hover { border-color: var(--nidqc-primary); background: #EEF4FB;
 }
 
 /* ===== Sơ đồ menu cuối trang (feedback 12) ===== */
+/* Sơ đồ menu cuối trang: CHỈ tên mục cấp 1, xếp thành một hàng ngang (feedback
+   21/08 "Chỉ cần tên tab thôi"). Bản trước là lưới 6 cột trải hết mục con — lặp
+   nguyên mega menu ở đầu trang và chiếm gần một màn hình. */
 .nidqc-sitemap {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 12px;
 }
-.nidqc-sitemap__col { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
 .nidqc-sitemap__head {
   font-family: 'Lexend', sans-serif;
   font-size: 13.5px;
@@ -792,22 +804,20 @@ a.nidqc-weblink:hover { border-color: var(--nidqc-primary); background: #EEF4FB;
   text-transform: uppercase;
   color: var(--nidqc-primary);
   text-decoration: none;
-  padding-bottom: 8px;
-  margin-bottom: 3px;
-  border-bottom: 1px solid #DCE4EF;
+  padding: 9px 16px;
+  background: #fff;
+  border: 1px solid #DCE4EF;
+  transition: background .15s ease, border-color .15s ease;
 }
-.nidqc-sitemap__link {
-  font-size: 13px;
-  line-height: 19px;
-  color: var(--nidqc-text-muted);
-  text-decoration: none;
+.nidqc-sitemap__head:hover {
+  background: var(--nidqc-primary);
+  border-color: var(--nidqc-primary);
+  color: #fff;
 }
-.nidqc-sitemap__head:hover,
-.nidqc-sitemap__link:hover { color: var(--nidqc-primary); text-decoration: underline; }
+.nidqc-sitemap__head:focus-visible { outline: 2px solid #1D6AC5; outline-offset: 2px; }
 
 /* ===== Responsive trang chủ ===== */
 @media (max-width: 1100px) {
-  .nidqc-sitemap { grid-template-columns: repeat(3, 1fr); }
   .nidqc-three-col { grid-template-columns: 1fr 1fr !important; }
   /* Thư viện là khối rộng nhất -> cho nó chiếm cả hàng, hai cột còn lại xếp dưới. */
   .nidqc-three-col > :first-child { grid-column: 1 / -1; }
@@ -816,7 +826,6 @@ a.nidqc-weblink:hover { border-color: var(--nidqc-primary); background: #EEF4FB;
   .nidqc-service-grid { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 640px) {
-  .nidqc-sitemap { grid-template-columns: repeat(2, 1fr); }
   .nidqc-three-col { grid-template-columns: 1fr !important; }
   .nidqc-heading__text { font-size: 18px; }
   .nidqc-standards-cta { gap: 12px; padding: 14px; }

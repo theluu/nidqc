@@ -82,15 +82,17 @@ watch(paused, restart)
           :aria-hidden="i === active ? undefined : 'true'"
           :tabindex="i === active ? undefined : -1"
         >
-          <img
-            v-if="item.image"
-            :src="item.image"
-            alt=""
-            class="hero__img"
-            :loading="i === 0 ? 'eager' : 'lazy'"
-            :fetchpriority="i === 0 ? 'high' : undefined"
-          >
-          <div class="hero__overlay">
+          <div class="hero__media">
+            <img
+              v-if="item.image"
+              :src="item.image"
+              alt=""
+              class="hero__img"
+              :loading="i === 0 ? 'eager' : 'lazy'"
+              :fetchpriority="i === 0 ? 'high' : undefined"
+            >
+          </div>
+          <div class="hero__body">
             <span class="hero__badge">Tin nổi bật</span>
             <h2 class="hero__title">{{ item.title }}</h2>
             <p v-if="item.summary" class="hero__summary">{{ item.summary }}</p>
@@ -102,7 +104,7 @@ watch(paused, restart)
         </NuxtLink>
       </div>
 
-      <template v-if="count > 1">
+      <div v-if="count > 1" class="hero__controls" aria-hidden="false">
         <button type="button" class="hero__nav is-prev" aria-label="Tin nổi bật trước" @click="select(active - 1)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6" /></svg>
         </button>
@@ -122,7 +124,7 @@ watch(paused, restart)
             @click="select(i)"
           />
         </div>
-      </template>
+      </div>
     </div>
   </div>
 </template>
@@ -131,7 +133,7 @@ watch(paused, restart)
 .hero {
   display: flex;
   flex-direction: column;
-  background: #0D2870;
+  background: #fff;
   border: 1px solid #CCCCCC;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 }
@@ -147,17 +149,24 @@ watch(paused, restart)
   height: 100%;
   transition: transform .55s cubic-bezier(.4, 0, .2, 1);
 }
-/* min-height chứ không phải height cố định: khối hero nằm cùng hàng grid với cột
-   tab bên phải và align-items:stretch, nên nó cao bằng cột cao hơn. Khoá height thì
-   phần dư lộ ra thành một dải xanh trơn dưới ảnh. Ảnh trải tuyệt đối để phủ kín dù
-   chiều cao thực là bao nhiêu. */
+/* Ảnh TRÊN, chữ DƯỚI — không còn lớp chữ đè lên ảnh (feedback 21/08: "Phần tiêu
+   đề đặt dưới hình ảnh, không chồng lên hình ảnh").
+   Slide là cột: ảnh khoá tỷ lệ 16:9, khối chữ nở ra lấp phần cao còn lại. Hero nằm
+   cùng hàng grid với cột tab (align-items:stretch) nên chiều cao do cột cao hơn
+   quyết định; phần dư rơi vào khối chữ nền trắng chứ không lộ ra dải xanh trơn. */
 .hero__slide {
-  position: relative;
+  display: flex;
+  flex-direction: column;
   flex: 0 0 100%;
   min-width: 100%;
-  min-height: 430px;
   text-decoration: none;
+  background: #fff;
+}
+.hero__media {
+  position: relative;
+  aspect-ratio: 16 / 9;
   background: #0D2870;
+  overflow: hidden;
 }
 .hero__img {
   position: absolute;
@@ -172,66 +181,84 @@ watch(paused, restart)
   transform: scale(1.03);
 }
 
-/* Chữ nằm ĐÈ lên ảnh: khối hero cao cố định nên tiêu đề dài ngắn khác nhau không
-   làm giật chiều cao khi chuyển slide. Nền chuyển sắc để chữ trắng luôn đọc được
-   dù ảnh nền sáng hay tối. */
-.hero__overlay {
-  position: absolute;
-  inset: auto 0 0 0;
-  padding: 60px 26px 22px;
-  background: linear-gradient(to top, rgba(8, 24, 66, 0.94) 12%, rgba(8, 24, 66, 0.78) 45%, rgba(8, 24, 66, 0) 100%);
-  color: #fff;
+/* Khối chữ nền trắng. Tiêu đề và mô tả đều clamp cứng số dòng: tiêu đề tin của
+   Viện dài ngắn rất khác nhau, không khoá thì mỗi lần đổi slide cả khối lại nhảy
+   chiều cao. */
+.hero__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 16px 22px 20px;
 }
 .hero__badge {
   display: inline-block;
   background: #E11D48;
+  color: #fff;
   font-family: 'Lexend', sans-serif;
   font-weight: 700;
   font-size: 11px;
   letter-spacing: 0.6px;
   text-transform: uppercase;
   padding: 5px 11px;
-  margin-bottom: 12px;
+  margin-bottom: 11px;
 }
 .hero__title {
   font-family: 'Lexend', sans-serif;
   font-weight: 700;
-  font-size: 25px;
-  line-height: 33px;
-  color: #fff;
-  margin: 0 0 9px;
-  /* Khoá 2 dòng: tiêu đề tin của Viện rất dài, không clamp thì chữ tràn hết ảnh. */
+  font-size: 22px;
+  line-height: 30px;
+  color: var(--nidqc-text, #212529);
+  margin: 0 0 8px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .hero__slide:hover .hero__title {
+  color: var(--nidqc-primary, #0F3093);
   text-decoration: underline;
   text-underline-offset: 4px;
 }
 .hero__summary {
   font-size: 14.5px;
   line-height: 22px;
-  color: rgba(255, 255, 255, 0.86);
+  color: #555;
   margin: 0 0 12px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+/* KHÔNG margin-top:auto ghim ngày xuống đáy: bài chưa nhập tóm tắt thì giữa tiêu
+   đề và ngày hở ra một mảng trắng cả trăm pixel. Cho chữ dồn lên trên, phần cao dư
+   (khối hero cao bằng cột tab bên cạnh) rơi xuống dưới cùng, không ai để ý. */
 .hero__date {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   font-size: 12.5px;
-  color: rgba(255, 255, 255, 0.75);
+  color: #777;
 }
+
+/* Lớp điều khiển trùm ĐÚNG vùng ảnh (cùng tỷ lệ 16:9 với .hero__media) — nếu để
+   nguyên trong viewport thì mũi tên và chấm tròn rơi xuống đè lên khối chữ trắng,
+   chấm trắng trên nền trắng coi như biến mất. */
+.hero__controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  aspect-ratio: 16 / 9;
+  pointer-events: none;
+}
+.hero__controls > * { pointer-events: auto; }
 
 /* ===== Điều hướng ===== */
 .hero__nav {
   position: absolute;
-  top: 40%;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -255,8 +282,8 @@ watch(paused, restart)
 
 .hero__dots {
   position: absolute;
-  right: 26px;
-  bottom: 24px;
+  right: 16px;
+  bottom: 14px;
   display: flex;
   gap: 8px;
 }
@@ -278,12 +305,11 @@ watch(paused, restart)
 .hero__dot:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 
 @media (max-width: 900px) {
-  .hero__slide { min-height: 300px; }
-  .hero__overlay { padding: 48px 18px 18px; }
-  .hero__title { font-size: 19px; line-height: 26px; }
-  .hero__summary { -webkit-line-clamp: 2; font-size: 13.5px; line-height: 20px; }
+  .hero__body { padding: 14px 16px 16px; }
+  .hero__title { font-size: 18px; line-height: 25px; }
+  .hero__summary { font-size: 13.5px; line-height: 20px; }
   .hero__nav { opacity: 1; width: 34px; height: 34px; }
-  .hero__dots { right: 18px; bottom: 16px; }
+  .hero__dots { right: 12px; bottom: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -15,7 +15,7 @@ field_name: field_attachments
 entity_type: node
 bundle: news
 label: 'Tài liệu đính kèm'
-description: 'File đính kèm của bài viết (văn bản gốc, biểu mẫu…).'
+description: 'File đính kèm của bài viết (văn bản gốc, biểu mẫu…). Định dạng: PDF, Word, Excel, PowerPoint, ZIP/RAR và các định dạng ảnh thông dụng. Dung lượng tối đa 20 MB mỗi file.'
 required: false
 translatable: false
 default_value: {  }
@@ -24,7 +24,7 @@ settings:
   handler: 'default:file'
   handler_settings: {  }
   file_directory: 'old-news/files/[date:custom:Y-m]'
-  file_extensions: 'pdf doc docx xls xlsx ppt pptx rar zip jpg jpeg png gif webp'
-  max_filesize: ''
+  file_extensions: 'pdf doc docx xls xlsx ppt pptx rar zip 7z jpg jpeg jfif png gif webp bmp tif tiff heic txt csv'
+  max_filesize: '20 MB'
   description_field: true
 field_type: file
