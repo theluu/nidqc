@@ -102,6 +102,19 @@ if [ "$SEED" = "1" ]; then
   "$DRUSH" cr
 fi
 
+# Xoá cache HTML của Nitro TRƯỚC khi restart.
+#
+# routeRules '/**': { swr: 600 } lưu HTML đã render xuống ĐĨA (nuxt.config.ts đặt
+# storage.cache driver 'fs'), nên cache SỐNG QUA restart daemon: build xong, restart
+# xong, mà trang vẫn trả bản cũ tới hết TTL. Đã dính đúng bẫy này khi deploy đợt
+# feedback 21/08 — cả 8 thay đổi giao diện đều "không lên".
+#
+# Đường dẫn phải khớp NUXT_CACHE_DIR lúc build (mặc định /tmp/nidqc-nitro-cache).
+echo "==> 5b. Xoá cache HTML đã render (SWR)"
+NITRO_CACHE_DIR="${NUXT_CACHE_DIR:-/tmp/nidqc-nitro-cache}"
+rm -rf "$NITRO_CACHE_DIR"
+echo "   đã xoá $NITRO_CACHE_DIR"
+
 echo "==> 6. Khởi động lại tiến trình Nuxt SSR"
 # Mặc định dùng systemd unit `nidqc-nuxt` (xem docs/deployment/DEPLOYMENT.md).
 # Hạ tầng khác (pm2…) thì đặt SSR_RESTART_CMD, ví dụ:
