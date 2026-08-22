@@ -32,7 +32,7 @@ export const mainNav: NavItem[] = [
   // qua mainNavWithBlocks(). Chép cứng thì admin thêm/sửa/xoá một hoạt động trong
   // Drupal là menu và khối lệch nhau ngay. Giữ lại danh sách này để khi API lỗi menu
   // vẫn có mục con thay vì rỗng.
-  { label: EXPERTISE_LABEL, to: '/#hoat-dong-chuyen-mon', children: [
+  { label: EXPERTISE_LABEL, to: '/hoat-dong-chuyen-mon', children: [
     { label: 'Chỉ đạo tuyến', to: '/hoat-dong-chuyen-mon/chi-dao-tuyen' },
     { label: 'Kiểm nghiệm và giám sát chất lượng thuốc', to: '/hoat-dong-chuyen-mon/kiem-nghiem-va-giam-sat-chat-luong-thuoc' },
     { label: 'Hợp tác quốc tế', to: '/hoat-dong-chuyen-mon/hop-tac-quoc-te' },
@@ -54,7 +54,7 @@ export const mainNav: NavItem[] = [
   //
   // "Cung ứng chất chuẩn" KHÔNG phải một danh mục dịch vụ: nó dẫn sang trang tra
   // cứu chất chuẩn ở hệ thống cũ, nên giữ link ngoài chứ không có danh sách bài.
-  { label: SERVICE_LABEL, to: '/#dich-vu', children: [
+  { label: SERVICE_LABEL, to: '/dich-vu', children: [
     { label: 'Phân tích - Kiểm nghiệm', to: '/dich-vu/phan-tich-kiem-nghiem' },
     { label: 'Đánh giá tương đương sinh học (TĐSH)', to: '/dich-vu/danh-gia-tuong-duong-sinh-hoc-tdsh' },
     { label: 'Đào tạo và tư vấn kỹ thuật', to: '/dich-vu/dao-tao-va-tu-van-ky-thuat' },

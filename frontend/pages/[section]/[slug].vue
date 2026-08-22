@@ -12,9 +12,10 @@ const alias = computed(() => `/${route.params.section}/${route.params.slug}`)
 // Nhãn breadcrumb theo đoạn đầu của đường dẫn. Đoạn lạ thì không hiện cấp nào chứ
 // không đoán bừa một cái tên.
 const SECTION_LABELS = {
-  'dich-vu': { label: 'Dịch vụ', to: '/#dich-vu' },
-  'danh-muc-nang-luc': { label: 'Danh mục năng lực', to: '/#dich-vu' },
-  'hoat-dong-chuyen-mon': { label: 'Hoạt động chuyên môn', to: '/#hoat-dong-chuyen-mon' },
+  'dich-vu': { label: 'Dịch vụ', to: '/dich-vu' },
+  // "Danh mục năng lực" là một khối nằm TRONG trang Dịch vụ, không có trang riêng.
+  'danh-muc-nang-luc': { label: 'Danh mục năng lực', to: '/dich-vu' },
+  'hoat-dong-chuyen-mon': { label: 'Hoạt động chuyên môn', to: '/hoat-dong-chuyen-mon' },
 }
 const section = computed(() => SECTION_LABELS[String(route.params.section)] || null)
 

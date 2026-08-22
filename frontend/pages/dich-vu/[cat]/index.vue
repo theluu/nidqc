@@ -121,7 +121,7 @@ useHead({ link: [{ rel: 'canonical', href: () => reqUrl.href }] })
         <Pagination :current="page" :total="totalPages" @change="changePage" />
 
         <div class="svc__back">
-          <NuxtLink to="/#dich-vu">
+          <NuxtLink to="/dich-vu">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7M19 12H5" /></svg>
             Quay lại Dịch vụ
           </NuxtLink>
