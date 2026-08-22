@@ -53,37 +53,39 @@ echo "==> 3. Drupal: updatedb + import config + cache rebuild"
 # báo lỗi "Không tải được tệp lên" kèm dòng "2 MB limit" (21/08/2026) — đó là
 # upload_max_filesize mặc định của PHP, không phải lỗi của Drupal.
 #
-# Phải đọc ini của FPM: php CLI thường được cấu hình riêng và hay rộng hơn hẳn, xem
+# Phải hỏi chính BINARY FPM (`php-fpm8.3 -i`) chứ không grep php.ini: giá trị thật
+# là php.ini gộp với mọi file trong conf.d, mà bản vá của site nằm ở
+# conf.d/99-nidqc-upload.ini — grep mỗi php.ini sẽ báo động giả 2M ở mọi lần deploy.
+# Cũng không dùng php CLI: CLI là SAPI riêng, cấu hình thường rộng hơn hẳn nên xem
 # CLI rồi kết luận là bỏ sót đúng cái đang gây lỗi.
 #
 # php.ini nằm ngoài git nên chỉ CẢNH BÁO, không tự sửa và không chặn deploy.
 echo "==> 3b. Kiểm tra giới hạn upload của PHP-FPM"
 PHP_MAJOR_MINOR="$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')"
-FPM_UPLOAD=""
-for ini in "/etc/php/$PHP_MAJOR_MINOR/fpm/php.ini" /etc/php/*/fpm/php.ini /etc/php-fpm.d/*.conf /usr/local/etc/php/php.ini; do
-  [ -f "$ini" ] || continue
-  value="$(grep -hE '^[[:space:]]*upload_max_filesize' "$ini" 2>/dev/null | tail -1 | sed 's/.*=[[:space:]]*//')"
-  [ -n "$value" ] && FPM_UPLOAD="$value" && FPM_INI="$ini" && break
-done
+FPM_BIN="$(command -v "php-fpm$PHP_MAJOR_MINOR" || command -v php-fpm || true)"
 
-if [ -z "$FPM_UPLOAD" ]; then
-  echo "   ?  Không tìm thấy php.ini của FPM — kiểm tra tay bằng phpinfo()."
+if [ -z "$FPM_BIN" ]; then
+  echo "   ?  Không tìm thấy binary php-fpm — kiểm tra tay bằng phpinfo()."
 else
-  # Quy về MB để so sánh; giá trị dạng 1G trở lên thì chắc chắn đủ.
+  FPM_UPLOAD="$("$FPM_BIN" -i 2>/dev/null | awk -F' => ' '/^upload_max_filesize/ { print $2; exit }' | tr -d ' ')"
   case "$FPM_UPLOAD" in
-    *G|*g) UPLOAD_MB=99999 ;;
-    *) UPLOAD_MB="$(printf '%s' "$FPM_UPLOAD" | tr -cd '0-9')" ;;
+    '') echo "   ?  Không đọc được upload_max_filesize từ $FPM_BIN." ;;
+    *G|*g) echo "   ✓  upload_max_filesize = $FPM_UPLOAD" ;;
+    *)
+      UPLOAD_MB="$(printf '%s' "$FPM_UPLOAD" | tr -cd '0-9')"
+      if [ "${UPLOAD_MB:-0}" -lt 24 ]; then
+        echo "   ⚠  upload_max_filesize = $FPM_UPLOAD (cần >= 24M)."
+        echo "      Biên tập viên sẽ KHÔNG tải được ảnh lớn hơn mức này."
+        echo "      Sửa /etc/php/$PHP_MAJOR_MINOR/fpm/conf.d/99-nidqc-upload.ini rồi"
+        echo "      'systemctl restart php$PHP_MAJOR_MINOR-fpm':"
+        echo "        upload_max_filesize = 24M"
+        echo "        post_max_size = 32M"
+        echo "        memory_limit = 512M"
+      else
+        echo "   ✓  upload_max_filesize = $FPM_UPLOAD"
+      fi
+      ;;
   esac
-  if [ "${UPLOAD_MB:-0}" -lt 24 ]; then
-    echo "   ⚠  upload_max_filesize = $FPM_UPLOAD trong $FPM_INI (cần >= 24M)."
-    echo "      Biên tập viên sẽ KHÔNG tải được ảnh lớn hơn mức này."
-    echo "      Sửa rồi 'systemctl restart php$PHP_MAJOR_MINOR-fpm':"
-    echo "        upload_max_filesize = 24M"
-    echo "        post_max_size = 32M"
-    echo "        memory_limit = 512M"
-  else
-    echo "   ✓  upload_max_filesize = $FPM_UPLOAD"
-  fi
 fi
 
 echo "==> 4. Build frontend Nuxt (SSR)"
