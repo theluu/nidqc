@@ -158,8 +158,16 @@ useSeoMeta({
             <ul class="hub__list">
               <li v-for="item in block.items" :key="item.id">
                 <NuxtLink :to="item.alias" class="hub__item">
-                  <span class="hub__title">{{ item.title }}</span>
-                  <span class="hub__date">{{ item.date }}</span>
+                  <span class="hub__thumb">
+                    <img v-if="item.image" :src="item.image" :alt="item.title" loading="lazy">
+                  </span>
+                  <span class="hub__body">
+                    <span class="hub__title">{{ item.title }}</span>
+                    <span class="hub__date">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+                      {{ item.date }}
+                    </span>
+                  </span>
                 </NuxtLink>
               </li>
             </ul>
@@ -173,11 +181,16 @@ useSeoMeta({
         </div>
 
         <!-- ===== Dạng 2: DANH SÁCH MỘT CHUYÊN MỤC ===== -->
-        <template v-else>
-          <p v-if="!news || !news.length" class="empty">Không có tin nào trong chuyên mục này.</p>
-          <NewsGrid v-else :items="news" :loading="pending" />
-          <Pagination :current="page" :total="totalPages" @change="changePage" />
-        </template>
+        <!-- Hai cột 3:1 như trang mẫu /noi-bat: danh sách bài bên trái, cột phải
+             gồm menu chuyên mục, video và liên kết web. -->
+        <div v-else class="cat">
+          <div class="cat__main">
+            <p v-if="!news || !news.length" class="empty">Không có tin nào trong chuyên mục này.</p>
+            <NewsGrid v-else :items="news" :loading="pending" />
+            <Pagination :current="page" :total="totalPages" @change="changePage" />
+          </div>
+          <NewsAside :categories="categories || []" :active-cat="cat" @select="selectCat" />
+        </div>
       </div>
     </section>
   </div>
@@ -217,32 +230,43 @@ useSeoMeta({
   margin: 0;
   padding: 0;
 }
-/* Chỉ tiêu đề + ngày, KHÔNG ảnh — đúng cấu trúc trang mẫu: trang tổng hợp để lướt
-   nhanh xem có gì mới, muốn xem ảnh và trích dẫn thì bấm vào chuyên mục. */
+/* Ảnh thu nhỏ + tiêu đề + ngày. Thumbnail cố định 92px khoá tỷ lệ 3:2 nên cả cột
+   ra một dãy ảnh thẳng hàng dù ảnh gốc đủ mọi kích thước, mà vẫn đủ nhỏ để 6 dòng
+   không kéo khối dài hơn khối bên cạnh. */
 .hub__item {
   display: flex;
-  align-items: baseline;
-  gap: 14px;
-  padding: 10px 0;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 0;
   border-bottom: 1px solid #F0F0F0;
   text-decoration: none;
 }
-.hub__item::before {
-  content: '';
-  flex: 0 0 5px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #C7D4E6;
-  transform: translateY(-3px);
+.hub__thumb {
+  flex: 0 0 92px;
+  width: 92px;
+  aspect-ratio: 3 / 2;
+  background: #E8F0F7;
+  overflow: hidden;
 }
-.hub__item:hover .hub__title { color: var(--nidqc-primary); }
-.hub__item:hover::before { background: var(--nidqc-primary); }
-.hub__title {
+.hub__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .3s ease;
+}
+.hub__item:hover .hub__thumb img { transform: scale(1.06); }
+.hub__body {
   flex: 1;
   min-width: 0;
-  font-size: 14.5px;
-  line-height: 21px;
+  display: flex;
+  flex-direction: column;
+}
+.hub__item:hover .hub__title { color: var(--nidqc-primary); }
+.hub__title {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
   color: #212529;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -250,11 +274,23 @@ useSeoMeta({
   overflow: hidden;
 }
 .hub__date {
-  flex: 0 0 auto;
-  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+  font-size: 11.5px;
   color: #888;
   font-variant-numeric: tabular-nums;
 }
+
+/* ===== Trang chuyên mục: danh sách + cột phải ===== */
+.cat {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+  gap: 34px;
+  align-items: start;
+}
+.cat__main { min-width: 0; }
 .hub__all {
   display: inline-flex;
   align-items: center;
@@ -271,13 +307,21 @@ useSeoMeta({
 .hub__all:focus-visible,
 .hub__head-link:focus-visible { outline: 2px solid #1D6AC5; outline-offset: 2px; }
 
+@media (max-width: 1024px) {
+  /* Cột phải xuống dưới danh sách: bóp còn ~200px thì tên chuyên mục và tên cơ quan
+     đều vỡ dòng, đọc còn khó hơn là cuộn thêm. */
+  .cat { grid-template-columns: 1fr; gap: 32px; }
+}
 @media (max-width: 900px) {
   .hub { grid-template-columns: 1fr; gap: 30px; }
 }
 @media (max-width: 420px) {
-  /* Màn hẹp: ngày xuống dòng dưới tiêu đề thay vì bóp tiêu đề còn vài chữ. */
-  .hub__item { flex-wrap: wrap; }
-  .hub__date { flex-basis: 100%; margin-left: 19px; }
+  .hub__thumb { flex-basis: 76px; width: 76px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub__thumb img { transition: none; }
+  .hub__item:hover .hub__thumb img { transform: none; }
 }
 
 /* Bộ lọc */
