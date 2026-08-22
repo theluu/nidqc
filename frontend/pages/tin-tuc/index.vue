@@ -1,9 +1,23 @@
 <script setup>
-// Danh sách Tin tức — PHÂN TRANG PHÍA SERVER (12 tin/trang).
-// Trạng thái nằm trong URL: ?cat=<uuid>&trang=N -> SSR đúng, chia sẻ link được, F5 giữ nguyên.
-// Không tải toàn bộ rồi lọc phía JS (có >700 tin): mỗi trang chỉ nạp 12 tin qua
-// endpoint /api/v1/news/list, trả kèm meta.total nên số trang có ngay trong 1 request.
+// Tin tức & Thông báo — MỘT trang, HAI dạng hiển thị (feedback khách 22/08):
+//
+//   /tin-tuc              -> TRANG TỔNG HỢP, mỗi chuyên mục một khối tiêu đề + danh
+//                            sách tiêu đề bài, giống https://nifc.gov.vn/tin-tuc-new
+//   /tin-tuc?cat=thong-bao -> DANH SÁCH một chuyên mục: ảnh + tiêu đề + ngày + trích
+//                            dẫn, có phân trang, giống https://nifc.gov.vn/noi-bat
+//
+// Gộp vào một route chứ không tách thành hai trang: bộ lọc pill vẫn chuyển qua lại
+// được bằng query string, link cũ /tin-tuc?cat=... không hỏng, và SEO giữ nguyên
+// một canonical cho mỗi chuyên mục.
+//
+// Trạng thái nằm trong URL (?cat=&trang=N) -> SSR đúng, chia sẻ link được, F5 giữ
+// nguyên. Không tải toàn bộ rồi lọc phía JS (có >700 tin).
 const PAGE_SIZE = 12
+// Số tin mỗi khối ở trang tổng hợp. 6 dòng là vừa một khối cao ngang khối bên cạnh
+// trong lưới hai cột; nhiều hơn thì trang dài lê thê mà vẫn không thay được trang
+// danh sách của chính chuyên mục đó.
+const HUB_SIZE = 6
+
 const route = useRoute()
 const listTop = ref(null)
 
@@ -31,14 +45,44 @@ const cat = computed(() => {
   if (requested === 'all') return 'all'
   return categories.value?.find((item) => item.id === requested || categorySlug(item.label) === requested)?.id || 'all'
 })
+const isHub = computed(() => cat.value === 'all')
+const catLabel = computed(() => categories.value?.find((item) => item.id === cat.value)?.label || '')
 
-// 12 tin của trang hiện tại + TỔNG SỐ trong cùng một request (endpoint trả meta.total
-// bằng một câu COUNT). Trước đây tổng số phải đếm bằng cách liệt kê hết 705 tin —
-// 18 request JSON:API, 5.5s khi cache nguội. Key theo (cat, trang) nên đổi trang tự
-// refetch, mỗi trang cache riêng, quay lại tức thì mà vẫn đúng dữ liệu.
-const { data: result, pending } = await useCachedData(
-  () => `news-list-${cat.value}-p${page.value}`,
+// ===== Dạng 1: trang tổng hợp =====
+// Mỗi chuyên mục một request nhỏ (limit 6). Chỉ chạy khi KHÔNG chọn chuyên mục —
+// useCachedData nhận key là hàm nên đổi ?cat= là tự bỏ qua, không tốn 6 request
+// thừa mỗi lần người dùng mở một chuyên mục.
+const { data: hub } = await useCachedData(
+  () => (isHub.value ? 'news-hub' : 'news-hub--bo-qua'),
   async () => {
+    // Đang mở một chuyên mục thì khỏi gọi 6 request cho trang tổng hợp.
+    if (!isHub.value) return []
+    const list = categories.value ?? []
+    const results = await Promise.all(
+      list.map((c) => fetchNewsList({ cat: c.label, limit: HUB_SIZE })),
+    )
+    return list
+      .map((c, i) => ({
+        label: c.label,
+        to: `/tin-tuc?cat=${categorySlug(c.label)}`,
+        total: c.count,
+        items: results[i].data.map(mapItem),
+      }))
+      // Chuyên mục rỗng thì bỏ hẳn khối: một tiêu đề với khoảng trắng bên dưới
+      // trông như trang lỗi.
+      .filter((block) => block.items.length > 0)
+  },
+)
+
+// ===== Dạng 2: danh sách một chuyên mục =====
+// 12 tin của trang hiện tại + TỔNG SỐ trong cùng một request (endpoint trả meta.total
+// bằng một câu COUNT). Key theo (cat, trang) nên đổi trang tự refetch, mỗi trang
+// cache riêng, quay lại tức thì mà vẫn đúng dữ liệu.
+const { data: result, pending } = await useCachedData(
+  () => (isHub.value ? 'news-list--bo-qua' : `news-list-${cat.value}-p${page.value}`),
+  async () => {
+    // Trang tổng hợp không dùng danh sách phân trang này.
+    if (isHub.value) return { items: [], total: 0 }
     const res = await fetchNewsList({
       cat: cat.value,
       page: page.value - 1,
@@ -65,23 +109,36 @@ const changePage = (n) => {
   }
 }
 
+// Tiêu đề trang bám theo chuyên mục đang xem — trang mẫu /noi-bat cũng lấy chính
+// tên chuyên mục làm tiêu đề chứ không dùng một tiêu đề chung.
+const pageTitle = computed(() => (isHub.value ? 'Tin tức & Thông báo' : catLabel.value))
+const pageDesc = computed(() => (isHub.value
+  ? 'Thông báo, tin hoạt động, mua sắm - đấu thầu và các sự kiện của Viện Kiểm nghiệm thuốc Trung ương.'
+  : `Các bài viết thuộc chuyên mục ${catLabel.value} của Viện Kiểm nghiệm thuốc Trung ương.`))
+
 useSeoMeta({
-  title: 'Tin tức & Thông báo — NIDQC',
-  description: 'Thông báo, tin hoạt động, mua sắm - đấu thầu, tuyển dụng và các sự kiện của Viện Kiểm nghiệm thuốc Trung ương.',
-  ogTitle: 'Tin tức & Thông báo — NIDQC',
-  ogDescription: 'Thông báo, tin hoạt động, mua sắm - đấu thầu, tuyển dụng và các sự kiện của Viện Kiểm nghiệm thuốc Trung ương.',
+  title: () => `${pageTitle.value} — NIDQC`,
+  description: () => pageDesc.value,
+  ogTitle: () => `${pageTitle.value} — NIDQC`,
+  ogDescription: () => pageDesc.value,
 })
 </script>
 
 <template>
   <div>
-    <PageBand title="Tin tức & Thông báo" description="Thông báo, tin hoạt động, mua sắm - đấu thầu và các sự kiện của Viện Kiểm nghiệm thuốc Trung ương." />
+    <!-- Chuyên mục nằm sau "Tin tức & Thông báo" trên breadcrumb, không thay thế nó:
+         người đọc phải thấy đường quay về trang tổng hợp. -->
+    <PageBand
+      :title="pageTitle"
+      :description="pageDesc"
+      :crumbs="isHub ? [] : ['Tin tức & Thông báo']"
+    />
 
     <section class="news">
       <div ref="listTop" class="news__wrap">
         <!-- Bộ lọc chuyên mục dạng pill -->
         <div class="filters">
-          <button class="pill" :class="{ 'is-active': cat === 'all' }" @click="selectCat('all')">Tất cả</button>
+          <button class="pill" :class="{ 'is-active': isHub }" @click="selectCat('all')">Tất cả</button>
           <button
             v-for="c in categories" :key="c.id"
             class="pill" :class="{ 'is-active': cat === c.id }"
@@ -89,11 +146,38 @@ useSeoMeta({
           >{{ c.label }}</button>
         </div>
 
-        <p v-if="!news || !news.length" class="empty">Không có tin nào trong chuyên mục này.</p>
+        <!-- ===== Dạng 1: TRANG TỔNG HỢP ===== -->
+        <div v-if="isHub" class="hub">
+          <section v-for="block in hub || []" :key="block.label" class="hub__block">
+            <div class="nidqc-heading">
+              <span class="nidqc-heading__bar"></span>
+              <h2 class="nidqc-heading__text">
+                <NuxtLink :to="block.to" class="hub__head-link">{{ block.label }}</NuxtLink>
+              </h2>
+            </div>
+            <ul class="hub__list">
+              <li v-for="item in block.items" :key="item.id">
+                <NuxtLink :to="item.alias" class="hub__item">
+                  <span class="hub__title">{{ item.title }}</span>
+                  <span class="hub__date">{{ item.date }}</span>
+                </NuxtLink>
+              </li>
+            </ul>
+            <NuxtLink :to="block.to" class="hub__all">
+              Xem tất cả
+              <span v-if="block.total" class="hub__count">({{ block.total }})</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </NuxtLink>
+          </section>
+          <p v-if="hub && !hub.length" class="empty">Chưa có tin nào được đăng.</p>
+        </div>
 
-        <NewsGrid v-else :items="news" :loading="pending" />
-
-        <Pagination :current="page" :total="totalPages" @change="changePage" />
+        <!-- ===== Dạng 2: DANH SÁCH MỘT CHUYÊN MỤC ===== -->
+        <template v-else>
+          <p v-if="!news || !news.length" class="empty">Không có tin nào trong chuyên mục này.</p>
+          <NewsGrid v-else :items="news" :loading="pending" />
+          <Pagination :current="page" :total="totalPages" @change="changePage" />
+        </template>
       </div>
     </section>
   </div>
@@ -109,6 +193,91 @@ useSeoMeta({
   margin: 0 auto;
   padding: 0 24px;
   scroll-margin-top: 80px;
+}
+
+/* ===== Trang tổng hợp: mỗi chuyên mục một khối ===== */
+/* Hai cột trên màn rộng: 6 chuyên mục xếp dọc một cột thì trang dài gấp đôi mà
+   nửa bên phải bỏ trống. align-items:start để khối ít tin không bị kéo cao bằng
+   khối bên cạnh. */
+.hub {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 34px 40px;
+  align-items: start;
+}
+.hub__block { min-width: 0; }
+.hub__head-link {
+  color: inherit;
+  text-decoration: none;
+}
+.hub__head-link:hover { color: var(--nidqc-primary); }
+
+.hub__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+/* Chỉ tiêu đề + ngày, KHÔNG ảnh — đúng cấu trúc trang mẫu: trang tổng hợp để lướt
+   nhanh xem có gì mới, muốn xem ảnh và trích dẫn thì bấm vào chuyên mục. */
+.hub__item {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid #F0F0F0;
+  text-decoration: none;
+}
+.hub__item::before {
+  content: '';
+  flex: 0 0 5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #C7D4E6;
+  transform: translateY(-3px);
+}
+.hub__item:hover .hub__title { color: var(--nidqc-primary); }
+.hub__item:hover::before { background: var(--nidqc-primary); }
+.hub__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 14.5px;
+  line-height: 21px;
+  color: #212529;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hub__date {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: #888;
+  font-variant-numeric: tabular-nums;
+}
+.hub__all {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 14px;
+  color: var(--nidqc-primary);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.hub__all:hover { text-decoration: underline; }
+.hub__count { color: #888; font-weight: 500; }
+.hub__item:focus-visible,
+.hub__all:focus-visible,
+.hub__head-link:focus-visible { outline: 2px solid #1D6AC5; outline-offset: 2px; }
+
+@media (max-width: 900px) {
+  .hub { grid-template-columns: 1fr; gap: 30px; }
+}
+@media (max-width: 420px) {
+  /* Màn hẹp: ngày xuống dòng dưới tiêu đề thay vì bóp tiêu đề còn vài chữ. */
+  .hub__item { flex-wrap: wrap; }
+  .hub__date { flex-basis: 100%; margin-left: 19px; }
 }
 
 /* Bộ lọc */
@@ -140,8 +309,13 @@ useSeoMeta({
 }
 
 .empty {
+  padding: 40px 0;
+  text-align: center;
   color: #777;
-  padding: 24px 0;
+  font-size: 15px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .pill { transition: none; }
+}
 </style>
