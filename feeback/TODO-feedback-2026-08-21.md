@@ -204,6 +204,47 @@ một chút tốc độ tải trang đầu).
 
 ---
 
+## 📌 CHỐT NGÀY 22/08 — đã deploy lên https://nidqc.themeshub.net
+
+Khách chốt: **giữ 6 tab** · **"Tin mới" để tự động theo thời gian** · **"Tra cứu chất chuẩn" → "Cung ứng chất chuẩn"**. Cả ba đã xử lý xong.
+
+**16/17 việc đã xong và đã kiểm chứng trên prod.** Commit: `4a4100f`, `9e95831`, `9a630c0`.
+
+### Còn đúng 1 việc — cần anh chạy tay
+
+`systemctl restart php8.3-fpm` bị chặn quyền nên tôi không chạy được. File cấu hình
+**đã đặt sẵn** ở `/etc/php/8.3/fpm/conf.d/99-nidqc-upload.ini` (24M/32M, memory 512M)
+và `php-fpm8.3 -t` đã báo hợp lệ. **Chưa restart thì lỗi upload vẫn còn.**
+
+```
+ssh root@45.118.145.203 'systemctl restart php8.3-fpm && systemctl is-active php8.3-fpm'
+```
+
+Gỡ bỏ nếu cần: xoá file `99-nidqc-upload.ini` rồi restart lại. Không đụng PHP 8.1
+(site khác trên máy này dùng) và không sửa `php.ini` gốc.
+
+### Ba dữ liệu footer còn TRỐNG — cần khách cung cấp
+
+Rà `<footer>` trên prod thấy thiếu, đều là dữ liệu chỉ khách mới có. Nhập tại
+`/admin/config/nidqc/settings`:
+
+| Mục | Tình trạng |
+|---|---|
+| Cơ sở 1 + Cơ sở 2 + link bản đồ | ✅ đủ |
+| Tel · Email | ✅ có |
+| **Fax** | ❌ trống (bảng Word của khách có dòng Fax) |
+| **4 đầu mối khách hàng** (Kiểm nghiệm · Đào tạo · Hiệu chuẩn thiết bị · Cung ứng chất chuẩn — mỗi mục email + hotline) | ❌ trống — footer đang hiện câu "đang được cập nhật" |
+| **Mạng xã hội** (YouTube · Facebook · Zalo · TikTok) | ❌ chưa có URL nào → cả cụm icon không hiện |
+| Bản quyền © 2026 | ✅ đúng |
+
+### Một chỗ cần khách duyệt lại câu chữ
+
+Mục năng lực thứ 6 "DANH MỤC CHỨNG NHẬN HỆ THỐNG QUẢN LÝ" là mục MỚI, khách chỉ cho
+tên chứ không cho mô tả. Tôi tạm đặt *"Danh mục các chứng nhận hệ thống quản lý Viện
+thực hiện đánh giá và cấp."* — **cần biên tập viên sửa lại cho đúng phạm vi thật.**
+
+---
+
 ## Thứ tự làm (2 ngày)
 
 **22/08 sáng:** việc 9, 2, 5, 8 (sửa nhanh ~1h) → việc 1 (FeaturedHero) → việc 6 + 7 (dùng chung 1 khuôn thẻ list).
