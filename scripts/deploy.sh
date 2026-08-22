@@ -53,40 +53,53 @@ echo "==> 3. Drupal: updatedb + import config + cache rebuild"
 # báo lỗi "Không tải được tệp lên" kèm dòng "2 MB limit" (21/08/2026) — đó là
 # upload_max_filesize mặc định của PHP, không phải lỗi của Drupal.
 #
-# Phải hỏi chính BINARY FPM (`php-fpm8.3 -i`) chứ không grep php.ini: giá trị thật
-# là php.ini gộp với mọi file trong conf.d, mà bản vá của site nằm ở
-# conf.d/99-nidqc-upload.ini — grep mỗi php.ini sẽ báo động giả 2M ở mọi lần deploy.
-# Cũng không dùng php CLI: CLI là SAPI riêng, cấu hình thường rộng hơn hẳn nên xem
-# CLI rồi kết luận là bỏ sót đúng cái đang gây lỗi.
+# Hỏi chính BINARY FPM chứ không grep php.ini: giá trị thật là php.ini gộp với mọi
+# file trong conf.d, mà bản vá của site nằm ở conf.d/99-nidqc-upload.ini — grep mỗi
+# php.ini sẽ báo động giả 2M ở mọi lần deploy. Cũng không dùng php CLI: CLI là SAPI
+# riêng, cấu hình thường rộng hơn hẳn nên xem CLI là bỏ sót đúng cái đang gây lỗi.
 #
-# php.ini nằm ngoài git nên chỉ CẢNH BÁO, không tự sửa và không chặn deploy.
-echo "==> 3b. Kiểm tra giới hạn upload của PHP-FPM"
-PHP_MAJOR_MINOR="$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')"
-FPM_BIN="$(command -v "php-fpm$PHP_MAJOR_MINOR" || command -v php-fpm || true)"
+# Hứng trọn output vào biến RỒI mới lọc, không nối pipe vào awk/grep có `exit`/`-m1`:
+# lệnh lọc đóng pipe sớm làm php-fpm dính SIGPIPE, gặp `set -o pipefail` là cả script
+# chết ngay giữa deploy — và chết KHÔNG ổn định, tuỳ output có lọt vừa pipe buffer
+# hay không. Đã dính đúng lỗi này một lần.
+#
+# Cả khối gọi qua `|| true`: đây là bước CHẨN ĐOÁN, hỏng nó không được phép chặn
+# deploy. php.ini nằm ngoài git nên chỉ cảnh báo chứ không tự sửa.
+check_fpm_upload_limit() {
+  local php_mm fpm_bin fpm_info value mb
+  php_mm="$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')"
+  fpm_bin="$(command -v "php-fpm$php_mm" || command -v php-fpm || true)"
 
-if [ -z "$FPM_BIN" ]; then
-  echo "   ?  Không tìm thấy binary php-fpm — kiểm tra tay bằng phpinfo()."
-else
-  FPM_UPLOAD="$("$FPM_BIN" -i 2>/dev/null | awk -F' => ' '/^upload_max_filesize/ { print $2; exit }' | tr -d ' ')"
-  case "$FPM_UPLOAD" in
-    '') echo "   ?  Không đọc được upload_max_filesize từ $FPM_BIN." ;;
-    *G|*g) echo "   ✓  upload_max_filesize = $FPM_UPLOAD" ;;
+  if [ -z "$fpm_bin" ]; then
+    echo "   ?  Không tìm thấy binary php-fpm — kiểm tra tay bằng phpinfo()."
+    return 0
+  fi
+
+  fpm_info="$("$fpm_bin" -i 2>/dev/null || true)"
+  value="$(printf '%s\n' "$fpm_info" | sed -n 's/^upload_max_filesize *=> *\([^ ]*\).*/\1/p' | tail -1)"
+
+  case "$value" in
+    '')    echo "   ?  Không đọc được upload_max_filesize từ $fpm_bin." ;;
+    *G|*g) echo "   ✓  upload_max_filesize = $value" ;;
     *)
-      UPLOAD_MB="$(printf '%s' "$FPM_UPLOAD" | tr -cd '0-9')"
-      if [ "${UPLOAD_MB:-0}" -lt 24 ]; then
-        echo "   ⚠  upload_max_filesize = $FPM_UPLOAD (cần >= 24M)."
+      mb="$(printf '%s' "$value" | tr -cd '0-9')"
+      if [ "${mb:-0}" -lt 24 ]; then
+        echo "   ⚠  upload_max_filesize = $value (cần >= 24M)."
         echo "      Biên tập viên sẽ KHÔNG tải được ảnh lớn hơn mức này."
-        echo "      Sửa /etc/php/$PHP_MAJOR_MINOR/fpm/conf.d/99-nidqc-upload.ini rồi"
-        echo "      'systemctl restart php$PHP_MAJOR_MINOR-fpm':"
+        echo "      Sửa /etc/php/$php_mm/fpm/conf.d/99-nidqc-upload.ini rồi"
+        echo "      'systemctl restart php$php_mm-fpm':"
         echo "        upload_max_filesize = 24M"
         echo "        post_max_size = 32M"
         echo "        memory_limit = 512M"
       else
-        echo "   ✓  upload_max_filesize = $FPM_UPLOAD"
+        echo "   ✓  upload_max_filesize = $value"
       fi
       ;;
   esac
-fi
+}
+
+echo "==> 3b. Kiểm tra giới hạn upload của PHP-FPM"
+check_fpm_upload_limit || true
 
 echo "==> 4. Build frontend Nuxt (SSR)"
 cd frontend
