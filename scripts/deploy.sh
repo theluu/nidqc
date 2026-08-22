@@ -17,6 +17,18 @@ DRUSH="${DRUSH:-vendor/bin/drush}"
 SEED=0
 [ "${1:-}" = "--seed" ] && SEED=1
 
+# TOÀN BỘ thân script nằm trong một hàm, gọi ở DÒNG CUỐI CÙNG.
+#
+# Vì sao: bước 1 chạy `git pull`, tức là script TỰ GHI ĐÈ LÊN CHÍNH NÓ trong lúc
+# đang chạy. Bash đọc file theo byte offset chứ không nạp hết một lần, nên sau khi
+# nội dung đổi nó đọc tiếp từ offset cũ trên file MỚI — rơi vào giữa một câu lệnh
+# và chết ngang, thường là ngay trước bước build. Bọc trong hàm thì bash buộc phải
+# đọc tới dấu } đóng trước khi thực thi dòng nào, `git pull` đổi file cũng không
+# ảnh hưởng lần chạy này nữa (lần chạy sau mới dùng bản mới).
+#
+# Đã dính đúng lỗi này: deploy dừng im lặng ở bước 3b, tưởng lỗi kiểm tra php-fpm.
+main() {
+
 echo "==> 1. Cập nhật code từ git"
 git pull --ff-only
 
@@ -139,3 +151,6 @@ echo "   \$ $SSR_RESTART_CMD"
 eval "$SSR_RESTART_CMD"
 
 echo "==> Xong. Nội dung do prod quản lý (admin /admin/content), không đến từ git."
+}
+
+main "$@"
