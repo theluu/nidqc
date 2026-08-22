@@ -7,6 +7,7 @@ import { ref, computed, nextTick, provide, onMounted, onUnmounted } from 'vue';
  */
 
 const now = ref('');
+const nowWeekday = ref('');
 const openMenu = ref(null);
 const mobileOpen = ref(false);
 const navBottom = ref(50);
@@ -32,10 +33,14 @@ const { data: tickerNews } = await useCachedData('layout-ticker', async () => {
 let timer;
 
 const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+// Thứ tách RIÊNG khỏi ngày/giờ: trên điện thoại hẹp chỉ bỏ chữ "Thứ Bảy," để vừa
+// một dòng, phần ngày giờ — thứ người dùng thật sự cần — vẫn còn (trước đây cả cụm
+// bị ẩn từ 760px trở xuống).
 function tick() {
   const d = new Date();
   const p = (n) => String(n).padStart(2, '0');
-  now.value = `${days[d.getDay()]}, ${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} · ${p(d.getHours())}:${p(d.getMinutes())}`;
+  nowWeekday.value = days[d.getDay()];
+  now.value = `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} · ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
 /**
@@ -235,6 +240,7 @@ const footerLinks = [
              ngay trong HTML là hydrate lệch. -->
         <span v-if="now" class="nidqc-topbar__time">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          <span class="nidqc-topbar__dow">{{ nowWeekday }},</span>
           {{ now }}
         </span>
 

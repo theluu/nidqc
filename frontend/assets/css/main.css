@@ -327,13 +327,24 @@ body { margin: 0; }
   .nidqc-nav-search-form button { padding: 0 14px; }
 }
 
-/* Máy hẹp: bỏ ngày/giờ trước (thông tin trang trí), rồi tới mã ngôn ngữ, giữ cờ. */
-@media (max-width: 760px) {
-  .nidqc-topbar__time { display: none; }
+/* Máy hẹp: GIỮ ngày/giờ, chỉ cắt dần những phần phụ quanh nó.
+   Thứ tự hy sinh: chữ "Thứ Bảy," -> mã ngôn ngữ VI/EN (còn lại lá cờ).
+   Trước đây cả cụm ngày/giờ bị ẩn từ 760px, tức là đúng nhóm người dùng điện thoại
+   thì không xem được ngày — mà đây là site cơ quan, ngày/giờ hệ thống là thông tin
+   người ta hay nhìn. */
+@media (max-width: 640px) {
+  .nidqc-topbar__inner { gap: 12px; }
+  .nidqc-topbar__time { font-size: 12px; }
+  .nidqc-topbar__dow { display: none; }
 }
 @media (max-width: 480px) {
-  .nidqc-topbar__inner { padding: 6px 16px; gap: 12px; }
+  .nidqc-topbar__inner { padding: 6px 16px; gap: 10px; }
   .nidqc-topbar__code { display: none; }
+}
+/* Máy rất hẹp (~320px): bỏ nốt icon lịch, chừa chỗ cho chính con số. */
+@media (max-width: 360px) {
+  .nidqc-topbar__time { font-size: 11.5px; gap: 5px; }
+  .nidqc-topbar__time > svg { display: none; }
 }
 
 /* ===== Google Translate: ẩn banner/tooltip mặc định, tránh xô layout ===== */
