@@ -31,6 +31,7 @@ final class VisitCounter {
   public function __construct(
     private readonly Connection $database,
     private readonly TimeInterface $time,
+    private readonly VisitBaseline $baseline,
   ) {
   }
 
@@ -67,12 +68,34 @@ final class VisitCounter {
   }
 
   /**
-   * Số lượt hôm nay / tháng này / năm nay / tổng cộng.
+   * Số lượt hôm nay / tháng này / năm nay / tổng cộng để HIỆN RA TRANG.
+   *
+   * = số đếm thật + nền ước lượng cho quãng trước khi có bộ đếm (VisitBaseline).
+   * Phần thật luôn được cộng nguyên vào, nên mỗi lượt mới vẫn làm con số tăng
+   * đúng 1; tắt nền (baseline.enabled: false) là về đúng số thật.
    *
    * @return array<string, int>
    *   Mảng có các khoá today, month, year, total.
    */
   public function stats(): array {
+    $real = $this->realStats();
+    $baseline = $this->baseline->stats();
+
+    $stats = [];
+    foreach ($real as $key => $value) {
+      $stats[$key] = $value + ($baseline[$key] ?? 0);
+    }
+
+    return $stats;
+  }
+
+  /**
+   * Số lượt THẬT trong bảng, không cộng nền — dùng để kiểm tra/đối chiếu.
+   *
+   * @return array<string, int>
+   *   Mảng có các khoá today, month, year, total.
+   */
+  public function realStats(): array {
     $today = $this->today();
 
     return [

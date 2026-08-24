@@ -1,11 +1,19 @@
 services:
+  nidqc_online.baseline:
+    class: Drupal\nidqc_online\Service\VisitBaseline
+    arguments:
+      - '@config.factory'
+      - '@datetime.time'
+      - '@cache.default'
   nidqc_online.counter:
     class: Drupal\nidqc_online\Service\OnlineCounter
     arguments:
       - '@database'
       - '@datetime.time'
+      - '@nidqc_online.baseline'
   nidqc_online.visits:
     class: Drupal\nidqc_online\Service\VisitCounter
     arguments:
       - '@database'
       - '@datetime.time'
+      - '@nidqc_online.baseline'

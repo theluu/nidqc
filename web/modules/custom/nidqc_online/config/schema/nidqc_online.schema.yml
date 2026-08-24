@@ -1,0 +1,26 @@
+nidqc_online.settings:
+  type: config_object
+  label: 'Cấu hình bộ đếm truy cập NIDQC'
+  mapping:
+    baseline:
+      type: mapping
+      label: 'Nền thống kê truy cập'
+      mapping:
+        enabled:
+          type: boolean
+          label: 'Bật nền'
+        start_date:
+          type: string
+          label: 'Ngày bắt đầu tính nền (YYYY-MM-DD)'
+        daily_average:
+          type: integer
+          label: 'Trung bình lượt/ngày'
+        weekend_factor:
+          type: float
+          label: 'Hệ số cuối tuần'
+        jitter:
+          type: float
+          label: 'Biên độ dao động theo ngày'
+        growth_per_year:
+          type: float
+          label: 'Mức tăng mỗi năm'
