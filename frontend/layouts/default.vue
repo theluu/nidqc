@@ -211,13 +211,6 @@ onUnmounted(() => {
 // cứng trong useMainNav.ts, trùng khớp chỉ vì có người nhớ sửa cả hai chỗ.
 const nav = computed(() => mainNavWithBlocks(homeBlocks.value));
 
-const footerLinks = [
-  { label: 'Giới thiệu chung', to: '/gioi-thieu-chung' },
-  { label: 'Tin tức & Thông báo', to: '/tin-tuc' },
-  { label: 'Văn bản - Tài liệu', to: '/van-ban-tai-lieu' },
-  { label: 'Câu hỏi thường gặp', to: '/faq' },
-  { label: 'Liên hệ & hỗ trợ', to: '/lien-he' },
-];
 </script>
 
 <template>
@@ -394,6 +387,11 @@ const footerLinks = [
           </ul>
         </div>
 
+        <!-- Cột giữa CHỈ dành cho đầu mối liên hệ theo dịch vụ (feedback 24/08: "cột ở
+             giữa để anh cho các thông tin cụ thể dành cho khách hàng"). Dải link nhanh
+             Giới thiệu chung / Tin tức / Văn bản... đã bỏ theo đúng yêu cầu đó — các
+             mục này vẫn còn ở menu chính và ở khối sơ đồ menu ngay phía trên chân trang.
+             Nội dung bốn nhóm dịch vụ nhập ở /admin/config/nidqc/settings. -->
         <div>
           <h4 class="nidqc-footer__label">Thông tin dành cho khách hàng</h4>
           <ol v-if="customerServices.length" class="nidqc-footer__services">
@@ -407,9 +405,6 @@ const footerLinks = [
             Đầu mối liên hệ theo từng dịch vụ đang được cập nhật. Trong thời gian này,
             xin liên hệ qua số điện thoại và email chung của Viện.
           </p>
-          <div class="nidqc-footer__quick">
-            <NuxtLink v-for="(l, i) in footerLinks" :key="i" :to="l.to">{{ l.label }}</NuxtLink>
-          </div>
         </div>
 
         <div>

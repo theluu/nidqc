@@ -258,13 +258,18 @@ function formatDate(iso) {
 }
 .lib__title-wrap { display: flex; align-items: center; gap: 11px; min-width: 0; }
 .lib__bar { width: 6px; height: 26px; background: #0F3093; flex: 0 0 6px; }
+/* 21px = đúng cỡ .nidqc-heading__text của "Liên kết web" và "Thống kê truy cập":
+   cột đã hẹp lại nên 24px làm tiêu đề xuống hai dòng, đường kẻ chân tiêu đề tụt
+   thấp hơn hai cột bên và cả hàng trông lệch. */
 .lib__title {
-  font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 24px;
+  font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 21px;
   letter-spacing: 0.3px; text-transform: uppercase; color: #212529; margin: 0;
 }
 .lib__nav { display: flex; gap: 8px; flex: 0 0 auto; }
+/* 28px: hai nút mũi tên là phần tử cao nhất trong .lib__head, để 34px thì đường kẻ
+   chân tiêu đề cột này tụt thấp hơn hai cột bên cạnh 7px. */
 .lib__arrow {
-  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
   background: #fff; border: 1px solid #CCCCCC; color: #0F3093; cursor: pointer;
   transition: background .15s ease, color .15s ease, border-color .15s ease;
 }
@@ -286,11 +291,14 @@ function formatDate(iso) {
 .lib__slide.is-active { opacity: 1; visibility: visible; }
 .lib__slide:focus-visible { outline: 2px solid #1D6AC5; outline-offset: -2px; }
 
-/* 250px thay vì 300px: khối này quyết định chiều cao cả section ba cột, mà hai cột
-   bên cạnh (Liên kết web, Thống kê truy cập) chỉ cao ~300px. Hạ xuống cho ba cột
-   gần bằng nhau (feedback 21/08 "Bố trí chiều cao các mục cho hợp lý"). */
+/* Khối này quyết định chiều cao cả section ba cột, mà hai cột bên cạnh chỉ cao
+   ~340px (Liên kết web) và ~270px (Thống kê truy cập). 250px vẫn khiến cột thư viện
+   vượt hẳn lên nên hạ tiếp còn 180px (feedback 24/08 "căn nhỏ cột phần thư viện,
+   hình ảnh để cân đối với cột liên kết web và thống kê truy cập").
+   Từ 1100px trở xuống khối chiếm trọn một hàng (main.css), lúc đó không còn phải
+   so chiều cao với ai nên các breakpoint bên dưới vẫn để ảnh cao hơn. */
 .lib__media {
-  position: relative; display: block; width: 100%; height: 250px;
+  position: relative; display: block; width: 100%; height: 180px;
   overflow: hidden; background: #0D2870;
 }
 .lib__media img,
@@ -303,31 +311,33 @@ function formatDate(iso) {
   font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; padding: 5px 10px;
 }
 .lib__play {
-  position: absolute; inset: 0; margin: auto; width: 60px; height: 60px;
+  position: absolute; inset: 0; margin: auto; width: 52px; height: 52px;
   display: flex; align-items: center; justify-content: center;
   background: rgba(15, 48, 147, 0.85); color: #fff; border-radius: 50%;
   transition: background .2s ease, transform .2s ease;
 }
 .lib__slide:hover .lib__play { background: #0F3093; transform: scale(1.08); }
 
-.lib__body { display: block; padding: 18px 20px 14px; }
+.lib__body { display: block; padding: 14px 18px 12px; }
 .lib__date {
   display: flex; align-items: center; gap: 7px;
   color: #777; font-size: 12.5px; margin-bottom: 8px;
 }
 .lib__name {
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-  font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 19px; line-height: 26px; color: #212529;
+  font-family: 'Lexend', sans-serif; font-weight: 700; font-size: 17px; line-height: 23px; color: #212529;
 }
 .lib__slide:hover .lib__name { color: #0F3093; }
 
 .lib__thumbs {
-  display: flex; gap: 10px; padding: 3px 20px 18px;
+  display: flex; gap: 10px; padding: 3px 18px 16px;
   overflow-x: auto; scrollbar-width: none;
 }
 .lib__thumbs::-webkit-scrollbar { display: none; }
+/* Chiều cao CỐ ĐỊNH thay cho aspect-ratio: thumbnail giãn theo bề ngang cột, nên
+   aspect-ratio làm cả dải cao thêm mỗi khi màn rộng ra và kéo dài cột thư viện. */
 .lib__thumb {
-  position: relative; flex: 1 1 0; min-width: 84px; aspect-ratio: 16 / 10;
+  position: relative; flex: 1 1 0; min-width: 84px; height: 58px;
   padding: 0; border: 0; background: #E8F0F7; cursor: pointer; overflow: hidden;
   box-shadow: inset 0 0 0 2px transparent; transition: box-shadow .25s ease;
 }
@@ -402,10 +412,20 @@ function formatDate(iso) {
 .viewer__thumb:hover { opacity: .85; }
 .viewer__thumb.is-active { opacity: 1; box-shadow: inset 0 0 0 2px #fff; }
 
-@media (max-width: 900px) {
-  .lib__media { height: 230px; }
+/* Khoảng 1101-1279px vẫn là ba cột nhưng cột thư viện chỉ còn ~414px: 21px làm tiêu
+   đề xuống hai dòng, đường kẻ chân tiêu đề lệch hẳn so với hai cột bên. 19px vừa đủ
+   một dòng ở 1101px — chỗ hẹp nhất còn giữ ba cột. */
+@media (max-width: 1279px) and (min-width: 1101px) {
   .lib__title { font-size: 19px; }
-  .lib__name { font-size: 17px; line-height: 23px; }
+}
+
+/* Từ 1100px trở xuống thư viện chiếm trọn một hàng nên ảnh được phép cao trở lại. */
+@media (max-width: 1100px) {
+  .lib__media { height: 230px; }
+  .lib__thumb { height: 66px; }
+}
+@media (max-width: 900px) {
+  .lib__title { font-size: 19px; }
   .lib__thumb { flex: 0 0 92px; }
 }
 @media (max-width: 520px) {

@@ -80,3 +80,6 @@ Thumbs.db
 /frontend/.nuxt/
 /frontend/.output/
 /frontend/.data/
+
+# Ảnh chụp/snapshot do Playwright MCP sinh ra khi kiểm thử giao diện
+/.playwright-mcp/

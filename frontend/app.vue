@@ -28,7 +28,7 @@ useHead({
         description: 'Cơ quan khoa học kỹ thuật đầu ngành về kiểm tra, giám sát chất lượng thuốc, nguyên liệu làm thuốc và mỹ phẩm.',
         address: {
           '@type': 'PostalAddress',
-          streetAddress: '48 Hai Bà Trưng, Tràng Tiền, Hoàn Kiếm',
+          streetAddress: '48 Hai Bà Trưng, phường Cửa Nam',
           addressLocality: 'Hà Nội',
           addressCountry: 'VN',
         },

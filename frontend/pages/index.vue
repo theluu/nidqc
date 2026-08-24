@@ -260,7 +260,7 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
 
     <!-- ===== 7. THƯ VIỆN · LIÊN KẾT WEB · THỐNG KÊ TRUY CẬP (feedback 11) ===== -->
     <section class="nidqc-section" style="background:#fff;border-top:1px solid #ECECEC;">
-      <div class="nidqc-three-col" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr) minmax(0,0.85fr);gap:28px;">
+      <div class="nidqc-three-col" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,0.9fr);gap:28px;">
         <div class="nidqc-col">
           <MediaLibrary v-if="mediaPosts && mediaPosts.length" :posts="mediaPosts" />
         </div>
