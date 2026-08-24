@@ -43,7 +43,7 @@ final class VisitBaseline {
   private const DEFAULTS = [
     'enabled' => TRUE,
     'start_date' => '2016-01-01',
-    'daily_average' => 810,
+    'daily_average' => 25,
     'weekend_factor' => 0.55,
     'jitter' => 0.18,
     'growth_per_year' => 0.06,

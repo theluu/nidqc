@@ -12,7 +12,7 @@ baseline:
   # Mốc bắt đầu tính nền — lấy theo thời điểm trang web cũ của Viện đi vào hoạt động.
   start_date: '2016-01-01'
   # Trung bình lượt/ngày ở năm start_date (đã gộp cả ngày thường và cuối tuần).
-  daily_average: 810
+  daily_average: 25
   # Cuối tuần vắng hơn ngày thường bao nhiêu (0.55 = còn 55%).
   weekend_factor: 0.55
   # Biên độ dao động giữa các ngày (0.18 = ±18%), xác định theo ngày nên không nhảy số.
