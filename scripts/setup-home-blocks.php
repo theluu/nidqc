@@ -142,7 +142,7 @@ foreach ($services as $i => $t) {
 
 $offices = [
   ['Cơ sở 1', '48 Hai Bà Trưng, phường Cửa Nam, Hà Nội', '(024) 3825 5075', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.185366346867!2d105.84769501476318!3d21.025267786000292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab949db87b29%3A0xeab602afd22b8090!2zNDggSGFpIELDoCBUcsawbmcsIFRyw6BuZyBUaeG7gW4sIEhvw6BuIEtp4bq_bSwgSMOgIE7hu5lpLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1577957514119!5m2!1svi!2s'],
-  ['Cơ sở 2', 'Phường Hoàng Liệt, Hà Nội', '(024) 3736 4738', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3725.941679701607!2d105.8298021147619!3d20.954857086038405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ada9a6796f99%3A0xebd36f00bc31e2f4!2zVmnhu4duIEtp4buDbSBuZ2hp4buHbSB0aHXhu5FjIFRydW5nIMawxqFuZyAoQ8ahIHPhu58gSUkp!5e0!3m2!1svi!2s!4v1577958314927!5m2!1svi!2s'],
+  ['Cơ sở 2', 'Phường Hoàng Liệt, Tp. Hà Nội', '(024) 3736 4738', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3725.941679701607!2d105.8298021147619!3d20.954857086038405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ada9a6796f99%3A0xebd36f00bc31e2f4!2zVmnhu4duIEtp4buDbSBuZ2hp4buHbSB0aHXhu5FjIFRydW5nIMawxqFuZyAoQ8ahIHPhu58gSUkp!5e0!3m2!1svi!2s!4v1577958314927!5m2!1svi!2s'],
 ];
 foreach ($offices as $i => [$t, $addr, $tel, $map]) {
   $seedNode(['type' => 'office', 'title' => $t, 'field_address' => $addr, 'field_phone' => $tel, 'field_map' => $map, 'field_weight' => $i]);

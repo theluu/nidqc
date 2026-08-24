@@ -14,7 +14,7 @@ $storage = \Drupal::entityTypeManager()->getStorage('node');
 // 1. Content type "Cơ sở" -> footer + trang /lien-he lấy địa chỉ từ đây.
 $addresses = [
   'Cơ sở 1' => '48 Hai Bà Trưng, phường Cửa Nam, Hà Nội',
-  'Cơ sở 2' => 'Phường Hoàng Liệt, Hà Nội',
+  'Cơ sở 2' => 'Phường Hoàng Liệt, Tp. Hà Nội',
 ];
 foreach ($storage->loadByProperties(['type' => 'office']) as $node) {
   $title = $node->label();
