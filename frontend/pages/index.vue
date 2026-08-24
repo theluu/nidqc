@@ -9,8 +9,8 @@
 //   5. Banner quảng cáo slideshow                                          (9)
 //   6. Tin thông báo | Tin mua sắm                                         (10)
 //   7. Thư viện video/hình ảnh | Liên kết web | Thống kê truy cập          (11)
-//   8. Sơ đồ menu                                                          (12)
-// Chân trang (13) nằm ở layouts/default.vue.
+// Sơ đồ menu (12) và chân trang (13) nằm ở layouts/default.vue — cả hai giờ hiện ở
+// MỌI trang chứ không riêng trang chủ.
 import { inject } from 'vue'
 
 const mapItem = (n) => ({
@@ -118,13 +118,6 @@ const visitRows = computed(() => [
   { label: 'Tổng truy cập', value: online.visits.value?.total ?? null },
 ])
 const formatNumber = (value) => (value === null || value === undefined ? '—' : value.toLocaleString('vi-VN'))
-
-// Sơ đồ menu ở cuối trang (feedback 12) — cùng nguồn với thanh menu trên đầu.
-//
-// CHỈ mục cấp 1 (feedback 21/08: "Chỉ cần tên tab thôi, không cần chi tiết như
-// vầy"): bản trước trải hết mục con của 7 nhóm thành một bảng chữ dày đặc, lặp lại
-// đúng những gì mega menu ở đầu trang đã có.
-const siteMap = computed(() => mainNavWithBlocks(blocks.value).filter((item) => item.to !== '/'))
 
 useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương', description: 'Tin tức, thông báo, dịch vụ kiểm nghiệm, tra cứu chất chuẩn và hoạt động chuyên môn của Viện Kiểm nghiệm thuốc Trung ương.', ogTitle: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương', ogDescription: 'Tin tức, thông báo, dịch vụ kiểm nghiệm, tra cứu chất chuẩn và hoạt động chuyên môn của Viện Kiểm nghiệm thuốc Trung ương.' })
 </script>
@@ -298,15 +291,6 @@ useSeoMeta({ title: 'Trang chủ — Viện Kiểm nghiệm thuốc Trung ương
             </li>
           </ul>
         </div>
-      </div>
-    </section>
-
-    <!-- ===== 8. SƠ ĐỒ MENU (feedback 12) ===== -->
-    <section class="nidqc-section" style="background:#F5F5F5;border-top:1px solid #ECECEC;">
-      <div class="nidqc-sitemap" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;">
-        <NuxtLink v-for="(item, i) in siteMap" :key="i" :to="item.to" class="nidqc-sitemap__head">
-          {{ item.label }}
-        </NuxtLink>
       </div>
     </section>
   </div>

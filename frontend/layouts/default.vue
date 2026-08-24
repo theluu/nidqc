@@ -211,6 +211,12 @@ onUnmounted(() => {
 // cứng trong useMainNav.ts, trùng khớp chỉ vì có người nhớ sửa cả hai chỗ.
 const nav = computed(() => mainNavWithBlocks(homeBlocks.value));
 
+// Sơ đồ menu ngay trên chân trang (feedback 12). Nằm ở LAYOUT chứ không ở trang chủ:
+// khách 24/08 muốn dải menu này có mặt ở chân MỌI trang, không riêng trang chủ.
+// Dùng lại đúng `nav` ở trên nên không thêm request và không thể lệch với menu đầu
+// trang. Bỏ mục "Trang chủ": đây là dải điều hướng phụ, link về chính trang đang xem
+// không dẫn đi đâu.
+const siteMap = computed(() => nav.value.filter((item) => item.to !== '/'));
 </script>
 
 <template>
@@ -357,6 +363,15 @@ const nav = computed(() => mainNavWithBlocks(homeBlocks.value));
          Ba cột: thông tin Viện · đầu mối dành cho khách hàng · mạng xã hội.
          Địa chỉ và link bản đồ lấy từ content type "Cơ sở"; điện thoại/fax/email và
          bốn đầu mối dịch vụ lấy từ /admin/config/nidqc/settings. -->
+    <!-- ===== SƠ ĐỒ MENU (feedback 12) — mọi trang, ngay trên chân trang ===== -->
+    <section class="nidqc-section" style="background:#F5F5F5;border-top:1px solid #ECECEC;">
+      <div class="nidqc-sitemap" data-container style="max-width:1280px;margin:0 auto;padding:0 24px;">
+        <NuxtLink v-for="(item, i) in siteMap" :key="i" :to="item.to" class="nidqc-sitemap__head">
+          {{ item.label }}
+        </NuxtLink>
+      </div>
+    </section>
+
     <footer style="background:#0D2870;color:#fff;">
       <div class="nidqc-footer-grid" data-container style="max-width:1280px;margin:0 auto;padding:44px 24px 22px;display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px;">
         <div>
