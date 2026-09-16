@@ -176,6 +176,26 @@ else
   fi
 fi
 
+# nginx chỉ đẩy một DANH SÁCH TIỀN TỐ cố định về Drupal, còn lại proxy sang Nuxt
+# (/etc/nginx/snippets/nidqc-app.conf — file của server, KHÔNG nằm trong git; bản
+# tương ứng cho môi trường dev là .ddev/nginx_full/nginx-site.conf).
+#
+# Thiếu một tiền tố là đường dẫn đó rơi vào Nuxt và trả 404, nhưng site vẫn chạy
+# bình thường nên không ai biết. Đã dính: /ckeditor5/upload-image/... không có
+# trong danh sách -> nút chèn ảnh trong bài báo "Couldn't upload file" (16/09/2026).
+#
+# Ping thử endpoint đó: Drupal trả 405 (GET vào route chỉ nhận POST) hoặc 403,
+# còn 404 nghĩa là request đang bị Nuxt nuốt.
+echo "==> 8. Kiểm tra nginx định tuyến đường dẫn Drupal"
+SITE_URL="${SITE_URL:-https://nidqc.themeshub.net}"
+CKE_CODE="$(curl -s -o /dev/null -w '%{http_code}' "$SITE_URL/ckeditor5/upload-image/basic_html" || echo 000)"
+case "$CKE_CODE" in
+  404) echo "   LỖI: /ckeditor5/... trả 404 — nginx đang đẩy sang Nuxt. Thêm 'ckeditor5' vào" >&2
+       echo "        danh sách tiền tố trong /etc/nginx/snippets/nidqc-app.conf rồi reload." >&2 ;;
+  000) echo "   BỎ QUA: không gọi được $SITE_URL." ;;
+  *)   echo "   OK: Drupal nhận đường dẫn ckeditor5 (HTTP $CKE_CODE)." ;;
+esac
+
 echo "==> Xong. Nội dung do prod quản lý (admin /admin/content), không đến từ git."
 }
 
