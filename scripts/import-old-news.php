@@ -490,7 +490,17 @@ function nidqc_old_news_apply_node(NodeInterface $node, array $item, ?FileInterf
   $node->set('type', 'news');
   $node->setTitle($item['title']);
   $node->setOwnerId(1);
-  $node->setPublished(TRUE);
+  // Content type `news` nằm trong workflow editorial (content_moderation):
+  // `status` do moderation_state quyết định, nên setPublished() đứng một mình
+  // bị ghi đè về draft và bài import không hiện ra ngoài. Bài mới thì publish
+  // thẳng; bài đã có thì GIỮ NGUYÊN trạng thái biên tập (có bài admin chủ động
+  // gỡ xuống, --update-existing không được tự đăng lại).
+  if ($node->isNew()) {
+    $node->setPublished(TRUE);
+    if ($node->hasField('moderation_state')) {
+      $node->set('moderation_state', 'published');
+    }
+  }
   $node->setCreatedTime($timestamp);
   $node->setChangedTime($timestamp);
   $node->set('field_category', ['target_id' => $item['target_tid']]);
