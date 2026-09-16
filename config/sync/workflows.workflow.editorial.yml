@@ -3,7 +3,22 @@ langcode: vi
 status: true
 dependencies:
   config:
+    - node.type.banner
+    - node.type.capability
+    - node.type.certificate
+    - node.type.department
+    - node.type.document
+    - node.type.equipment
+    - node.type.expertise
+    - node.type.faq
+    - node.type.home_block
     - node.type.news
+    - node.type.office
+    - node.type.page
+    - node.type.project
+    - node.type.service
+    - node.type.service_post
+    - node.type.web_link
   module:
     - content_moderation
 _core:
@@ -54,5 +69,24 @@ type_settings:
       weight: 4
   entity_types:
     node:
+      # Mọi loại nội dung biên tập viên nhập được đều qua kiểm duyệt (17/09/2026):
+      # người viết bài được tạo cả trang tĩnh, văn bản, banner... nên nếu loại đó
+      # nằm ngoài workflow thì bài lên website ngay khi lưu. Chỉ chừa
+      # contact_submission — do form liên hệ ngoài website tạo, không ai nhập tay.
+      - banner
+      - capability
+      - certificate
+      - department
+      - document
+      - equipment
+      - expertise
+      - faq
+      - home_block
       - news
+      - office
+      - page
+      - project
+      - service
+      - service_post
+      - web_link
   default_moderation_state: draft
