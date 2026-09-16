@@ -30,7 +30,9 @@ ini_set('memory_limit', '1024M');
 const FIX_IMG_MAX_BYTES = 8388608;
 const FIX_IMG_ALLOWED_MIME = ['image/gif', 'image/jpeg', 'image/png', 'image/webp'];
 
-$options = fix_old_news_args($argv ?? []);
+// Drush không truyền $argv vào scope script; đọc thẳng từ $_SERVER như
+// import-old-news.php.
+$options = fix_old_news_args($_SERVER['argv'] ?? []);
 $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
 
 if ($options['all']) {
