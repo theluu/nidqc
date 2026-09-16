@@ -65,7 +65,7 @@ foreach ($nodeStorage->loadMultiple($nids) as $node) {
   $body = (string) $node->get('body')->value;
   $before = strlen($body);
   $stats = ['images' => 0, 'skipped' => 0];
-  $date = date('Y-m', $node->getCreatedTime());
+  $date = date('Y-m', (int) $node->getCreatedTime());
   $title = (string) $node->label();
 
   $fixed = preg_replace_callback(
