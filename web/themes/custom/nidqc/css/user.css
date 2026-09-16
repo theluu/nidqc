@@ -145,3 +145,250 @@
   outline: none;
   box-shadow: 0 0 0 3px var(--nidqc-primary-pale);
 }
+
+/* ---------------------------------------------------------------------------
+ * Khung đăng nhập hai cột (.nidqc-auth) — page--nidqc-auth.html.twig.
+ * Chỉ áp cho /user/login, /user/password, /user/reset. Trang hồ sơ người dùng
+ * vẫn dùng phần style .nidqc-user-auth ở trên.
+ * ------------------------------------------------------------------------ */
+
+.nidqc-auth-page .nidqc-auth {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Cột trái: khối định danh cơ quan. */
+.nidqc-auth__brand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 56px clamp(32px, 5vw, 88px);
+  color: var(--nidqc-white);
+  background: linear-gradient(160deg, var(--nidqc-primary) 0%, var(--nidqc-primary-dark) 100%);
+  overflow: hidden;
+}
+
+/* Hoa văn chìm: hai vòng tròn rất mờ, gợi con dấu. Thuần CSS nên không thêm
+   request ảnh nào. */
+.nidqc-auth__brand::before {
+  content: '';
+  position: absolute;
+  right: -150px;
+  top: -90px;
+  width: 420px;
+  height: 420px;
+  border: 60px solid rgba(255, 255, 255, 0.045);
+  border-radius: 50%;
+}
+.nidqc-auth__brand::after {
+  content: '';
+  position: absolute;
+  left: -110px;
+  bottom: -130px;
+  width: 300px;
+  height: 300px;
+  border: 40px solid rgba(255, 255, 255, 0.035);
+  border-radius: 50%;
+}
+
+.nidqc-auth__brand-inner {
+  position: relative;
+  max-width: 460px;
+}
+
+.nidqc-auth__ministry {
+  margin: 0 0 14px;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.nidqc-auth__org {
+  margin: 0 0 12px;
+  font-family: 'Lexend', sans-serif;
+  font-size: clamp(30px, 3.4vw, 46px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -.01em;
+}
+
+.nidqc-auth__org-en {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 21px;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+.nidqc-auth__system {
+  margin: 34px 0 0;
+  padding-top: 26px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.nidqc-auth__notes {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.nidqc-auth__notes li {
+  position: relative;
+  padding: 6px 0 6px 20px;
+  font-size: 14.5px;
+  line-height: 21px;
+  color: rgba(255, 255, 255, 0.74);
+}
+.nidqc-auth__notes li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15px;
+  width: 8px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Cột phải: form. */
+.nidqc-auth__panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 48px clamp(24px, 4vw, 64px);
+  background: var(--nidqc-white);
+}
+
+.nidqc-auth__card {
+  width: 100%;
+  max-width: 400px;
+}
+
+.nidqc-auth__title {
+  margin: 0 0 8px;
+  font-family: 'Lexend', sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--nidqc-text);
+}
+
+.nidqc-auth__lead {
+  margin: 0 0 28px;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--nidqc-text-muted);
+}
+
+/* Tiêu đề và tabs mặc định của Drupal: khung này đã có tiêu đề riêng bằng
+   tiếng Việt, và tab "Reset your password" thay bằng link ở chân form. */
+.nidqc-auth-page #block-nidqc-page-title,
+.nidqc-auth-page #block-nidqc-primary-local-tasks,
+.nidqc-auth-page .tabs {
+  display: none;
+}
+
+/* Form nằm thẳng trên nền trắng, không bọc card lồng card. */
+.nidqc-auth-page #block-nidqc-content form {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.nidqc-auth-page .form-item {
+  margin: 0 0 20px;
+}
+
+.nidqc-auth-page input[type="text"],
+.nidqc-auth-page input[type="password"],
+.nidqc-auth-page input[type="email"] {
+  padding: 13px 15px;
+  font-size: 15px;
+  border-radius: 10px;
+}
+
+.nidqc-auth-page .form-actions input.form-submit,
+.nidqc-auth-page .form-actions .button {
+  padding: 14px 18px;
+  font-size: 15.5px;
+  border-radius: 10px;
+}
+
+/* Thông báo lỗi sai mật khẩu: gọn lại, không tràn hết chiều ngang màn hình. */
+.nidqc-auth-page .messages {
+  margin: 0 0 22px;
+  font-size: 14px;
+  line-height: 21px;
+  border-radius: 10px;
+}
+
+.nidqc-auth__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--nidqc-border);
+  font-size: 14px;
+}
+.nidqc-auth__foot a {
+  color: var(--nidqc-primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+.nidqc-auth__foot a:hover {
+  text-decoration: underline;
+}
+.nidqc-auth__home {
+  color: var(--nidqc-text-light) !important;
+  font-weight: 400 !important;
+}
+
+.nidqc-auth__copy {
+  margin: 36px 0 0;
+  max-width: 400px;
+  width: 100%;
+  font-size: 12.5px;
+  line-height: 18px;
+  color: var(--nidqc-text-light);
+}
+
+/* Máy tính bảng và điện thoại: xếp dọc, khối định danh rút gọn. */
+@media (max-width: 900px) {
+  .nidqc-auth-page .nidqc-auth {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .nidqc-auth__brand {
+    padding: 32px 24px;
+  }
+  .nidqc-auth__brand::before,
+  .nidqc-auth__brand::after {
+    display: none;
+  }
+  .nidqc-auth__org {
+    font-size: 26px;
+  }
+  .nidqc-auth__org-en {
+    font-size: 13px;
+  }
+  /* Ở màn hẹp, phần giới thiệu hệ thống là thứ đẩy form xuống dưới màn hình —
+     bỏ đi, người dùng vào đây để đăng nhập chứ không để đọc. */
+  .nidqc-auth__system,
+  .nidqc-auth__notes {
+    display: none;
+  }
+  .nidqc-auth__panel {
+    padding: 36px 24px 48px;
+    align-items: flex-start;
+  }
+  .nidqc-auth__copy {
+    margin-top: 28px;
+  }
+}

@@ -1,0 +1,60 @@
+{#
+/**
+ * @file
+ * Khung riêng cho các trang xác thực: /user/login, /user/password, /user/reset.
+ *
+ * KHÔNG dùng page.html.twig ở đây có chủ đích: trang đăng nhập không cần banner,
+ * mega menu và footer 3 cột — đó là điều hướng cho khách đọc tin, còn đây là cửa
+ * vào khu quản trị, chỉ cán bộ của Viện dùng. Bỏ chúng đi thì trang gọn, tải
+ * nhanh, và không còn kéo ảnh banner từ nidqc.gov.vn về (page.html.twig đang
+ * hotlink ảnh đó).
+ *
+ * Bố cục: hai cột. Trái là khối định danh cơ quan, phải là form.
+ * Dưới 900px thì xếp dọc, khối định danh rút còn một dải mỏng.
+ *
+ * Biến bổ sung do nidqc_preprocess_page() đặt:
+ * - nidqc_auth_title: tiêu đề tiếng Việt theo route.
+ * - nidqc_auth_lead: câu mô tả ngắn dưới tiêu đề.
+ */
+#}
+<div class="nidqc-auth">
+
+  <section class="nidqc-auth__brand">
+    <div class="nidqc-auth__brand-inner">
+      <p class="nidqc-auth__ministry">Bộ Y tế</p>
+      <h1 class="nidqc-auth__org">Viện Kiểm nghiệm<br>thuốc Trung ương</h1>
+      <p class="nidqc-auth__org-en">National Institute of Drug Quality Control</p>
+
+      <p class="nidqc-auth__system">Hệ thống quản trị nội dung website</p>
+
+      <ul class="nidqc-auth__notes">
+        <li>Khu vực dành riêng cho cán bộ của Viện</li>
+        <li>Tài khoản do quản trị viên cấp theo từng vai trò</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="nidqc-auth__panel">
+    <div class="nidqc-auth__card">
+      <h2 class="nidqc-auth__title">{{ nidqc_auth_title }}</h2>
+      {% if nidqc_auth_lead %}
+        <p class="nidqc-auth__lead">{{ nidqc_auth_lead }}</p>
+      {% endif %}
+
+      <a id="main-content" tabindex="-1"></a>
+      {{ page.content }}
+
+      <div class="nidqc-auth__foot">
+        {% if nidqc_auth_route == 'user.login' %}
+          <a href="{{ path('user.pass') }}">Quên mật khẩu?</a>
+        {% else %}
+          <a href="{{ path('user.login') }}">Quay lại đăng nhập</a>
+        {% endif %}
+        <a href="{{ path('<front>') }}" class="nidqc-auth__home">Về trang chủ</a>
+      </div>
+    </div>
+
+    <p class="nidqc-auth__copy">© {{ 'now'|date('Y') }} Viện Kiểm nghiệm thuốc Trung ương · 48 Hai Bà Trưng, phường Cửa Nam, Hà Nội</p>
+  </section>
+
+</div>

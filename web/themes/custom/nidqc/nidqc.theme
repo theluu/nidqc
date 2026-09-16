@@ -36,6 +36,33 @@ function nidqc_preprocess_menu__main(array &$variables): void {
 }
 
 /**
+ * Ba route dùng khung đăng nhập riêng (page--nidqc-auth.html.twig).
+ *
+ * Trang hồ sơ người dùng và trang sửa hồ sơ KHÔNG nằm ở đây: chúng vẫn dùng
+ * khung chung vì người dùng đã đăng nhập, cần menu và footer như mọi trang khác.
+ */
+const NIDQC_AUTH_ROUTES = [
+  'user.login',
+  'user.pass',
+  'user.reset',
+  'user.reset.login',
+  'user.reset.form',
+];
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter() for page.
+ *
+ * Trỏ các route xác thực sang khung riêng. Dùng suggestion thay vì đặt tên file
+ * theo đường dẫn (page--user--login) vì cả ba route dùng chung một khung, đặt
+ * theo đường dẫn sẽ phải nhân bản file.
+ */
+function nidqc_theme_suggestions_page_alter(array &$suggestions, array $variables): void {
+  if (in_array(\Drupal::routeMatch()->getRouteName(), NIDQC_AUTH_ROUTES, TRUE)) {
+    $suggestions[] = 'page__nidqc_auth';
+  }
+}
+
+/**
  * Implements hook_preprocess_HOOK() for html.
  *
  * Route tài khoản (đăng nhập / khôi phục mật khẩu) -> gắn class body + nạp css/user.css.
@@ -56,6 +83,12 @@ function nidqc_preprocess_html(array &$variables): void {
   if (in_array($route, $auth_routes, TRUE)) {
     $variables['attributes']['class'][] = 'nidqc-user-auth';
     $variables['#attached']['library'][] = 'nidqc/user';
+  }
+
+  // Class riêng cho ba trang xác thực dùng khung hai cột. Tách khỏi
+  // .nidqc-user-auth để style mới không đụng trang hồ sơ người dùng.
+  if (in_array($route, NIDQC_AUTH_ROUTES, TRUE)) {
+    $variables['attributes']['class'][] = 'nidqc-auth-page';
   }
 }
 
@@ -80,6 +113,20 @@ function nidqc_preprocess_page(array &$variables): void {
   ];
   if (in_array(\Drupal::routeMatch()->getRouteName(), $auth_routes, TRUE)) {
     $variables['page']['breadcrumb'] = [];
+  }
+
+  // Tiêu đề tiếng Việt cho khung xác thực. Đặt ở đây thay vì để block tiêu đề
+  // của Drupal vì chuỗi gốc của core chưa dịch ("Reset your password").
+  $route = \Drupal::routeMatch()->getRouteName();
+  if (in_array($route, NIDQC_AUTH_ROUTES, TRUE)) {
+    $variables['nidqc_auth_route'] = $route;
+    [$title, $lead] = match ($route) {
+      'user.pass' => ['Quên mật khẩu', 'Nhập tên đăng nhập hoặc email, hệ thống sẽ gửi liên kết đặt lại mật khẩu.'],
+      'user.reset', 'user.reset.login', 'user.reset.form' => ['Đặt lại mật khẩu', 'Chọn mật khẩu mới cho tài khoản của bạn.'],
+      default => ['Đăng nhập', 'Dùng tài khoản được Viện cấp để vào khu quản trị nội dung.'],
+    };
+    $variables['nidqc_auth_title'] = $title;
+    $variables['nidqc_auth_lead'] = $lead;
   }
 
   if (empty($variables['is_front'])) {
