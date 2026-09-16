@@ -50,6 +50,21 @@ const NIDQC_AUTH_ROUTES = [
 ];
 
 /**
+ * Nhãn tiếng Việt cho từng route xác thực: [tiêu đề, câu mô tả].
+ *
+ * Gom vào một chỗ vì dùng ở ba nơi: thẻ title của trình duyệt, tiêu đề trong
+ * khung, và câu dẫn dưới tiêu đề. Chuỗi gốc của core chưa dịch
+ * ("Reset your password") nên không mượn được block tiêu đề mặc định.
+ */
+function nidqc_auth_labels(string $route): array {
+  return match ($route) {
+    'user.pass' => ['Quên mật khẩu', 'Nhập tên đăng nhập hoặc email, hệ thống sẽ gửi liên kết đặt lại mật khẩu.'],
+    'user.reset', 'user.reset.login', 'user.reset.form' => ['Đặt lại mật khẩu', 'Chọn mật khẩu mới cho tài khoản của bạn.'],
+    default => ['Đăng nhập', 'Dùng tài khoản được Viện cấp để vào khu quản trị nội dung.'],
+  };
+}
+
+/**
  * Implements hook_theme_suggestions_HOOK_alter() for page.
  *
  * Trỏ các route xác thực sang khung riêng. Dùng suggestion thay vì đặt tên file
@@ -89,6 +104,9 @@ function nidqc_preprocess_html(array &$variables): void {
   // .nidqc-user-auth để style mới không đụng trang hồ sơ người dùng.
   if (in_array($route, NIDQC_AUTH_ROUTES, TRUE)) {
     $variables['attributes']['class'][] = 'nidqc-auth-page';
+    // Thẻ <title> của core lấy từ route nên vẫn ra "Reset your password".
+    [$title] = nidqc_auth_labels($route);
+    $variables['head_title']['title'] = $title;
   }
 }
 
@@ -120,11 +138,7 @@ function nidqc_preprocess_page(array &$variables): void {
   $route = \Drupal::routeMatch()->getRouteName();
   if (in_array($route, NIDQC_AUTH_ROUTES, TRUE)) {
     $variables['nidqc_auth_route'] = $route;
-    [$title, $lead] = match ($route) {
-      'user.pass' => ['Quên mật khẩu', 'Nhập tên đăng nhập hoặc email, hệ thống sẽ gửi liên kết đặt lại mật khẩu.'],
-      'user.reset', 'user.reset.login', 'user.reset.form' => ['Đặt lại mật khẩu', 'Chọn mật khẩu mới cho tài khoản của bạn.'],
-      default => ['Đăng nhập', 'Dùng tài khoản được Viện cấp để vào khu quản trị nội dung.'],
-    };
+    [$title, $lead] = nidqc_auth_labels($route);
     $variables['nidqc_auth_title'] = $title;
     $variables['nidqc_auth_lead'] = $lead;
   }
