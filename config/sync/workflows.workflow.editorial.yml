@@ -13,16 +13,21 @@ label: Editorial
 type: content_moderation
 type_settings:
   states:
-    # Bỏ trạng thái "Bản nháp" (16/09/2026). Ba trạng thái là thừa một: người
-    # viết luôn phải gửi kiểm duyệt, nên nháp chỉ làm thêm một lần bấm. Tệ hơn,
-    # bài ĐÃ XUẤT BẢN khi mở ra sửa chỉ còn đúng một lựa chọn là "Bản nháp" —
-    # không có cách nào lưu mà giữ nguyên trạng thái đang đăng.
-    needs_review:
+    # Chỉ còn HAI trạng thái (16/09/2026). Trước đây có thêm "Bản nháp" ở giữa:
+    # thừa một bước vì người viết luôn phải gửi kiểm duyệt, mà bài ĐÃ XUẤT BẢN
+    # khi mở ra sửa lại chỉ còn đúng một lựa chọn là "Bản nháp" — không ai lưu
+    # được mà giữ nguyên trạng thái đang đăng.
+    #
+    # ID vẫn là 'draft' chứ không phải 'needs_review': plugin content_moderation
+    # của core khai báo 'draft' và 'published' là REQUIRED STATES, xoá đi thì
+    # config:import chết với "requires states with the ID 'draft'". ID nằm trong
+    # máy, người dùng chỉ nhìn thấy nhãn.
+    draft:
       label: 'Chờ kiểm duyệt'
       weight: 0
       published: false
-      # false: sửa bài ĐANG ĐĂNG sẽ tạo bản chờ duyệt, bản trên website vẫn
-      # chạy tới khi được phê duyệt. Để true thì bài tụt khỏi site ngay lúc
+      # false: sửa bài ĐANG ĐĂNG thì tạo bản chờ duyệt, bản trên website vẫn
+      # chạy cho tới khi được phê duyệt. Để true là bài tụt khỏi site ngay lúc
       # người viết bấm lưu.
       default_revision: false
     published:
@@ -34,20 +39,20 @@ type_settings:
     submit_for_review:
       label: 'Gửi kiểm duyệt'
       from:
-        - needs_review
+        - draft
         - published
-      to: needs_review
+      to: draft
       weight: 1
     publish:
       label: 'Phê duyệt và xuất bản'
       from:
-        - needs_review
-        # published -> published: lãnh đạo sửa bài đang đăng rồi lưu, bài giữ
-        # nguyên trên website, không phải duyệt lại vòng nữa.
+        - draft
+        # published -> published: lãnh đạo sửa bài đang đăng rồi lưu là xong,
+        # bài giữ nguyên trên website, không phải đi lại một vòng duyệt.
         - published
       to: published
       weight: 4
   entity_types:
     node:
       - news
-  default_moderation_state: needs_review
+  default_moderation_state: draft
