@@ -150,6 +150,32 @@ SSR_RESTART_CMD="${SSR_RESTART_CMD:-systemctl restart nidqc-nuxt}"
 echo "   \$ $SSR_RESTART_CMD"
 eval "$SSR_RESTART_CMD"
 
+# Mọi image style của site đều có effect image_convert_avif (core, fallback webp),
+# nên MỌI ảnh nội dung phục vụ ra ngoài đều là file .avif. nginx 1.18 (Ubuntu) KHÔNG
+# có avif trong /etc/nginx/mime.types: file tĩnh bị trả về với
+# `Content-Type: application/octet-stream`. Chrome tự đoán nội dung nên vẫn hiện ảnh,
+# còn Safari bám đúng Content-Type -> TRẮNG TOÀN BỘ ảnh. Khách báo "ảnh bị mất" ngày
+# 16/09/2026, mất gần một buổi truy vì trên Chrome mọi thứ trông bình thường.
+#
+# Tự vá, không chỉ cảnh báo: server dựng lại hoặc nginx nâng cấp ghi đè mime.types là
+# lỗi quay lại y nguyên và rất khó đoán.
+echo "==> 7. Kiểm tra nginx biết kiểu MIME của .avif"
+NGINX_MIME="${NGINX_MIME:-/etc/nginx/mime.types}"
+if [ ! -w "$NGINX_MIME" ]; then
+  echo "   BỎ QUA: không ghi được $NGINX_MIME (cần chạy bằng root)."
+elif grep -qE '^[[:space:]]*image/avif[[:space:]]+avif;' "$NGINX_MIME"; then
+  echo "   OK: đã có image/avif."
+else
+  cp "$NGINX_MIME" "$NGINX_MIME.bak-$(date +%F-%H%M%S)"
+  sed -i "s#^\( *\)image/webp  *webp;#\1image/avif                            avif;\n&#" "$NGINX_MIME"
+  if grep -qE '^[[:space:]]*image/avif[[:space:]]+avif;' "$NGINX_MIME" && nginx -t >/dev/null 2>&1; then
+    systemctl reload nginx
+    echo "   đã thêm image/avif vào $NGINX_MIME và reload nginx."
+  else
+    echo "   LỖI: thêm image/avif không thành công, đã giữ bản backup cạnh file. Kiểm tra tay." >&2
+  fi
+fi
+
 echo "==> Xong. Nội dung do prod quản lý (admin /admin/content), không đến từ git."
 }
 

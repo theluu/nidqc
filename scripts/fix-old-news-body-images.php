@@ -33,6 +33,9 @@ ini_set('pcre.backtrack_limit', '100000000');
 // Drush chạy không có request nên generateAbsoluteString() sinh host "default".
 // Mọi ảnh/file body của các lần import trước đều mang tiền tố này.
 const BAD_HOST_PREFIX = 'http://default/';
+// Ảnh vẫn nằm trên site cũ: bài nhập ở đợt chưa bật --with-images chỉ giữ nguyên
+// link. Site cũ tắt là ảnh chết, nên phải kéo hẳn về.
+const OLD_SITE_HOSTS = ['nidqc.gov.vn', 'www.nidqc.gov.vn'];
 const FIX_IMG_MAX_BYTES = 8388608;
 const FIX_IMG_ALLOWED_MIME = ['image/gif', 'image/jpeg', 'image/png', 'image/webp'];
 
@@ -51,7 +54,8 @@ if ($options['all']) {
     ->condition('d.type', 'news')
     ->condition($select->orConditionGroup()
       ->condition('b.body_value', '%;base64,%', 'LIKE')
-      ->condition('b.body_value', '%' . BAD_HOST_PREFIX . '%', 'LIKE'));
+      ->condition('b.body_value', '%' . BAD_HOST_PREFIX . '%', 'LIKE')
+      ->condition('b.body_value', '%nidqc.gov.vn%', 'LIKE'));
   $nids = array_map('intval', $select->execute()->fetchCol());
 }
 else {
@@ -66,6 +70,7 @@ if ($nids === []) {
 printf("%s | %d node\n", $options['dry-run'] ? 'DRY-RUN' : 'SỬA THẬT', count($nids));
 
 $totalImages = 0;
+$totalRemote = 0;
 $totalHostFixed = 0;
 $totalSavedBytes = 0;
 
@@ -132,21 +137,50 @@ foreach ($nids as $nid) {
   }
   $stats['host'] = $hostFixed;
 
-  if ($fixed === NULL || ($stats['images'] === 0 && $hostFixed === 0)) {
+  // Kéo ảnh còn hotlink sang site cũ về đây.
+  $stats['remote'] = 0;
+  if (is_string($fixed)) {
+    $hosts = implode('|', array_map('preg_quote', OLD_SITE_HOSTS));
+    $fixed = preg_replace_callback(
+      '#src="(https?://(?:' . $hosts . ')/[^"]+)"#i',
+      static function (array $match) use ($date, $options, &$stats): string {
+        if ($options['dry-run']) {
+          $stats['remote']++;
+          return $match[0];
+        }
+
+        $uri = fix_old_news_fetch_remote(html_entity_decode($match[1]), $date);
+        if ($uri === NULL) {
+          $stats['skipped']++;
+          return $match[0];
+        }
+
+        $stats['remote']++;
+        /** @var \Drupal\Core\File\FileUrlGeneratorInterface $urlGenerator */
+        $urlGenerator = \Drupal::service('file_url_generator');
+        return 'src="' . $urlGenerator->generateString($uri) . '"';
+      },
+      $fixed,
+    ) ?? $fixed;
+  }
+
+  if ($fixed === NULL || ($stats['images'] === 0 && $hostFixed === 0 && $stats['remote'] === 0)) {
     printf("  [%d] %s — không có gì để sửa (bỏ qua %d)\n", $node->id(), mb_substr($title, 0, 40), $stats['skipped']);
     continue;
   }
 
   $after = strlen($fixed);
   $totalImages += $stats['images'];
+  $totalRemote += $stats['remote'];
   $totalHostFixed += $stats['host'];
   $totalSavedBytes += max(0, $before - $after);
 
   printf(
-    "  [%d] %s — %d ảnh, %d URL nắn lại, body %s → %s%s\n",
+    "  [%d] %s — %d ảnh base64, %d ảnh kéo từ site cũ, %d URL nắn lại, body %s → %s%s\n",
     $node->id(),
     mb_substr($title, 0, 40),
     $stats['images'],
+    $stats['remote'],
     $stats['host'],
     fix_old_news_size($before),
     $options['dry-run'] ? '(ước lượng)' : fix_old_news_size($after),
@@ -177,11 +211,56 @@ foreach ($nids as $nid) {
 }
 
 printf(
-  "Xong: %d ảnh tách ra file, %d URL http://default nắn lại, body giảm %s.\n",
+  "Xong: %d ảnh base64 tách ra file, %d ảnh kéo từ site cũ, %d URL http://default nắn lại, body giảm %s.\n",
   $totalImages,
+  $totalRemote,
   $totalHostFixed,
   fix_old_news_size($totalSavedBytes),
 );
+
+/**
+ * Tải ảnh còn nằm trên site cũ về, trả về URI file mới (hoặc NULL).
+ */
+function fix_old_news_fetch_remote(string $url, string $date): ?string {
+  $parts = parse_url($url);
+  if (!in_array($parts['host'] ?? '', OLD_SITE_HOSTS, TRUE)) {
+    return NULL;
+  }
+
+  try {
+    $response = \Drupal::httpClient()->request('GET', $url, [
+      'headers' => [
+        'Accept' => 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+        'User-Agent' => 'NIDQC migration script',
+      ],
+      'timeout' => 30,
+    ]);
+  }
+  catch (Exception) {
+    return NULL;
+  }
+
+  if ($response->getStatusCode() >= 400) {
+    return NULL;
+  }
+
+  $data = (string) $response->getBody();
+  if ($data === '' || strlen($data) > FIX_IMG_MAX_BYTES) {
+    return NULL;
+  }
+
+  $info = @getimagesizefromstring($data);
+  if (!is_array($info) || empty($info['mime']) || !in_array($info['mime'], FIX_IMG_ALLOWED_MIME, TRUE)) {
+    return NULL;
+  }
+
+  // Tên file giữ theo tên gốc trên site cũ cho dễ đối chiếu, thêm hash nội dung
+  // để hai ảnh khác nhau trùng tên không đè nhau.
+  $base = pathinfo((string) ($parts['path'] ?? ''), PATHINFO_FILENAME);
+  $base = trim(preg_replace('/[^a-z0-9]+/', '-', mb_strtolower($base)) ?? '', '-');
+
+  return fix_old_news_write_file($data, $info['mime'], $base === '' ? 'anh-site-cu' : $base, $date);
+}
 
 /**
  * Ghi dữ liệu ảnh thành file managed, trả về URI (hoặc NULL nếu hỏng).
