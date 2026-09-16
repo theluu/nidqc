@@ -26,6 +26,9 @@ use Drupal\node\NodeInterface;
 
 // Body chứa base64 nhiều MB, decode xong còn giữ cả bản gốc lẫn bản decode.
 ini_set('memory_limit', '1024M');
+// Một ảnh base64 dài cả triệu ký tự; giới hạn backtrack mặc định (1e6) làm
+// preg_replace_callback() trả NULL và bài coi như không sửa được.
+ini_set('pcre.backtrack_limit', '100000000');
 
 // Drush chạy không có request nên generateAbsoluteString() sinh host "default".
 // Mọi ảnh/file body của các lần import trước đều mang tiền tố này.
@@ -39,14 +42,17 @@ $options = fix_old_news_args($_SERVER['argv'] ?? []);
 $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
 
 if ($options['all']) {
-  $query = $nodeStorage->getQuery()
-    ->accessCheck(FALSE)
-    ->condition('type', 'news');
-  $nids = array_values($query
-    ->condition($query->orConditionGroup()
-      ->condition('body.value', '%;base64,%', 'LIKE')
-      ->condition('body.value', '%' . BAD_HOST_PREFIX . '%', 'LIKE'))
-    ->execute());
+  // Hỏi thẳng DB thay vì entity query: chỉ cần danh sách nid, không được đụng
+  // tới body (mỗi body tới 15 MB, nạp cả mớ là hết RAM server).
+  $db = \Drupal::database();
+  $select = $db->select('node__body', 'b');
+  $select->join('node_field_data', 'd', 'd.nid = b.entity_id');
+  $select->fields('b', ['entity_id'])
+    ->condition('d.type', 'news')
+    ->condition($select->orConditionGroup()
+      ->condition('b.body_value', '%;base64,%', 'LIKE')
+      ->condition('b.body_value', '%' . BAD_HOST_PREFIX . '%', 'LIKE'));
+  $nids = array_map('intval', $select->execute()->fetchCol());
 }
 else {
   $nids = $options['nid'];
@@ -63,7 +69,11 @@ $totalImages = 0;
 $totalHostFixed = 0;
 $totalSavedBytes = 0;
 
-foreach ($nodeStorage->loadMultiple($nids) as $node) {
+// Từng node một, xoá cache entity sau mỗi vòng: nạp cả loạt thì 30 body nặng
+// ~100 MB nằm hết trong RAM cùng lúc và drush chết vì hết bộ nhớ.
+foreach ($nids as $nid) {
+  $nodeStorage->resetCache([$nid]);
+  $node = $nodeStorage->load($nid);
   if (!$node instanceof NodeInterface || $node->bundle() !== 'news' || $node->get('body')->isEmpty()) {
     continue;
   }
@@ -162,6 +172,8 @@ foreach ($nodeStorage->loadMultiple($nids) as $node) {
   $node->setRevisionLogMessage('Tách ảnh base64 trong body thành file (fix-old-news-body-images.php).');
   $node->setChangedTime($node->getChangedTime());
   $node->save();
+  unset($body, $fixed, $node);
+  $nodeStorage->resetCache([$nid]);
 }
 
 printf(
