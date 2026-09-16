@@ -21,7 +21,6 @@ permissions:
   - 'access navigation'
   - 'create news content'
   - 'edit own news content'
-  - 'use editorial transition create_new_draft'
   - 'use editorial transition submit_for_review'
   - 'view own unpublished content'
   - 'view the administration theme'
