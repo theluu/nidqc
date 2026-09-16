@@ -625,7 +625,11 @@ function nidqc_old_news_import_body_images(ClientInterface $client, string $body
       continue;
     }
 
-    $node->setAttribute('src', $fileUrlGenerator->generateAbsoluteString($file->getFileUri()));
+    // URL TƯƠNG ĐỐI, không phải generateAbsoluteString(): chạy qua drush thì
+    // không có request nên Drupal lấy host mặc định và sinh ra
+    // `http://default/sites/default/files/...` — ảnh chết trên mọi domain.
+    // Đường dẫn tương đối đúng cho cả ddev, dev lẫn prod (file cùng domain).
+    $node->setAttribute('src', $fileUrlGenerator->generateString($file->getFileUri()));
     if ($node->getAttribute('alt') === '') {
       $node->setAttribute('alt', $title);
     }

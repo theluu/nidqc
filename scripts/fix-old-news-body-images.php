@@ -27,6 +27,9 @@ use Drupal\node\NodeInterface;
 // Body chứa base64 nhiều MB, decode xong còn giữ cả bản gốc lẫn bản decode.
 ini_set('memory_limit', '1024M');
 
+// Drush chạy không có request nên generateAbsoluteString() sinh host "default".
+// Mọi ảnh/file body của các lần import trước đều mang tiền tố này.
+const BAD_HOST_PREFIX = 'http://default/';
 const FIX_IMG_MAX_BYTES = 8388608;
 const FIX_IMG_ALLOWED_MIME = ['image/gif', 'image/jpeg', 'image/png', 'image/webp'];
 
@@ -36,12 +39,14 @@ $options = fix_old_news_args($_SERVER['argv'] ?? []);
 $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
 
 if ($options['all']) {
-  $nids = $nodeStorage->getQuery()
+  $query = $nodeStorage->getQuery()
     ->accessCheck(FALSE)
-    ->condition('type', 'news')
-    ->condition('body.value', '%;base64,%', 'LIKE')
-    ->execute();
-  $nids = array_values($nids);
+    ->condition('type', 'news');
+  $nids = array_values($query
+    ->condition($query->orConditionGroup()
+      ->condition('body.value', '%;base64,%', 'LIKE')
+      ->condition('body.value', '%' . BAD_HOST_PREFIX . '%', 'LIKE'))
+    ->execute());
 }
 else {
   $nids = $options['nid'];
@@ -55,6 +60,7 @@ if ($nids === []) {
 printf("%s | %d node\n", $options['dry-run'] ? 'DRY-RUN' : 'SỬA THẬT', count($nids));
 
 $totalImages = 0;
+$totalHostFixed = 0;
 $totalSavedBytes = 0;
 
 foreach ($nodeStorage->loadMultiple($nids) as $node) {
@@ -96,25 +102,42 @@ foreach ($nodeStorage->loadMultiple($nids) as $node) {
 
       /** @var \Drupal\Core\File\FileUrlGeneratorInterface $urlGenerator */
       $urlGenerator = \Drupal::service('file_url_generator');
-      return 'src="' . $urlGenerator->generateAbsoluteString($uri) . '"';
+
+      // Tương đối, không tuyệt đối: xem ghi chú cùng vấn đề trong
+      // import-old-news.php (drush không có request -> host "default").
+      return 'src="' . $urlGenerator->generateString($uri) . '"';
     },
     $body,
   );
 
-  if ($fixed === NULL || $stats['images'] === 0) {
-    printf("  [%d] %s — không có ảnh base64 hợp lệ (bỏ qua %d)\n", $node->id(), mb_substr($title, 0, 40), $stats['skipped']);
+  // Nắn URL của những lần import trước: http://default/... -> /...
+  $hostFixed = 0;
+  if (is_string($fixed)) {
+    $fixed = str_replace(
+      ['src="' . BAD_HOST_PREFIX, "src='" . BAD_HOST_PREFIX, 'href="' . BAD_HOST_PREFIX, "href='" . BAD_HOST_PREFIX],
+      ['src="/', "src='/", 'href="/', "href='/"],
+      $fixed,
+      $hostFixed,
+    );
+  }
+  $stats['host'] = $hostFixed;
+
+  if ($fixed === NULL || ($stats['images'] === 0 && $hostFixed === 0)) {
+    printf("  [%d] %s — không có gì để sửa (bỏ qua %d)\n", $node->id(), mb_substr($title, 0, 40), $stats['skipped']);
     continue;
   }
 
   $after = strlen($fixed);
   $totalImages += $stats['images'];
+  $totalHostFixed += $stats['host'];
   $totalSavedBytes += max(0, $before - $after);
 
   printf(
-    "  [%d] %s — %d ảnh, body %s → %s%s\n",
+    "  [%d] %s — %d ảnh, %d URL nắn lại, body %s → %s%s\n",
     $node->id(),
     mb_substr($title, 0, 40),
     $stats['images'],
+    $stats['host'],
     fix_old_news_size($before),
     $options['dry-run'] ? '(ước lượng)' : fix_old_news_size($after),
     $stats['skipped'] > 0 ? ", bỏ qua {$stats['skipped']}" : '',
@@ -142,8 +165,9 @@ foreach ($nodeStorage->loadMultiple($nids) as $node) {
 }
 
 printf(
-  "Xong: %d ảnh tách ra file, body giảm %s.\n",
+  "Xong: %d ảnh tách ra file, %d URL http://default nắn lại, body giảm %s.\n",
   $totalImages,
+  $totalHostFixed,
   fix_old_news_size($totalSavedBytes),
 );
 
