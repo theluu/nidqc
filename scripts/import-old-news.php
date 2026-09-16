@@ -613,7 +613,14 @@ function nidqc_old_news_import_body_images(ClientInterface $client, string $body
       continue;
     }
 
-    $file = nidqc_old_news_import_image($client, $node->getAttribute('src'), $title, $date, $stats);
+    $src = $node->getAttribute('src');
+    // Site cũ nhúng ảnh bài viết dưới dạng `data:image/...;base64,...`. Phải
+    // tách ra file TRƯỚC khi Xss::filter() chạy: bộ lọc giao thức của Drupal
+    // coi `data:` là không an toàn và cắt nó đi, để lại src rác
+    // `image/png;base64,...` (ảnh vỡ) mà body vẫn gánh cả khối base64.
+    $file = str_starts_with(strtolower($src), 'data:image/')
+      ? nidqc_old_news_import_data_uri_image($src, $title, $date, $stats)
+      : nidqc_old_news_import_image($client, $src, $title, $date, $stats);
     if (!$file instanceof FileInterface) {
       continue;
     }
@@ -628,6 +635,70 @@ function nidqc_old_news_import_body_images(ClientInterface $client, string $body
   $html = $wrapper instanceof DOMNode ? nidqc_old_news_inner_html($wrapper) : $body;
 
   return trim(Xss::filter($html, NIDQC_OLD_BODY_TAGS));
+}
+
+/**
+ * Tách ảnh base64 nhúng trong body ra thành file managed.
+ */
+function nidqc_old_news_import_data_uri_image(string $src, string $title, string $date, array &$stats): ?FileInterface {
+  if (!preg_match('#^data:(image/[a-z0-9.+-]+);base64,(.+)$#is', $src, $match)) {
+    $stats['image_skipped']++;
+    return NULL;
+  }
+
+  $data = base64_decode(preg_replace('/\s+/', '', $match[2]) ?? '', TRUE);
+  if ($data === FALSE || $data === '' || strlen($data) > NIDQC_OLD_IMAGE_MAX_BYTES) {
+    $stats['image_skipped']++;
+    return NULL;
+  }
+
+  $info = @getimagesizefromstring($data);
+  if (!is_array($info) || empty($info['mime']) || !in_array($info['mime'], NIDQC_OLD_ALLOWED_IMAGE_MIME, TRUE)) {
+    $stats['image_skipped']++;
+    return NULL;
+  }
+
+  $extension = match ($info['mime']) {
+    'image/png' => 'png',
+    'image/gif' => 'gif',
+    'image/webp' => 'webp',
+    default => 'jpg',
+  };
+  // Tên file lấy theo hash NỘI DUNG (data URI không có URL để băm): ảnh dùng
+  // lại ở nhiều bài chỉ ghi một lần. Phải khớp với
+  // scripts/fix-old-news-body-images.php để hai script không tạo file trùng.
+  $filename = nidqc_old_news_data_uri_filename($data, $title, $extension);
+  $directory = 'public://old-news/' . substr($date, 0, 7);
+  $fileSystem = \Drupal::service('file_system');
+  $fileSystem->prepareDirectory($directory, $fileSystem::CREATE_DIRECTORY | $fileSystem::MODIFY_PERMISSIONS);
+  $uri = $directory . '/' . $filename;
+
+  $fileStorage = \Drupal::entityTypeManager()->getStorage('file');
+  $existing = $fileStorage->loadByProperties(['uri' => $uri]);
+  if ($existing) {
+    return reset($existing);
+  }
+
+  /** @var \Drupal\file\FileRepositoryInterface $repository */
+  $repository = \Drupal::service('file.repository');
+  $file = $repository->writeData($data, $uri, FileExists::Replace);
+  $file->setPermanent();
+  $file->save();
+  $stats['images']++;
+
+  return $file;
+}
+
+/**
+ * Tên file cho ảnh base64: hash nội dung + slug tiêu đề.
+ */
+function nidqc_old_news_data_uri_filename(string $data, string $title, string $extension): string {
+  $slug = trim(preg_replace('/[^a-z0-9]+/', '-', mb_strtolower(nidqc_old_news_ascii($title))) ?? '', '-');
+  if ($slug === '') {
+    $slug = 'old-news';
+  }
+
+  return substr(hash('sha256', $data), 0, 12) . '-' . Unicode::truncate($slug, 80, FALSE, FALSE) . '.' . $extension;
 }
 
 /**
