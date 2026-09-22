@@ -6,6 +6,101 @@
 /* Loại bỏ margin mặc định của trình duyệt để các dải full-width chạm hai mép. */
 body { margin: 0; }
 
+/* Banner cố định dẫn từ website thông tin sang cổng mua chất chuẩn. */
+.nidqc-reference-store {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  bottom: auto;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: clamp(132px, calc((100vw - 1280px) / 2), 320px);
+  min-height: 220px;
+  padding: 24px 16px;
+  color: var(--nidqc-white);
+  background: linear-gradient(145deg, var(--nidqc-primary-dark), var(--nidqc-accent));
+  border: 3px solid var(--nidqc-white);
+  border-left: 0;
+  border-radius: 0 14px 14px 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.34);
+  font-family: 'Be Vietnam Pro', sans-serif;
+  text-align: center;
+  text-decoration: none;
+  transform: translateY(-50%);
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.nidqc-reference-store:hover {
+  color: var(--nidqc-white);
+  background: var(--nidqc-primary-dark);
+  box-shadow: 0 9px 24px rgba(0, 0, 0, 0.3);
+  transform: translateY(calc(-50% - 2px));
+}
+
+.nidqc-reference-store:focus-visible {
+  outline: 3px solid var(--nidqc-primary-light);
+  outline-offset: 3px;
+}
+
+.nidqc-reference-store__icon {
+  display: grid;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  color: var(--nidqc-primary);
+  background: var(--nidqc-white);
+  border-radius: 50%;
+}
+
+.nidqc-reference-store__icon svg { width: 30px; height: 30px; }
+.nidqc-reference-store__copy { display: flex; flex-direction: column; align-items: center; line-height: 1.25; }
+.nidqc-reference-store__copy strong { margin-top: 5px; font-size: 18px; font-weight: 700; }
+.nidqc-reference-store__eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.9; }
+.nidqc-reference-store__cta { margin-top: 14px; padding: 7px 12px; color: var(--nidqc-primary-dark); background: var(--nidqc-white); border-radius: 999px; font-size: 12px; font-weight: 700; }
+.nidqc-reference-store__arrow { width: 18px; height: 18px; }
+
+@media (max-width: 1535px) and (min-width: 769px) {
+  .nidqc-reference-store {
+    width: 92px;
+    min-height: 220px;
+    padding: 18px 9px;
+  }
+  .nidqc-reference-store__eyebrow { font-size: 10px; }
+  .nidqc-reference-store__copy strong { font-size: 15px; }
+  .nidqc-reference-store__cta { padding: 6px 8px; font-size: 10px; }
+}
+
+@media (max-width: 768px) {
+  .nidqc-reference-store {
+    left: 12px;
+    right: 12px;
+    top: auto;
+    bottom: 12px;
+    width: auto;
+    min-height: 64px;
+    padding: 9px 12px;
+    flex-direction: row;
+    justify-content: flex-start;
+    border-left: 3px solid var(--nidqc-white);
+    border-radius: 10px;
+    text-align: left;
+    transform: none;
+  }
+  .nidqc-reference-store:hover { transform: translateY(-2px); }
+  .nidqc-reference-store__icon { flex-basis: 42px; width: 42px; height: 42px; }
+  .nidqc-reference-store__icon svg { width: 25px; height: 25px; }
+  .nidqc-reference-store__copy { align-items: flex-start; }
+  .nidqc-reference-store__copy strong { margin-top: 1px; font-size: 16px; }
+  .nidqc-reference-store__eyebrow { font-size: 10px; }
+  .nidqc-reference-store__cta { display: none; }
+  .nidqc-reference-store__arrow { margin-left: auto; }
+}
+
 .nidqc-visually-hidden {
   position: absolute;
   width: 1px;
