@@ -445,5 +445,30 @@ const siteMap = computed(() => nav.value.filter((item) => item.to !== '/'));
         </div>
       </div>
     </footer>
+
+    <!-- Lối sang website mua chất chuẩn luôn có mặt trên mọi trang. Đây là link
+         HTML thật trong SSR, không phụ thuộc JavaScript và giữ nguyên domain khi
+         website thông tin chuyển từ staging sang nidqc.gov.vn. -->
+    <a
+      class="nidqc-reference-store"
+      href="https://muabanchuan.nidqc.gov.vn"
+      aria-label="Truy cập website mua chất chuẩn của NIDQC"
+    >
+      <span class="nidqc-reference-store__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 3h6" />
+          <path d="M10 3v6l-5.2 8.8A2.1 2.1 0 0 0 6.6 21h10.8a2.1 2.1 0 0 0 1.8-3.2L14 9V3" />
+          <path d="M7.4 16h9.2" />
+        </svg>
+      </span>
+      <span class="nidqc-reference-store__copy">
+        <span class="nidqc-reference-store__eyebrow">Cổng mua chất chuẩn</span>
+        <strong>Đặt mua trực tuyến</strong>
+        <span class="nidqc-reference-store__cta">Truy cập ngay</span>
+      </span>
+      <svg class="nidqc-reference-store__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="m9 18 6-6-6-6" />
+      </svg>
+    </a>
   </div>
 </template>
