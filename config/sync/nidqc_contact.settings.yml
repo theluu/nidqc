@@ -4,7 +4,7 @@ smtp:
   auth: true
   port: 25
   security: NONE
-  admin_email: it@nidqc.gov.vn
+  admin_email: Nhanmauvkn@gmail.com
 recaptcha:
   site_key: 6Ld18OomAAAAAMNT7_8xeBEHdq5TyGYQgn0Y_GG-
   minimum_score: 0.5
