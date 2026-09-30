@@ -325,7 +325,7 @@ thành node `contact_submission` không publish, gửi email cho admin và email
 | `name` | string | có | — | trim, 2–120 ký tự |
 | `email` | string | có | — | email hợp lệ, 5–254 ký tự |
 | `phone` | string | không | `''` | trim, tối đa 40 ký tự, chỉ chữ số, khoảng trắng và `+ . ( ) -` |
-| `subject` | string | không | `Khác` | một trong: `Dịch vụ kiểm nghiệm`, `Chất chuẩn - chất đối chiếu`, `Văn bản - tài liệu`, `Khác` |
+| `subject` | string | không | `Văn bản - tài liệu khác` | một trong: `Dịch vụ kiểm nghiệm`, `Chất chuẩn - Chất đối chiếu`, `Dịch vụ hiệu chuẩn`, `Dịch vụ đào tạo`, `Hỗ trợ kỹ thuật`, `Văn bản - tài liệu khác`. Email thông báo gửi tới hộp thư của chủ đề (`ContactMailer::SUBJECT_RECIPIENTS`); `smtp.admin_email` chỉ còn là dự phòng |
 | `message` | string | có | — | trim, 10–4000 ký tự |
 | `recaptchaToken` | string | có | — | token reCAPTCHA v3, tối đa 4096 ký tự |
 

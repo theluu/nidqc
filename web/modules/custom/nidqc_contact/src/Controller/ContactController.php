@@ -38,12 +38,6 @@ final class ContactController extends ControllerBase {
     'message',
     'recaptchaToken',
   ];
-  private const SUBJECTS = [
-    'Dịch vụ kiểm nghiệm',
-    'Chất chuẩn - chất đối chiếu',
-    'Văn bản - tài liệu',
-    'Khác',
-  ];
 
   public function __construct(
     private readonly CsrfTokenGenerator $csrfToken,
@@ -337,7 +331,7 @@ final class ContactController extends ControllerBase {
       'name' => $this->normalizeLine((string) $payload['name']),
       'email' => $this->normalizeLine((string) $payload['email']),
       'phone' => isset($payload['phone']) && is_string($payload['phone']) ? $this->normalizeLine($payload['phone']) : '',
-      'subject' => isset($payload['subject']) && is_string($payload['subject']) ? $this->normalizeLine($payload['subject']) : 'Khác',
+      'subject' => isset($payload['subject']) && is_string($payload['subject']) ? $this->normalizeLine($payload['subject']) : array_key_last(ContactMailer::SUBJECT_RECIPIENTS),
       'message' => $this->normalizeMessage((string) $payload['message']),
       'recaptchaToken' => $this->normalizeLine((string) $payload['recaptchaToken']),
     ];
@@ -352,7 +346,7 @@ final class ContactController extends ControllerBase {
     if ($submission['phone'] !== '' && (!$this->validTextLength($submission['phone'], 0, 40) || !preg_match('/^[0-9+\s().-]+$/u', $submission['phone']))) {
       $errors[] = ['field' => 'phone', 'issue' => 'Số điện thoại không hợp lệ.'];
     }
-    if (!in_array($submission['subject'], self::SUBJECTS, TRUE)) {
+    if (!array_key_exists($submission['subject'], ContactMailer::SUBJECT_RECIPIENTS)) {
       $errors[] = ['field' => 'subject', 'issue' => 'Chủ đề không hợp lệ.'];
     }
     if (!$this->validTextLength($submission['message'], 10, 4000) || $this->hasControlChars($submission['message'], TRUE)) {

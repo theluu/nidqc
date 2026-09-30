@@ -17,9 +17,11 @@ const offices = computed(() => page.value?.offices || [])
 
 const contactSubjects = [
   'Dịch vụ kiểm nghiệm',
-  'Chất chuẩn - chất đối chiếu',
-  'Văn bản - tài liệu',
-  'Khác',
+  'Chất chuẩn - Chất đối chiếu',
+  'Dịch vụ hiệu chuẩn',
+  'Dịch vụ đào tạo',
+  'Hỗ trợ kỹ thuật',
+  'Văn bản - tài liệu khác',
 ]
 
 const form = reactive({

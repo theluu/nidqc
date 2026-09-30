@@ -18,6 +18,21 @@ use Symfony\Component\Mime\Email;
  */
 final class ContactMailer {
 
+  /**
+   * Contact subjects and the mailbox that receives each one.
+   *
+   * The first entry is the form default; the last is the fallback when the
+   * payload omits the subject.
+   */
+  public const SUBJECT_RECIPIENTS = [
+    'Dịch vụ kiểm nghiệm' => 'nhanmauvkn@gmail.com',
+    'Chất chuẩn - Chất đối chiếu' => 'chatchuan.vkn@gmail.com',
+    'Dịch vụ hiệu chuẩn' => 'banhieuchuan.vknttw@gmail.com',
+    'Dịch vụ đào tạo' => 'khdt@nidqc.gov.vn',
+    'Hỗ trợ kỹ thuật' => 'it.nidqc@gmail.com',
+    'Văn bản - tài liệu khác' => 'qms@nidqc.gov.vn',
+  ];
+
   public function __construct(
     private readonly ConfigFactoryInterface $configFactory,
     private readonly EmailValidatorInterface $emailValidator,
@@ -60,7 +75,7 @@ final class ContactMailer {
    *   Result for each outbound email.
    */
   public function send(array $submission, int $submissionId): array {
-    $adminEmail = $this->adminEmail();
+    $adminEmail = self::SUBJECT_RECIPIENTS[$submission['subject']] ?? $this->adminEmail();
     $siteEmail = $this->siteEmail();
     $userEmail = $submission['email'];
 
